@@ -5,7 +5,16 @@ import MainWeb from '../views/MainWeb.vue'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/web'
+    redirect: '/auth'
+  },{
+    path: '/auth',
+    redirect: '/auth/login',
+    children: [
+      {
+        path:'login',
+        component: () => import('@/views/authentication/Login.vue')
+      }
+    ]
   },
   {
     path: '/web',
@@ -17,19 +26,19 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'player-home',
-        component: () => import('@/views/player/Home/MainHome.vue')
+        component: () => import('@/views/player/home/MainHome.vue')
       },
       {
         path: 'player-tournament',
-        component: () => import('@/views/player/Tournament/MainTournamnet.vue')
+        component: () => import('@/views/player/tournament/MainTournamnet.vue')
       },
       {
         path: 'player-calendar',
-        component: () => import('@/views/player/Calendar/MainCalendar.vue')
+        component: () => import('@/views/player/calendar/MainCalendar.vue')
       },
       {
         path: 'player-history',
-        component: () => import('@/views/player/History/MainHistory.vue')
+        component: () => import('@/views/player/history/MainHistory.vue')
       }
     ]
   }

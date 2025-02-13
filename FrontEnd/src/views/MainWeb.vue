@@ -3,7 +3,7 @@
     <div class="container">
       <Sidebar/>
       <ion-content :fullscreen="true">
-        <ion-router-outlet></ion-router-outlet>
+        <router-view />
       </ion-content>
     </div>
   </ion-page>
