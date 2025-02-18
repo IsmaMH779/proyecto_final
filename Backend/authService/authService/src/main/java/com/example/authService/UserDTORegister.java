@@ -3,10 +3,18 @@ package com.example.authService;
 import lombok.Data;
 
 @Data
-public class UserDTOLogin {
-
-    private String password;
+public class UserDTORegister {
     private String email;
+    private String password;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
 
     public String getPassword() {
         return password;
@@ -16,11 +24,5 @@ public class UserDTOLogin {
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
-    }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
 }

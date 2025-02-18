@@ -16,19 +16,19 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public User registerUser(UserDTO userDTO) {
+    public User registerPlayer(UserDTORegister userDTORegister) {
         User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setEmail(userDTO.getEmail());
+        user.setRole("player");
+        user.setPassword(passwordEncoder.encode(userDTORegister.getPassword()));
+        user.setEmail(userDTORegister.getEmail());
         return userRepository.save(user);
     }
 
-    public String loginUser(String username, String password) {
-        User user = userRepository.findByUsername(username)
+    public String loginUser(String userEmail, String password) {
+        User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         if (passwordEncoder.matches(password, user.getPassword())) {
-            return jwtUtil.generateToken(user.getUsername()); // Devuelve el token
+            return jwtUtil.generateToken(Long.toString(user.getId())); // Devuelve el token
         }
         throw new RuntimeException("Invalid credentials");
     }

@@ -12,14 +12,14 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody UserDTO userDTO) {
-        User user = authService.registerUser(userDTO);
+    public ResponseEntity<User> register(@RequestBody UserDTORegister userDTORegister) {
+        User user = authService.registerPlayer(userDTORegister);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
-        String token = authService.loginUser(userDTO.getUsername(), userDTO.getPassword());
+    public ResponseEntity<String> login(@RequestBody UserDTOLogin userDTOLogin) {
+        String token = authService.loginUser(userDTOLogin.getEmail(), userDTOLogin.getPassword());
         return ResponseEntity.ok(token);
     }
 }
