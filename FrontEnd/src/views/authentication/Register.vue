@@ -6,16 +6,36 @@
             
             <form>
                 <div class="input_container">
+                    <img src="@/assets/input_assets/User.svg">
+                    <input type="text" placeholder="Nombre de usuario" class="custom-input"/>
+                </div>
+                <div class="input_container">
                     <img src="@/assets/input_assets/mail.svg">
                     <input type="text" placeholder="Correo electronico" class="custom-input"/>
                 </div>
+                
+                <ion-list>
+                    <ion-item>
+                        <img src="@/assets/input_assets/location.svg">
+                        <ion-select label="Localización" placeholder="Localización">
+                            <ion-select-option value="1">Barcelona</ion-select-option>
+                            <ion-select-option value="2">Tarragona</ion-select-option>
+                            <ion-select-option value="3">Girona</ion-select-option>
+                            <ion-select-option value="4">Lleida</ion-select-option>
+                        </ion-select>
+                    </ion-item>
+                </ion-list>
                 <div class="input_container">
                     <img src="@/assets/input_assets/padlock.svg">
                     <input type="text" placeholder="Contraseña" class="custom-input"/>
                 </div> 
-                <button class="login_button">Iniciar sesión</button>
-                <div class="register_redirect">
-                    ¿Aún no tienes cuenta? <a href="/auth/register">Registrate aquí</a>
+                <div class="input_container button_separation">
+                    <img src="@/assets/input_assets/padlock.svg">
+                    <input type="text" placeholder="Repite la contraseña" class="custom-input"/>
+                </div>     
+                <button class="register_button">Registrarse</button>
+                <div class="login_redirect">
+                    ¿Ya tienes cuenta? <a href="/auth/login">Inicia sesión aquí</a>
                 </div>
             </form>
         </div>
@@ -32,8 +52,16 @@
         flex-direction: row;
     }
 
+    ion-list {
+    background-color: transparent;
+    }
+
+    ion-item {
+        --background: transparent;
+    }
+
     .logo_image {
-        margin-bottom: 150px;
+        margin-bottom: 70px;
     }
 
     .blue_container {
@@ -78,24 +106,25 @@
         flex-direction: row;
         border-bottom:2px solid #415A77;
         padding-bottom: 10px;
-        margin-bottom: 80px;
+        margin-bottom: 50px;
     }
 
-    .login_button {
+    .button_separation {
+        margin-bottom: 60px;
+    }
+
+    .register_button {
         background-color: #0D1B2A;
         width: 212px;
         height: 65px;
         border-radius: 50px;
         margin: auto;
-        margin-top: 80px;
-        margin-bottom: 10px;
+        margin-top: 0px;
         font-size: 20px;    
     }
-
-    .register_redirect {
+    .login_redirect {
         margin: auto;        
         color: #415A77;
         margin-top: 25px;
-        margin-bottom: 40px;
     }
 </style>
