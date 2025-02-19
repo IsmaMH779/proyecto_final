@@ -1,5 +1,9 @@
-package com.example.authService;
+package com.example.authService.service;
 
+import com.example.authService.config.JwtUtil;
+import com.example.authService.model.User;
+import com.example.authService.model.dto.UserDTORegister;
+import com.example.authService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

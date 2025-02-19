@@ -1,4 +1,4 @@
-package com.example.authService;
+package com.example.authService.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -17,16 +17,16 @@ public class JwtUtil {
     @Value("${jwt.expiration}") // Tiempo de expiración del token
     private Long expiration;
 
-    public String generateToken(String username) {
+    public String generateToken(String userID) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userID)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getIDFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)

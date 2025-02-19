@@ -4,14 +4,14 @@
         <div class="white_container">
             <img class="logo_image" src="@/assets/web_logo/Logo.svg">
             
-            <form>
+            <form  @submit.prevent="registrarse">
                 <div class="input_container">
                     <img src="@/assets/input_assets/User.svg">
                     <input type="text" placeholder="Nombre de usuario" class="custom-input"/>
                 </div>
                 <div class="input_container">
                     <img src="@/assets/input_assets/mail.svg">
-                    <input type="text" placeholder="Correo electronico" class="custom-input"/>
+                    <input v-model="email" type="text" placeholder="Correo electronico" class="custom-input"/>
                 </div>
                 
                 <ion-list>
@@ -27,13 +27,13 @@
                 </ion-list>
                 <div class="input_container">
                     <img src="@/assets/input_assets/padlock.svg">
-                    <input type="text" placeholder="Contraseña" class="custom-input"/>
+                    <input v-model="password" type="password" placeholder="Contraseña" class="custom-input"/>
                 </div> 
                 <div class="input_container button_separation">
                     <img src="@/assets/input_assets/padlock.svg">
                     <input type="text" placeholder="Repite la contraseña" class="custom-input"/>
                 </div>     
-                <button class="register_button">Registrarse</button>
+                <button class="register_button"  type="submit">Registrarse</button>
                 <div class="login_redirect">
                     ¿Ya tienes cuenta? <a href="/auth/login">Inicia sesión aquí</a>
                 </div>
@@ -44,6 +44,52 @@
   
 <script>
     import { IonPage } from '@ionic/vue';
+    import { ref } from 'vue';
+    import axios from 'axios';
+
+
+    export default {
+    name: 'RegisterPage',
+    setup() {
+      // Variables de los inputs
+      const username = ref('');
+      const email = ref('');
+      const location = ref('');
+      const password = ref('');
+      const confirmPassword = ref('');
+
+      // Función para enviar el formulario
+      const registrarse = async () => {
+        const data = {
+          email: email.value,
+          password: password.value,
+        };
+
+        console.log(data)
+        try {
+          const response = await axios.post('http://localhost:8080/auth/register', data);
+
+          // Verificar la respuesta del servidor
+          if (response.status === 200) {
+            console.log('Registro exitoso:', response.data);
+            // Redirigir o mostrar mensaje de éxito
+          }
+        } catch (error) {
+          console.error('Error en el registro:', error.response || error.message);
+          // Manejar error (mostrar mensaje al usuario)
+        }
+      };
+
+      return {
+        username,
+        email,
+        location,
+        password,
+        confirmPassword,
+        registrarse
+      };
+    }
+  };
 </script>
   
 <style scoped>

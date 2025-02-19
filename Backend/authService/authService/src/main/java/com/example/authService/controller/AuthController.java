@@ -1,5 +1,9 @@
-package com.example.authService;
+package com.example.authService.controller;
 
+import com.example.authService.service.AuthService;
+import com.example.authService.model.User;
+import com.example.authService.model.dto.UserDTOLogin;
+import com.example.authService.model.dto.UserDTORegister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +15,11 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody UserDTORegister userDTORegister) {
+    public ResponseEntity<String> register(@RequestBody UserDTORegister userDTORegister) {
         User user = authService.registerPlayer(userDTORegister);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok("Usuario registrado");
     }
 
     @PostMapping("/login")
