@@ -14,17 +14,13 @@
                     <input v-model="email" type="text" placeholder="Correo electronico" class="custom-input"/>
                 </div>
                 
-                <ion-list>
-                    <ion-item>
-                        <img src="@/assets/input_assets/location.svg">
-                        <ion-select label="Localización" placeholder="Localización">
-                            <ion-select-option value="1">Barcelona</ion-select-option>
-                            <ion-select-option value="2">Tarragona</ion-select-option>
-                            <ion-select-option value="3">Girona</ion-select-option>
-                            <ion-select-option value="4">Lleida</ion-select-option>
-                        </ion-select>
-                    </ion-item>
-                </ion-list>
+                <div>Localidad</div>
+                <select v-model="selected">
+                    <option>Barcelona</option>
+                    <option>Girona</option>
+                    <option>Tarragona</option>
+                    <option>Lleida</option>
+                </select>
                 <div class="input_container">
                     <img src="@/assets/input_assets/padlock.svg">
                     <input v-model="password" type="password" placeholder="Contraseña" class="custom-input"/>
@@ -96,14 +92,6 @@
     ion-page {
         display: flex;
         flex-direction: row;
-    }
-
-    ion-list {
-    background-color: transparent;
-    }
-
-    ion-item {
-        --background: transparent;
     }
 
     .logo_image {
