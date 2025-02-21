@@ -1,13 +1,11 @@
 package com.example.authService.model.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class UserDTORegister {
+public class RegisterPlayerDTO {
 
     private Long id;
 

@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: auth_db
+-- Host: 127.0.0.1    Database: users_management
 -- ------------------------------------------------------
 -- Server version	9.1.0
 
@@ -23,14 +23,20 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL,
   `role` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_name` varchar(255) NOT NULL,
+  `profile_image_url` varchar(255) DEFAULT NULL,
+  `user_phone_number` varchar(255) DEFAULT NULL,
+  `birth_day` date DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `id` (`id`),
+  UNIQUE KEY `role` (`role`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `user_name` (`user_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -39,7 +45,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'player','$2a$10$XP/K7K3HyZEcZxbrv4HJPOa8lvEq4P5RxE9KTUrEKE/PSajiLZeKS','usuario@example.com','2025-02-18 17:03:09');
+INSERT INTO `users` VALUES (1,'player','example.player@example.com','ismael','https://example.com/images/profile.jpg',NULL,'1995-06-15','New York, USA');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +58,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-18 17:08:22
+-- Dump completed on 2025-02-21 19:05:47

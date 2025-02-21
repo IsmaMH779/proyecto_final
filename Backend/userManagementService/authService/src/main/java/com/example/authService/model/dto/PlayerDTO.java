@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class playerDTO {
+public class PlayerDTO {
 
     String role;
     String mail;
@@ -14,6 +14,8 @@ public class playerDTO {
     String phoneNumber;
     LocalDate birthday;
     String location;
+
+
 
     public String getRole() {
         return role;

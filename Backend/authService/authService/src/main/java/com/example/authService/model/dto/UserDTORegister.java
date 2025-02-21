@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class UserDTORegister {
+    private String userName;
     private String email;
     private String password;
 
@@ -15,7 +16,6 @@ public class UserDTORegister {
         this.email = email;
     }
 
-
     public String getPassword() {
         return password;
     }
@@ -24,5 +24,11 @@ public class UserDTORegister {
         this.password = password;
     }
 
+    public String getUserName() {
+        return userName;
+    }
 
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 }

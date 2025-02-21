@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .and()
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/user-Management/player-register", "/user-Management/get-user-data").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

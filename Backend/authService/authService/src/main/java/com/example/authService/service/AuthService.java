@@ -25,6 +25,7 @@ public class AuthService {
         user.setRole("player");
         user.setPassword(passwordEncoder.encode(userDTORegister.getPassword()));
         user.setEmail(userDTORegister.getEmail());
+        user.setUsername(userDTORegister.getUserName());
         return userRepository.save(user);
     }
 

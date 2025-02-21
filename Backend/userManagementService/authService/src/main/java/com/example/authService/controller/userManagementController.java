@@ -1,9 +1,9 @@
 package com.example.authService.controller;
 
 import com.example.authService.config.JwtUtil;
-import com.example.authService.model.dto.UserDTO;
+import com.example.authService.model.dto.PlayerDTO;
 import com.example.authService.service.UserManagementService;
-import com.example.authService.model.dto.UserDTORegister;
+import com.example.authService.model.dto.RegisterPlayerDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +20,11 @@ public class userManagementController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/player-register")
-    public ResponseEntity<String> playerRegister(@RequestBody UserDTORegister userDTORegister) {
+    public ResponseEntity<String> playerRegister(@RequestBody RegisterPlayerDTO registerPlayerDTO) {
         // si el token recibido es true guardara el usuario
-        if (jwtUtil.validateToken(userDTORegister.getToken())) {
+        if (jwtUtil.validateToken(registerPlayerDTO.getToken())) {
             try {
-                userManagementService.registerPlayer(userDTORegister);
+                userManagementService.registerPlayer(registerPlayerDTO);
                 return ResponseEntity.status(HttpStatus.CREATED).build();
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -34,12 +34,18 @@ public class userManagementController {
         }
     }
 
-    @PostMapping("/get-user-data")
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
-
-
-
-
-        return ResponseEntity.ok(token);
+    @GetMapping("/get-user-data")
+    public ResponseEntity<PlayerDTO> getResource(@RequestHeader("Authorization") String token) {
+        // verificar que el token es valido
+        if (jwtUtil.validateToken((token))){
+            // si es valido manda el codigo 200 junto al userData
+            PlayerDTO userData = userManagementService.getUserData(token);
+            return ResponseEntity.ok(userData);
+        } else {
+            // si no es valido, devuelve el codigo 401 (unauthorized)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(null);
+        }
     }
+
 }
