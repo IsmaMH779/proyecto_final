@@ -30,8 +30,7 @@ public class AuthService {
     }
 
     public String loginUser(String userEmail, String password) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         if (passwordEncoder.matches(password, user.getPassword())) {
             return jwtUtil.generateToken(Long.toString(user.getId())); // Devuelve el token
         }

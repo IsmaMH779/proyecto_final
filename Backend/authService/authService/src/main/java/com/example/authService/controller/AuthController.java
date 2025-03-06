@@ -1,5 +1,6 @@
 package com.example.authService.controller;
 
+import com.example.authService.config.JwtUtil;
 import com.example.authService.service.AuthService;
 import com.example.authService.model.User;
 import com.example.authService.model.dto.UserDTOLogin;
@@ -15,11 +16,15 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserDTORegister userDTORegister) {
         User user = authService.registerPlayer(userDTORegister);
-        return ResponseEntity.ok("Usuario registrado");
+        String token = jwtUtil.generateToken(String.valueOf(user.getId()));
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/login")

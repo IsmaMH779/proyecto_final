@@ -1,8 +1,7 @@
-package com.example.authService.config;
+package com.example.userManagementService.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,13 +24,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 //preguntar a yago si dejar esto que esta deprectaed
-                .cors(c -> c.configurationSource(corsConfigurationSource))
+                .cors()
+                .and()
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/user-Management/player-register", "/user-Management/get-user-data").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -51,12 +51,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         // Configuración CORS
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("http://localhost:8100");
+        corsConfiguration.addAllowedOrigin("http://localhost:8100"); // Asegúrate de usar la URL correcta de tu cliente
         corsConfiguration.addAllowedMethod("GET");
         corsConfiguration.addAllowedMethod("POST");
         corsConfiguration.addAllowedMethod("PUT");
         corsConfiguration.addAllowedMethod("DELETE");
-        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedHeader("*"); // O especifica los encabezados necesarios
         corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
