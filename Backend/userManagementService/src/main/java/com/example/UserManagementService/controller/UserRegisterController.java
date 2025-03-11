@@ -43,5 +43,4 @@ public class UserRegisterController {
         return ResponseEntity.ok("jugador registrado");
     }
 
-
 }

@@ -25,7 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // Excluir rutas de registro y login
         String uri = request.getRequestURI();
-        if (uri.equals("/auth/register") || uri.equals("/auth/login")) {
+        if (uri.equals("/api/auth/register") || uri.equals("/api/auth/login")) {
             chain.doFilter(request, response);
             return;
         }
