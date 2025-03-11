@@ -30,7 +30,7 @@ public class UserRegisterController {
         String jwt = authorizationHeader.substring(7);
 
         // Extraer el userId desde el token
-        Long userId;
+        long userId;
         try {
             userId = Long.parseLong(jwtUtil.getIdFromToken(jwt));
         } catch (Exception e) {

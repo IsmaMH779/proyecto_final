@@ -3,9 +3,9 @@ package com.example.UserManagementService.service;
 import com.example.UserManagementService.model.Player;
 import com.example.UserManagementService.model.dto.register.PlayerRegisterDTO;
 import com.example.UserManagementService.repository.PlayerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,5 +24,12 @@ public class PlayerService {
         player.setLocation(playerDTO.getLocation());
 
         playerRepository.save(player);
+    }
+
+    public Player getPlayerData(long userId) {
+        Player player = playerRepository
+                .findById(userId).orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + userId));
+
+        return player;
     }
 }
