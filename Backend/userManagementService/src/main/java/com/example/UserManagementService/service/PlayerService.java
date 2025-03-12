@@ -1,5 +1,6 @@
 package com.example.UserManagementService.service;
 
+import com.example.UserManagementService.config.DataNotFoundException;
 import com.example.UserManagementService.model.Player;
 import com.example.UserManagementService.model.dto.register.PlayerRegisterDTO;
 import com.example.UserManagementService.repository.PlayerRepository;
@@ -7,6 +8,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class PlayerService {
@@ -27,9 +30,12 @@ public class PlayerService {
     }
 
     public Player getPlayerData(long userId) {
-        Player player = playerRepository
-                .findById(userId).orElseThrow(() -> new EntityNotFoundException("Player not found with id: " + userId));
+        Optional<Player> player = playerRepository.findById(userId);
 
-        return player;
+        if (player.isPresent()) {
+            return player.get();
+        } else {
+            throw DataNotFoundException.of("PLAYER_NOT_EXISTS");
+        }
     }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 
 import java.time.LocalDateTime;
 
+
 @Entity
 public class Player extends User{
 
