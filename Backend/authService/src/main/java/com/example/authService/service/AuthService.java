@@ -23,6 +23,10 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    /*
+     * REGISTER
+     */
+
     public String registerPlayer(UserDTORegister userDTORegister) {
         User user = new User();
         user.setRole("player");
@@ -56,11 +60,33 @@ public class AuthService {
             throw NotValidDataException.of("EMAIL_FOUND");
     }
 
+    /*
+    * LOGIN
+    */
+
     public String loginUser(String userEmail, String password) {
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
-        if (passwordEncoder.matches(password, user.getPassword())) {
-            return jwtUtil.generateToken(Long.toString(user.getId())); // Devuelve el token
-        }
-        throw new RuntimeException("Invalid credentials");
+        // verificar que el correo existe y obtener el user
+        User user = verifyEmailExistsAndGetUser(userEmail);
+        // verificar que la contraseña es correcta y obtener el token
+        String token = verifyMatchingPasswordAndGetGenerateToken(user, password);
+
+        return token;
     }
+
+    // verificar si existe el username
+    private User verifyEmailExistsAndGetUser(String userEmail) {
+        Optional<User> existingUser = userRepository.findByEmail(userEmail);
+
+        if (existingUser.isEmpty()) throw NotValidDataException.of("EMAIL_NOT_FOUND");
+
+        return existingUser.get();
+    }
+
+    private String verifyMatchingPasswordAndGetGenerateToken(User user, String password ) {
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            return jwtUtil.generateToken(Long.toString(user.getId()));
+        }
+        throw NotValidDataException.of("INCORRECT_PASSWORD");
+    }
+
 }

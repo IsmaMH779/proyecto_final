@@ -42,7 +42,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserDTOLogin userDTOLogin) {
-        String token = authService.loginUser(userDTOLogin.getEmail(), userDTOLogin.getPassword());
-        return ResponseEntity.ok(token);
+        try {
+            String token = authService.loginUser(userDTOLogin.getEmail(), userDTOLogin.getPassword());
+            return ResponseEntity.ok(token);
+        } catch (NotValidDataException e) {
+            log.error(e.getLocalizedMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
