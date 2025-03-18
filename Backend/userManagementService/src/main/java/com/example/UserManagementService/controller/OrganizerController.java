@@ -1,12 +1,12 @@
 package com.example.UserManagementService.controller;
 
 import com.example.UserManagementService.config.DataNotFoundException;
-import com.example.UserManagementService.config.JwtUtil;
+import com.example.UserManagementService.model.Organizer;
 import com.example.UserManagementService.model.Player;
+import com.example.UserManagementService.service.OrganizerService;
 import com.example.UserManagementService.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,22 +15,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/players")
+@RequestMapping("/api/organizers")
 @Slf4j
-public class PlayerController {
+public class OrganizerController {
 
     @Autowired
-    private PlayerService playerService;
+    private OrganizerService organizerService;
 
-
-    // obtener los datos del jugador autenticado
+    // obtener los datos del organizador autenticado
     @GetMapping("/me")
     public ResponseEntity<?> getPlayerData(@RequestHeader("Authorization") String authorizationHeader) {
         long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         try {
-            Player player = playerService.getPlayerData(userId);
-            return ResponseEntity.ok(player);
+            Organizer organizer = organizerService.getOrganizerData(userId);
+            return ResponseEntity.ok(organizer);
         } catch (DataNotFoundException e){
             log.error(e.getLocalizedMessage());
             return ResponseEntity.badRequest().body(e.getMessage());

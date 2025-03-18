@@ -25,7 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // Excluir rutas públicas (registro y login)
         String uri = request.getRequestURI();
-        if (uri.equals("/api/user_management/player_register")) {
+        if (authorizationHeader == null) {
             chain.doFilter(request, response);
             return;
         }
@@ -33,7 +33,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwt = null;
         Long userId = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             try {
                 userId = Long.parseLong(jwtUtil.getIdFromToken(jwt));

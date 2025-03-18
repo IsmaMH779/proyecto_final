@@ -6,10 +6,11 @@ import com.example.UserManagementService.service.OrganizerService;
 import com.example.UserManagementService.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user_management")
+@RequestMapping("/api/user-management")
 public class UserRegisterController {
     @Autowired
     private OrganizerService organizerService;
@@ -18,29 +19,22 @@ public class UserRegisterController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("/player_register")
-    private ResponseEntity<String> playerRegister(@RequestBody PlayerRegisterDTO playerRegisterDTO, @RequestHeader("Authorization") String authorizationHeader) {
+    @PostMapping("/players/register")
+    private ResponseEntity<String> playerRegister(@RequestBody PlayerRegisterDTO playerRegisterDTO) {
+        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Verifica que el header tiene el formato correcto
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).body("Token no proporcionado o inválido");
-        }
-
-        // Extraer el token
-        String jwt = authorizationHeader.substring(7);
-
-        // Extraer el userId desde el token
-        long userId;
-        try {
-            userId = Long.parseLong(jwtUtil.getIdFromToken(jwt));
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body("Token inválido");
-        }
-
-        // Llamar al servicio
         playerService.savePlayer(playerRegisterDTO, userId);
 
         return ResponseEntity.ok("jugador registrado");
     }
 
+    @PostMapping("/organizers/register")
+    private ResponseEntity<String> organizerRegister(@RequestBody PlayerRegisterDTO playerRegisterDTO, @RequestHeader("Authorization") String authorizationHeader) {
+        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Llamar al servicio
+        OrganizerService.saveOrganizer(playerRegisterDTO, userId);
+
+        return ResponseEntity.ok("Organizador registrado");
+    }
 }

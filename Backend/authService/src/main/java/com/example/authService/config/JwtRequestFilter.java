@@ -25,7 +25,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // Excluir rutas de registro y login
         String uri = request.getRequestURI();
-        if (uri.equals("/api/auth/register") || uri.equals("/api/auth/login")) {
+        if (authorizationHeader == null) {
             chain.doFilter(request, response);
             return;
         }
@@ -33,7 +33,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String userID = null;
         String jwt = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             userID = jwtUtil.getIDFromToken(jwt);
         }
