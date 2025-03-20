@@ -1,4 +1,4 @@
-package com.example.UserManagementService.config;
+package com.example.UserManagementService.config.exceptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

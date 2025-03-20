@@ -1,6 +1,6 @@
-package com.example.UserManagementService.config;
+package com.example.UserManagementService.config.exceptions;
 
-public class DataNotFoundException extends DeckLyException{
+public class DataNotFoundException extends DeckLyException {
 
     public DataNotFoundException(String message) {
         super(message);

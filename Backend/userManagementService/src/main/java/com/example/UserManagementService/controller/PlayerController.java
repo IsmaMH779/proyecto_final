@@ -1,18 +1,14 @@
 package com.example.UserManagementService.controller;
 
-import com.example.UserManagementService.config.DataNotFoundException;
-import com.example.UserManagementService.config.JwtUtil;
+import com.example.UserManagementService.config.exceptions.DataNotFoundException;
 import com.example.UserManagementService.model.Player;
+import com.example.UserManagementService.model.dto.update.UpdatePlayerDTO;
 import com.example.UserManagementService.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/players")
@@ -25,12 +21,26 @@ public class PlayerController {
 
     // obtener los datos del jugador autenticado
     @GetMapping("/me")
-    public ResponseEntity<?> getPlayerData(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> getPlayerData() {
         long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         try {
             Player player = playerService.getPlayerData(userId);
             return ResponseEntity.ok(player);
+        } catch (DataNotFoundException e){
+            log.error(e.getLocalizedMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Actualizar datos del jugador autenticado
+    @PutMapping("/me")
+    public ResponseEntity<?> updatePlayerData(@RequestBody UpdatePlayerDTO updatePlayerDTO) {
+        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        try {
+            playerService.updatePlayerData(userId, updatePlayerDTO);
+            return ResponseEntity.ok().build();
         } catch (DataNotFoundException e){
             log.error(e.getLocalizedMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
