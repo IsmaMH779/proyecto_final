@@ -1,7 +1,7 @@
 package com.example.authService.controller;
 
 import com.example.authService.config.JwtUtil;
-import com.example.authService.config.NotValidDataException;
+import com.example.authService.config.exceptions.NotValidDataException;
 import com.example.authService.model.dto.UserDTOLogin;
 import com.example.authService.model.dto.UserDTORegister;
 import com.example.authService.service.AuthService;

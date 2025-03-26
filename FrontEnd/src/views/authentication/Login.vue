@@ -121,9 +121,26 @@
               const token = response.data;
               localStorage.setItem('token', token);
               
-              // Redirigir al usuario a la página principal
-              //todo
-              router.push('/');
+              //obtener datos del jugador
+              const playerData = await axios.get("http://localhost:8081/api/players/me", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+              })
+
+              if (playerData.status == 200) {
+                localStorage.setItem('role', playerData.data.role)
+              } 
+
+              // Redirigir al usuario a la página principal en funcion del rol
+              if (localStorage.getItem('role') == "player") {
+                //router.push('/web');
+              }
+
+              if (localStorage.getItem('role') == "organizer") {
+
+              }
+              
             }
           } catch (error) {
             console.error('Error en el inicio de sesión:', error.response || error.message);

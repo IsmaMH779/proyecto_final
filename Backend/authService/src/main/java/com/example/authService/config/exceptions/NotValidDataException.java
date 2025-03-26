@@ -1,4 +1,4 @@
-package com.example.authService.config;
+package com.example.authService.config.exceptions;
 
 public class NotValidDataException extends DeckLyException {
     public NotValidDataException(String message) {
