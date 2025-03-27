@@ -8,18 +8,25 @@
             <li><a href="/web/player-tournament"><div class="button_nav">Torneos</div></a></li>
             <li><a href="/web/player-calendar"><div class="button_nav">Calendario</div></a></li>
             <li><a href="/web/player-history"><div class="button_nav">Historial</div></a></li>
+            <li><div class="button_nav"  @click="logout">logout</div></li>
         </ul>
     </div>
 </template>
   
 <script>
+import { useRouter } from 'vue-router';
     export default {
-    data() {
-        return {
-        isActive: false, // Estado para saber si el botón está activo
-        };
-    },
-    };
+    setup() {
+      const router = useRouter();
+
+      const logout = () => {
+        localStorage.removeItem('token');
+        router.push('/auth/login'); 
+      };
+
+      return { logout };
+    }
+};
 </script>
   
   <style scoped>
