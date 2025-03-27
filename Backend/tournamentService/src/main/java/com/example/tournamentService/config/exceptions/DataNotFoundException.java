@@ -1,4 +1,4 @@
-package com.example.UserManagementService.config.exceptions;
+package com.example.tournamentService.config.exceptions;
 
 public class DataNotFoundException extends DecklyException {
 
@@ -10,3 +10,4 @@ public class DataNotFoundException extends DecklyException {
         return new DataNotFoundException (message);
     }
 }
+

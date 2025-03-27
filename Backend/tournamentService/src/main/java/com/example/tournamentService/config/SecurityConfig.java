@@ -1,4 +1,4 @@
-package com.example.UserManagementService.config;
+package com.example.tournamentService.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,6 @@ public class SecurityConfig {
                 .cors(c -> c.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user-management/player-register").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -59,3 +58,4 @@ public class SecurityConfig {
         return source;
     }
 }
+

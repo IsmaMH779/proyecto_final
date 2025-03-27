@@ -22,6 +22,7 @@ public class PlayerController {
     // obtener los datos del jugador autenticado
     @GetMapping("/me")
     public ResponseEntity<?> getPlayerData() {
+        //preguntar al yago si eliminar esto despues de pasarlo al player
         long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         try {
