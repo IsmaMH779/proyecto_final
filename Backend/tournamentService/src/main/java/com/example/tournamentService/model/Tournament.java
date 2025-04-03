@@ -34,6 +34,9 @@ public class Tournament {
     @Column(name = "id_organizer", nullable = false)
     private String organizerId;
 
+    @Column(name = "max_players", nullable = false)
+    private String maxPlayers;
+
     // Relación con los jugadores (inscripciones)
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerRegistration> registrations = new ArrayList<>();
@@ -103,6 +106,14 @@ public class Tournament {
 
     public void setOrganizerId(String organizerId) {
         this.organizerId = organizerId;
+    }
+
+    public String getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public void setMaxPlayers(String maxPlayers) {
+        this.maxPlayers = maxPlayers;
     }
 
     public List<PlayerRegistration> getRegistrations() {

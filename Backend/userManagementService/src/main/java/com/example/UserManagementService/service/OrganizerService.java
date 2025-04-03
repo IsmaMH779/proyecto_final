@@ -15,7 +15,7 @@ public class OrganizerService {
     @Autowired
     private OrganizerRepository organizerRepository;
 
-    public static void saveOrganizer(PlayerRegisterDTO playerRegisterDTO, long userId) {
+    public void saveOrganizer(PlayerRegisterDTO playerRegisterDTO, long userId) {
         Organizer organizer = new Organizer();
 
         organizer.setId(userId);

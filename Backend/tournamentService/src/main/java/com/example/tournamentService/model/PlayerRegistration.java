@@ -18,7 +18,7 @@ public class PlayerRegistration {
     @Column(name = "id_player", nullable = false)
     private String playerId;
 
-    @Column(name = "registartion_date", nullable = false)
+    @Column(name = "registration_date", nullable = false)
     private LocalDate registrationDate;
 
     public PlayerRegistration() {

@@ -33,7 +33,7 @@ public class UserRegisterController {
         long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // Llamar al servicio
-        OrganizerService.saveOrganizer(playerRegisterDTO, userId);
+        organizerService.saveOrganizer(playerRegisterDTO, userId);
 
         return ResponseEntity.ok("Organizador registrado");
     }
