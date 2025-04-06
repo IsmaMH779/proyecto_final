@@ -12,12 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/user-management")
 public class UserRegisterController {
-    @Autowired
-    private OrganizerService organizerService;
-    @Autowired
-    private PlayerService playerService;
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final OrganizerService organizerService;
+    private final PlayerService playerService;
+    private final JwtUtil jwtUtil;
+
+    public UserRegisterController(OrganizerService organizerService, PlayerService playerService, JwtUtil jwtUtil) {
+        this.organizerService = organizerService;
+        this.playerService = playerService;
+        this.jwtUtil = jwtUtil;
+    }
 
     @PostMapping("/players/register")
     private ResponseEntity<String> playerRegister(@RequestBody PlayerRegisterDTO playerRegisterDTO) {
