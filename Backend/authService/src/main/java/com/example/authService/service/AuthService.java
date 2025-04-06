@@ -4,6 +4,7 @@ import com.example.authService.config.JwtUtil;
 import com.example.authService.config.exceptions.NotValidDataException;
 import com.example.authService.model.User;
 import com.example.authService.model.dto.UserDTORegister;
+import com.example.authService.model.dto.UserUpdateDTO;
 import com.example.authService.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,16 +36,15 @@ public class AuthService {
         user.setUsername(userDTORegister.getUsername());
 
         // verificar si existe el usuario y el correo
-        verifyUsernameExisting(user);
-        verifyEmailExisting(user);
+        verifyUsernameExisting(user.getUsername());
+        verifyEmailExisting(user.getEmail());
 
         userRepository.save(user);
         return String.valueOf(user.getId());
     }
 
     // verificar si existe el username
-    private void verifyUsernameExisting(User user) {
-        String username = user.getUsername();
+    private void verifyUsernameExisting(String username) {
         Optional<User> existingUser = userRepository.findByUsername(username);
 
         if (existingUser.isPresent())
@@ -52,8 +52,7 @@ public class AuthService {
     }
 
     // verificar si existe el mail
-    private void verifyEmailExisting(User user) {
-        String email = user.getEmail();
+    private void verifyEmailExisting(String email) {
         Optional<User> existingUser = userRepository.findByEmail(email);
 
         if (existingUser.isPresent())
@@ -87,6 +86,29 @@ public class AuthService {
             return jwtUtil.generateToken(Long.toString(user.getId()));
         }
         throw NotValidDataException.of("INCORRECT_PASSWORD");
+    }
+
+    /*
+     *  Update
+     */
+
+    public void updateUser(long userId, UserUpdateDTO userUpdateDTO) {
+        Optional<User> userFromDb = userRepository.findById(userId);
+        User user = null;
+
+        // verificar que el nombre no este ya en la base de datos
+        verifyUsernameExisting(userUpdateDTO.getUsername());
+
+        // verificar que el usuario existe
+        if (userFromDb.isPresent()) {
+            user = userFromDb.get();
+            user.setUsername(userUpdateDTO.getUsername());
+        }
+
+        // si user es null no guardar
+        if (user != null) {
+            userRepository.save(user);
+        }
     }
 
 }
