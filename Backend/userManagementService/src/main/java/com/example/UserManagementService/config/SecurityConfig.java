@@ -12,10 +12,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 
     private final JwtRequestFilter jwtRequestFilter;
 
@@ -57,5 +59,12 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", corsConfiguration); // Aplica la configuración a todas las rutas
 
         return source;
+    }
+
+    // mapear una url a la carpeta de imagenes
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/images/profile/**")
+                .addResourceLocations("file:backend/uploads/profile_pics/");
     }
 }

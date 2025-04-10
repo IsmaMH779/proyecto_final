@@ -6,9 +6,22 @@ import com.example.UserManagementService.model.dto.update.UpdatePlayerDTO;
 import com.example.UserManagementService.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/players")
@@ -47,4 +60,36 @@ public class PlayerController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // para guardar la foto de perfil del usuario
+    @PostMapping("/me/profile-picture")
+    public ResponseEntity<?> uploadProfilePicture(@RequestParam MultipartFile file) {
+        try {
+            String fileName = playerService.updateProfileImage(file);
+            String imageUrl = "/images/profile/" + fileName;
+            return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(e);
+        }
+    }
+
+    // obtener la imagen de perfil
+    @GetMapping("/images/profile/{filename:.+}")
+    public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) throws IOException {
+        // preparar la ruta de la imagen
+        Path filePath = Paths.get("backend/uploads/profile_pics/", filename);
+        // comprobar que existe la imagen
+        if (!Files.exists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // preparar la imagen como resource
+        Resource resource = new UrlResource(filePath.toUri());
+        // detecar el tipo de archivo
+        String contentType = Files.probeContentType(filePath);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                .body(resource);
+    }
+
 }

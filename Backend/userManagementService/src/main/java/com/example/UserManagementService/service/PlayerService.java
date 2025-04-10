@@ -7,12 +7,28 @@ import com.example.UserManagementService.model.dto.update.UpdatePlayerDTO;
 import com.example.UserManagementService.repository.PlayerRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PlayerService {
+    //ruta donde se guardan las imagenes de perfil
+    @Value("${assets.profileImage}")
+    String uploadDir;
+
+
     @Autowired
     PlayerRepository playerRepository;
 
@@ -65,4 +81,46 @@ public class PlayerService {
 
         playerRepository.save(player);
     }
+
+    // guardar la imagen de perfil
+    public String updateProfileImage(MultipartFile file) throws IOException {
+        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Validación de tipo MIME
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IOException("INVALID_FILE_TYPE");
+        }
+
+        // Carpeta donde guardar
+        String uploadDir = "backend/uploads/profile_pics/";
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir, fileName);
+        Files.createDirectories(filePath.getParent());
+
+        // Comprimir imagen antes de guardar
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+        if (originalImage == null) throw new IOException("INVALID_IMAGE");
+
+        // Guardar como JPEG con calidad reducida
+        try (OutputStream os = Files.newOutputStream(filePath)) {
+            ImageIO.write(originalImage, "jpg", os);
+        }
+
+        // Obtener y actualizar usuario
+        Player player = getPlayerData(userId);
+        player.setImageUrl(fileName);
+        playerRepository.save(player);
+
+        // Borrar imagen anterior si existe
+        if (player.getImageUrl() != null) {
+            Path oldFilePath = Paths.get(uploadDir, player.getImageUrl());
+            if (Files.exists(oldFilePath)) {
+                Files.delete(oldFilePath);
+            }
+        }
+
+        return fileName;
+    }
+
 }

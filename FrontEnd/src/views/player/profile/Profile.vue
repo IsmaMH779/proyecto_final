@@ -2,7 +2,9 @@
     <ion-page>
         <div class="profilepag-container">
             <div class="profile-header">
-                <div class="profile-img-container"></div>
+                <div class="profile-img-container" @click="openImagePicker">
+                    <button  @click="openImagePicker">adsdsd</button>
+                </div>
 
                 <div class="username-wrapper">
                     <span ref="usernameSpan" class="hidden-span">{{ userData.username }}</span>
@@ -81,6 +83,10 @@
                 </div>
             </div>
         </div>
+
+        <!-- Image picker modal -->
+        <ImagePickerModal :isOpen="showImageModal" @close="showImageModal = false" @uploaded="onImageUploaded" />
+
     </ion-page>
 </template>
 
@@ -92,14 +98,17 @@ import editIconPath from '@/assets/profile_assets/profile_settings.svg';
 import saveIconPath from '@/assets/profile_assets/saveCheck_icon.svg';
 import { useRouter } from 'vue-router';
 
+import ImagePickerModal from '@/components/ImagePickerModal.vue';
+
 export default {
-    components: { IonPage },
+    components: { IonPage, ImagePickerModal},
     setup() {
         const router = useRouter();
         const editMode = ref(false);
         const editIcon = ref(editIconPath);
         const saveIcon = ref(saveIconPath);
         const usernameError = ref(false);
+        const showImageModal= ref(false);
 
         const userData = ref({
             username: "Cargando...",
@@ -116,6 +125,17 @@ export default {
         const inputWidth = ref(100);
         const locationWidth = ref(100);
         const phoneWidth = ref(100);
+
+        const openImagePicker = async() => {
+            console.log("oh si")
+            showImageModal.value = true
+            console.log(showImageModal)
+        }
+
+        function onImageUploaded(newImageUrl) {
+            console.log("oh si")
+            //imageUrl.value = newImageUrl
+        }
 
         const toggleEditMode = async () => {
             if (!editMode.value) {
@@ -227,7 +247,8 @@ export default {
             userData, editMode, toggleEditMode, editIcon, saveIcon, 
             usernameSpan, locationSpan, phoneSpan, 
             inputWidth, locationWidth, phoneWidth, 
-            adjustWidth, isPhoneValid, onPhoneInput, usernameError
+            adjustWidth, isPhoneValid, onPhoneInput, usernameError,
+            onImageUploaded, openImagePicker,showImageModal
         };
     }
 };
