@@ -22,7 +22,7 @@ public class Tournament {
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
-    @Column(name = "format", nullable = true) // El formato puede ser nulo
+    @Column(name = "format") // El formato puede ser nulo
     private String format;
 
     @Column(name = "game", nullable = false)
@@ -35,7 +35,7 @@ public class Tournament {
     private String organizerId;
 
     @Column(name = "max_players", nullable = false)
-    private String maxPlayers;
+    private int maxPlayers;
 
     // Relación con los jugadores (inscripciones)
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -108,11 +108,11 @@ public class Tournament {
         this.organizerId = organizerId;
     }
 
-    public String getMaxPlayers() {
+    public int getMaxPlayers() {
         return maxPlayers;
     }
 
-    public void setMaxPlayers(String maxPlayers) {
+    public void setMaxPlayers(int maxPlayers) {
         this.maxPlayers = maxPlayers;
     }
 
