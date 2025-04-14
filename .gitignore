@@ -31,3 +31,5 @@ npm-debug.log*
 /FrontEnd/platforms
 /FrontEnd/plugins
 /FrontEnd/www
+
+/Backend/uploads

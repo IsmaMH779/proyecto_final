@@ -1,16 +1,19 @@
 package com.example.tournamentService.service;
 
 import com.example.tournamentService.config.exceptions.DataNotFoundException;
+import com.example.tournamentService.model.PlayerRegistration;
 import com.example.tournamentService.model.Tournament;
 import com.example.tournamentService.model.dto.TournamentDTO;
 import com.example.tournamentService.repository.PlayerRegistrationRepository;
 import com.example.tournamentService.repository.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.xml.crypto.Data;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TournamentService {
@@ -19,7 +22,7 @@ public class TournamentService {
     private TournamentRepository tournamentRepository;
 
     @Autowired
-    PlayerRegistrationRepository playerRegistrationRepository;
+    private PlayerRegistrationRepository playerRegistrationRepository;
 
     public Tournament createTournament(TournamentDTO tournamentDTO, String organizerId) {
         Tournament tournament = new Tournament();
@@ -67,16 +70,74 @@ public class TournamentService {
         tournamentRepository.delete(tournament);
     }
 
-    public List<Tournament> getTournamentsByOrganizer(String organizerId) {
-        return null;
+    public Tournament getTournamentsById(long id) {
+        Optional<Tournament> tournament = tournamentRepository.findById(id);
+
+        if (tournament.isPresent()) {
+            return tournament.get();
+        }
+
+        throw DataNotFoundException.of("TOURNAMENT_NOT_FOUND");
     }
 
-    public List<Tournament> getTournamentsByPlayer(String playerId) {
-        return null;
+    //todo filtrar los datos
+    public List<Tournament> getTournamentsByOrganizer() {
+        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return tournamentRepository.findByOrganizerId(userId);
     }
 
-    public Tournament registerPlayer(Long tournamentId, String playerId) {
-        return null;
+    //todo filtrar los datos
+    public List<Tournament> getTournamentsByPlayer() {
+        // Obtener el userId
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Obtener las inscripciones del jugador
+        List<PlayerRegistration> listOfRegistrations = playerRegistrationRepository.findByPlayerId(userId);
+
+        if (listOfRegistrations.isEmpty()) {
+            throw new DataNotFoundException("PLAYER_NOT_REGISTERED_IN_TOURNAMENTS");
+        }
+
+        // Extraer los torneos asociados a esas inscripciones
+        List<Long> tournamentIds = listOfRegistrations.stream()
+                .map(registration -> registration.getTournament().getId())
+                .collect(Collectors.toList());
+
+        // Buscar los torneos por sus id
+        List<Tournament> tournaments = tournamentRepository.findAllById(tournamentIds);
+
+        if (tournaments.isEmpty()) {
+            throw new DataNotFoundException("TOURNAMENTS_NOT_FOUND");
+        }
+
+        return tournaments;
+    }
+
+    public void registerPlayer(Long tournamentId, String playerId) {
+        // obtener el torneo
+        Tournament tournament = getTournamentsById(tournamentId);
+        List<PlayerRegistration> playerRegistrations = tournament.getRegistrations();
+
+        // Verificar si el torneo ha alcanzado el máximo número de jugadores
+        if (playerRegistrations.size() >= tournament.getMaxPlayers()) {
+            throw new IllegalStateException("MAX_NUM_PLAYERS");
+        }
+
+        // crear la inscripción
+        PlayerRegistration newPlayerRegistration = new PlayerRegistration();
+        newPlayerRegistration.setTournament(tournament);
+        newPlayerRegistration.setPlayerId(playerId);
+        newPlayerRegistration.setRegistrationDate(LocalDate.now());
+
+        // añadir la inscripción a la lista de registros del torneo
+        playerRegistrations.add(newPlayerRegistration);
+
+        // Como ya tienes CascadeType.ALL, al guardar el torneo, JPA debería guardar también la inscripción
+        tournament.setRegistrations(playerRegistrations);
+
+        // guardar el torneo (que incluirá la nueva inscripción debido a la cascada)
+        tournamentRepository.save(tournament);
     }
 
     public List<Tournament> searchTournaments() {
