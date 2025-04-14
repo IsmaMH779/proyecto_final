@@ -32,6 +32,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user-management/player-register").permitAll()
+                        .requestMatchers("/images/profile/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -65,6 +66,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/profile/**")
-                .addResourceLocations("file:backend/uploads/profile_pics/");
+                .addResourceLocations("file:../uploads/profile_pics/");
     }
 }

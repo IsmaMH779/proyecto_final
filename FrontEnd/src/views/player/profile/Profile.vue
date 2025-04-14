@@ -2,8 +2,13 @@
     <ion-page>
         <div class="profilepag-container">
             <div class="profile-header">
-                <div class="profile-img-container" @click="openImagePicker">
-                    <button  @click="openImagePicker">adsdsd</button>
+                <div 
+                    class="profile-img-container"
+                    :class="{ 'edit-highlight': editMode }"
+                    @click="handleProfileImageClicker"
+                >
+                <img v-if="userData.imageUrl" :src="'http://localhost:8081/images/profile/' + userData.imageUrl" />
+                <img v-else :src="defaultProfileImage" />
                 </div>
 
                 <div class="username-wrapper">
@@ -97,6 +102,7 @@ import axios from 'axios';
 import editIconPath from '@/assets/profile_assets/profile_settings.svg';
 import saveIconPath from '@/assets/profile_assets/saveCheck_icon.svg';
 import { useRouter } from 'vue-router';
+import defaultProfileImage from '@/assets/profile_assets/default-profile-image.svg';
 
 import ImagePickerModal from '@/components/ImagePickerModal.vue';
 
@@ -113,7 +119,8 @@ export default {
         const userData = ref({
             username: "Cargando...",
             location: "Cargando...",
-            phoneNumber1: "Cargando..."
+            phoneNumber1: "Cargando...",
+            imageUrl: null
         });
 
         const originalData = ref({});
@@ -126,6 +133,12 @@ export default {
         const locationWidth = ref(100);
         const phoneWidth = ref(100);
 
+        const handleProfileImageClicker = () => {
+            if (editMode.value) {
+                openImagePicker();
+            }
+        }
+
         const openImagePicker = async() => {
             console.log("oh si")
             showImageModal.value = true
@@ -133,8 +146,7 @@ export default {
         }
 
         function onImageUploaded(newImageUrl) {
-            console.log("oh si")
-            //imageUrl.value = newImageUrl
+            userData.value.imageUrl = newImageUrl;
         }
 
         const toggleEditMode = async () => {
@@ -168,7 +180,7 @@ export default {
                             "Authorization": `Bearer ${token}`
                         }
                     });
-
+                    
                     if (response.status !== 200) return;
 
                     usernameError.value = false;
@@ -230,6 +242,7 @@ export default {
                     location: response.data.location,
                     phoneNumber1: response.data.phoneNumber1,
                     birthdate: response.data.birthdate,
+                    imageUrl: response.data.imageUrl || null
                 };
 
                 originalData.value = { ...userData.value };
@@ -248,7 +261,8 @@ export default {
             usernameSpan, locationSpan, phoneSpan, 
             inputWidth, locationWidth, phoneWidth, 
             adjustWidth, isPhoneValid, onPhoneInput, usernameError,
-            onImageUploaded, openImagePicker,showImageModal
+            onImageUploaded, openImagePicker,showImageModal,defaultProfileImage,
+            handleProfileImageClicker
         };
     }
 };
@@ -276,6 +290,19 @@ export default {
     width: 142.63px;
     border-radius: 132px;
     border: 3px solid #1B263B;
+    overflow: hidden;
+}
+
+.profile-img-container img {
+    width: 100%;        
+    height: 100%; 
+    object-fit: cover; 
+}
+
+.edit-highlight {
+    box-shadow: 0 0 10px 4px rgba(65, 90, 119, 0.6);
+    cursor: pointer;
+    transition: box-shadow 0.3s ease;
 }
 
 .username-wrapper {

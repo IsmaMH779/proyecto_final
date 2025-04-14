@@ -23,6 +23,8 @@ public class OrganizerService {
         organizer.setUsername(playerRegisterDTO.getUsername());
         organizer.setMail(playerRegisterDTO.getMail());
         organizer.setLocation(playerRegisterDTO.getLocation());
+
+        organizerRepository.save(organizer);
     }
 
     public Organizer getOrganizerData(long userId) {

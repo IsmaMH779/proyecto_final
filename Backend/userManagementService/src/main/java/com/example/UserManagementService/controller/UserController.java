@@ -4,19 +4,26 @@ import com.example.UserManagementService.config.JwtUtil;
 import com.example.UserManagementService.model.dto.register.PlayerRegisterDTO;
 import com.example.UserManagementService.service.OrganizerService;
 import com.example.UserManagementService.service.PlayerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @RestController
 @RequestMapping("/api/user-management")
-public class UserRegisterController {
+public class UserController {
     private final OrganizerService organizerService;
     private final PlayerService playerService;
     private final JwtUtil jwtUtil;
 
-    public UserRegisterController(OrganizerService organizerService, PlayerService playerService, JwtUtil jwtUtil) {
+    public UserController(OrganizerService organizerService, PlayerService playerService, JwtUtil jwtUtil) {
         this.organizerService = organizerService;
         this.playerService = playerService;
         this.jwtUtil = jwtUtil;
@@ -39,5 +46,24 @@ public class UserRegisterController {
         organizerService.saveOrganizer(playerRegisterDTO, userId);
 
         return ResponseEntity.ok("Organizador registrado");
+    }
+
+    // obtener la imagen de perfil
+    @GetMapping("/images/profile/{filename:.+}")
+    public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) throws IOException {
+        // preparar la ruta de la imagen
+        Path filePath = Paths.get("backend/uploads/profile_pics/", filename);
+        // comprobar que existe la imagen
+        if (!Files.exists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // preparar la imagen como resource
+        Resource resource = new UrlResource(filePath.toUri());
+        // detecar el tipo de archivo
+        String contentType = Files.probeContentType(filePath);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                .body(resource);
     }
 }

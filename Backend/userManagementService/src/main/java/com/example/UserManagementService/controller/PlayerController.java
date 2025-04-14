@@ -66,30 +66,9 @@ public class PlayerController {
     public ResponseEntity<?> uploadProfilePicture(@RequestParam MultipartFile file) {
         try {
             String fileName = playerService.updateProfileImage(file);
-            String imageUrl = "/images/profile/" + fileName;
-            return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+            return ResponseEntity.ok(Map.of("imageUrl", fileName));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(e);
         }
     }
-
-    // obtener la imagen de perfil
-    @GetMapping("/images/profile/{filename:.+}")
-    public ResponseEntity<Resource> getProfileImage(@PathVariable String filename) throws IOException {
-        // preparar la ruta de la imagen
-        Path filePath = Paths.get("backend/uploads/profile_pics/", filename);
-        // comprobar que existe la imagen
-        if (!Files.exists(filePath)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // preparar la imagen como resource
-        Resource resource = new UrlResource(filePath.toUri());
-        // detecar el tipo de archivo
-        String contentType = Files.probeContentType(filePath);
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
-                .body(resource);
-    }
-
 }

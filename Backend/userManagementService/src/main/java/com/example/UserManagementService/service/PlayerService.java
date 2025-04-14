@@ -86,35 +86,40 @@ public class PlayerService {
     public String updateProfileImage(MultipartFile file) throws IOException {
         long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Validación de tipo MIME
+        // Validación de tipo
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
             throw new IOException("INVALID_FILE_TYPE");
         }
 
-        // Carpeta donde guardar
-        String uploadDir = "backend/uploads/profile_pics/";
+        // Obtener el jugador y la imagen anterior
+        Player player = getPlayerData(userId);
+        String oldImage = player.getImageUrl();
+
+        // Carpeta donde guardar (un nivel fuera del proyecto, como pediste)
+        String uploadDir = "../uploads/profile_pics/";
+        Files.createDirectories(Paths.get(uploadDir));
+
+        // Nombre aleatorio para el archivo
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = Paths.get(uploadDir, fileName);
-        Files.createDirectories(filePath.getParent());
 
-        // Comprimir imagen antes de guardar
+        // Leer la imagen
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
         if (originalImage == null) throw new IOException("INVALID_IMAGE");
 
-        // Guardar como JPEG con calidad reducida
+        // Guardar como JPEG
         try (OutputStream os = Files.newOutputStream(filePath)) {
             ImageIO.write(originalImage, "jpg", os);
         }
 
-        // Obtener y actualizar usuario
-        Player player = getPlayerData(userId);
+        // Actualizar imagen del jugador
         player.setImageUrl(fileName);
         playerRepository.save(player);
 
         // Borrar imagen anterior si existe
-        if (player.getImageUrl() != null) {
-            Path oldFilePath = Paths.get(uploadDir, player.getImageUrl());
+        if (oldImage != null) {
+            Path oldFilePath = Paths.get(uploadDir, oldImage);
             if (Files.exists(oldFilePath)) {
                 Files.delete(oldFilePath);
             }
@@ -122,5 +127,6 @@ public class PlayerService {
 
         return fileName;
     }
+
 
 }
