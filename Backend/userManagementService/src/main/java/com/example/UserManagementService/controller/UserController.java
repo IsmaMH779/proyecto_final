@@ -1,6 +1,7 @@
 package com.example.UserManagementService.controller;
 
 import com.example.UserManagementService.config.JwtUtil;
+import com.example.UserManagementService.model.dto.register.OrganizerRegisterDTO;
 import com.example.UserManagementService.model.dto.register.PlayerRegisterDTO;
 import com.example.UserManagementService.service.OrganizerService;
 import com.example.UserManagementService.service.PlayerService;
@@ -38,12 +39,12 @@ public class UserController {
         return ResponseEntity.ok("jugador registrado");
     }
 
+    // UserController.java
     @PostMapping("/organizers/register")
-    private ResponseEntity<String> organizerRegister(@RequestBody PlayerRegisterDTO playerRegisterDTO, @RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<String> organizerRegister(@RequestBody OrganizerRegisterDTO organizerRegisterDTO) {
         long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Llamar al servicio
-        organizerService.saveOrganizer(playerRegisterDTO, userId);
+        organizerService.saveOrganizer(organizerRegisterDTO, userId);
 
         return ResponseEntity.ok("Organizador registrado");
     }

@@ -2,7 +2,7 @@ package com.example.UserManagementService.service;
 
 import com.example.UserManagementService.config.exceptions.DataNotFoundException;
 import com.example.UserManagementService.model.Organizer;
-import com.example.UserManagementService.model.dto.register.PlayerRegisterDTO;
+import com.example.UserManagementService.model.dto.register.OrganizerRegisterDTO;
 import com.example.UserManagementService.model.dto.update.UpdateOrganizerDTO;
 import com.example.UserManagementService.repository.OrganizerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +15,15 @@ public class OrganizerService {
     @Autowired
     private OrganizerRepository organizerRepository;
 
-    public void saveOrganizer(PlayerRegisterDTO playerRegisterDTO, long userId) {
+    public void saveOrganizer(OrganizerRegisterDTO organizerRegisterDTO, long userId) {
         Organizer organizer = new Organizer();
 
         organizer.setId(userId);
         organizer.setRole("Organizer");
-        organizer.setUsername(playerRegisterDTO.getUsername());
-        organizer.setMail(playerRegisterDTO.getMail());
-        organizer.setLocation(playerRegisterDTO.getLocation());
+        organizer.setUsername(organizerRegisterDTO.getUsername());
+        organizer.setMail(organizerRegisterDTO.getMail());
+        organizer.setLocation(organizerRegisterDTO.getLocation());
+        organizer.setAdress(organizerRegisterDTO.getAdress());
 
         organizerRepository.save(organizer);
     }
