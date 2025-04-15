@@ -43,11 +43,11 @@ public class TournamentService {
 
     public Tournament updateTournament(Long tournamentId, TournamentDTO tournamentDTO, String organizerId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> DataNotFoundException.of("Torneo no encontrado"));
+                .orElseThrow(() -> DataNotFoundException.of("TOURNAMENT_NOT_FOUND"));
 
         // comprobacion de que es el mismo organizador el que hace el update
         if (!tournament.getOrganizerId().equals(organizerId)) {
-            throw DataNotFoundException.of("Intento no autorizado para actualizar el torneo");
+            throw DataNotFoundException.of("UNAUTHORIZED_UPDATE");
         }
 
         tournament.setName(tournamentDTO.getName());
@@ -62,11 +62,11 @@ public class TournamentService {
 
     public void deleteTournament(Long tournamentId, String organizerId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> DataNotFoundException.of("Torneo no encontrado"));
+                .orElseThrow(() -> DataNotFoundException.of("TOURNAMENT_NOT_FOUND"));
 
         // comprobacion de que es el mismo organizador el que hace el delete
         if (!tournament.getOrganizerId().equals(organizerId)) {
-            throw DataNotFoundException.of("Intento no autorizado para eliminar el torneo");
+            throw DataNotFoundException.of("UNAUTHORIZED_DELETE");
         }
 
         tournamentRepository.delete(tournament);

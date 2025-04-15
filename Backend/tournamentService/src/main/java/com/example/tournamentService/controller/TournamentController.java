@@ -22,10 +22,39 @@ public class TournamentController {
 
     // Crear un nuevo torneo
     @PostMapping
-    public ResponseEntity<Tournament> createTournament(@RequestBody TournamentDTO tournamentDTO) {
-        String organizerId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        Tournament tournament = tournamentService.createTournament(tournamentDTO, organizerId);
-        return ResponseEntity.ok(tournament);
+    public ResponseEntity<?> createTournament(@RequestBody TournamentDTO tournamentDTO) {
+        try {
+            String organizerId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+            Tournament tournament = tournamentService.createTournament(tournamentDTO, organizerId);
+            return ResponseEntity.ok(tournament);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Actualizar un torneo
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTournament(@PathVariable("id") Long tournamentId, @RequestBody TournamentDTO tournamentDTO) {
+        try {
+            String organizerId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+            Tournament tournament = tournamentService.updateTournament(tournamentId, tournamentDTO, organizerId);
+            return ResponseEntity.ok(tournament);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
+
+    // Eliminar un torneo
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTournament(@PathVariable("id") Long tournamentId) {
+        try {
+            String organizerId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+            tournamentService.deleteTournament(tournamentId, organizerId);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // Obtener un torneo por ID
