@@ -4,6 +4,8 @@ import com.example.tournamentService.config.exceptions.DataNotFoundException;
 import com.example.tournamentService.model.PlayerRegistration;
 import com.example.tournamentService.model.Tournament;
 import com.example.tournamentService.model.dto.TournamentDTO;
+import com.example.tournamentService.model.dto.TournamentOrganizerDTO;
+import com.example.tournamentService.model.dto.TournamentPlayerDTO;
 import com.example.tournamentService.repository.PlayerRegistrationRepository;
 import com.example.tournamentService.repository.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +72,7 @@ public class TournamentService {
         tournamentRepository.delete(tournament);
     }
 
+    // obtener torneo mediante la id
     public Tournament getTournamentsById(long id) {
         Optional<Tournament> tournament = tournamentRepository.findById(id);
 
@@ -80,17 +83,24 @@ public class TournamentService {
         throw DataNotFoundException.of("TOURNAMENT_NOT_FOUND");
     }
 
-    //todo filtrar los datos
-    public List<Tournament> getTournamentsByOrganizer() {
-        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    // obtener torneos creados por el organizador mediante su id
+    public List<TournamentOrganizerDTO> getTournamentsByOrganizer() {
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        return tournamentRepository.findByOrganizerId(userId);
+        List<Tournament> tournaments = tournamentRepository.findByOrganizerId(userId);
+
+        // extraer datos necesarios en una lista por cada torneo
+        List<TournamentOrganizerDTO> tournamentOrganizerDTOS = tournaments.stream()
+                .map(TournamentOrganizerDTO::new)
+                .toList();
+
+        return tournamentOrganizerDTOS;
     }
 
-    //todo filtrar los datos
-    public List<Tournament> getTournamentsByPlayer() {
+    // obtener torneos en los que el jugador esta inscrito mediante su id
+    public List<TournamentPlayerDTO> getTournamentsByPlayer() {
         // Obtener el userId
-        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // Obtener las inscripciones del jugador
         List<PlayerRegistration> listOfRegistrations = playerRegistrationRepository.findByPlayerId(userId);
@@ -107,13 +117,19 @@ public class TournamentService {
         // Buscar los torneos por sus id
         List<Tournament> tournaments = tournamentRepository.findAllById(tournamentIds);
 
+        // extraer datos necesarios en una lista por cada torneo
+        List<TournamentPlayerDTO> tournamentPlayerDTOS = tournaments.stream()
+                .map(TournamentPlayerDTO::new)
+                .toList();
+
         if (tournaments.isEmpty()) {
             throw new DataNotFoundException("TOURNAMENTS_NOT_FOUND");
         }
 
-        return tournaments;
+        return tournamentPlayerDTOS;
     }
 
+    // registrar un jugador mediante su id
     public void registerPlayer(Long tournamentId, String playerId) {
         // obtener el torneo
         Tournament tournament = getTournamentsById(tournamentId);

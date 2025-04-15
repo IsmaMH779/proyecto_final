@@ -15,7 +15,6 @@ public class TournamentDTO {
     @Future(message = "La fecha de inicio debe ser en el futuro")
     private LocalDate startDate;
 
-    // Este campo es opcional, por lo que puede dejarse sin validacion
     private String format;
 
     @NotNull(message = "El juego es obligatorio")
