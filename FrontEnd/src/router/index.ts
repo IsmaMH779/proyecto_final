@@ -10,7 +10,7 @@ const routes: Array<RouteRecordRaw> = [
   },{
     path: '/auth',
     redirect: '/auth/login',
-    meta: {requieresGuest: true},
+    meta: {requiresGuest: true},
     children: [
       {
         path:'login',
@@ -52,7 +52,45 @@ const routes: Array<RouteRecordRaw> = [
         path: 'player-profile',
         component: () => import('@/views/player/profile/Profile.vue'),
         meta: {role: 'player'}
-      }
+      },
+
+      // rutas del organizador
+      {
+        path: 'organizer-home',
+        component: () => import('@/views/organizer/home/MainHome.vue'),
+        meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-tournaments-created',
+        component: () => import('@/views/organizer/createdTournaments/MainCreatedTournaments.vue'),
+        meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-tournaments-active',
+        component: () => import('@/views/organizer/activeTournaments/MainActiveTournaments.vue'),
+        meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-search-tournament',
+        component: () => import('@/views/organizer/searchTournament/MainSearchTournaments.vue'),
+        meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-calendar',
+        component: () => import('@/views/organizer/calendar/MainCalendar.vue'),
+        meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-history',
+        component: () => import('@/views/organizer/history/MainHistory.vue'),
+        meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-profile',
+        component: () => import('@/views/organizer/profile/Profile.vue'),
+        meta: {role: 'organizer'}
+      },
+
     ]
   }
 ]
