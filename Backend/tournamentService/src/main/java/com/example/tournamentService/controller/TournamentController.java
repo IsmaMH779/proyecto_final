@@ -6,6 +6,7 @@ import com.example.tournamentService.model.dto.TournamentDTO;
 import com.example.tournamentService.model.dto.TournamentOrganizerDTO;
 import com.example.tournamentService.model.dto.TournamentPlayerDTO;
 import com.example.tournamentService.service.TournamentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tournaments")
+@Slf4j
 public class TournamentController {
 
     @Autowired
@@ -25,6 +27,7 @@ public class TournamentController {
     public ResponseEntity<?> createTournament(@RequestBody TournamentDTO tournamentDTO) {
         try {
             String organizerId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+            log.info("Organizer ID: {}", organizerId);
             Tournament tournament = tournamentService.createTournament(tournamentDTO, organizerId);
             return ResponseEntity.ok(tournament);
         } catch (DataNotFoundException e) {
@@ -51,6 +54,28 @@ public class TournamentController {
         try {
             String organizerId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
             tournamentService.deleteTournament(tournamentId, organizerId);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Eliminar un jugador del torneo siendo organizador
+    @DeleteMapping("/{tournamentId}/{playerId}")
+    public ResponseEntity<?> removePlayerFromTournament(@PathVariable("tournamentId") long tournamentId, @PathVariable("playerId") String playerId) {
+        try {
+            tournamentService.removePlayerFromMyTournament(tournamentId,playerId);
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // cerrar un torneo
+    @PatchMapping("/{id}/close")
+    public ResponseEntity<?> closeTorunament (@PathVariable long id) {
+        try {
+            tournamentService.closeTournament(id);
             return ResponseEntity.ok().build();
         } catch (DataNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -98,4 +123,5 @@ public class TournamentController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 }

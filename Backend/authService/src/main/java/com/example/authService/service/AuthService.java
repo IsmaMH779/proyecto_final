@@ -43,6 +43,21 @@ public class AuthService {
         return String.valueOf(user.getId());
     }
 
+    public String registerOrganizer(UserDTORegister userDTORegister) {
+        User user = new User();
+        user.setRole("organizer");
+        user.setPassword(passwordEncoder.encode(userDTORegister.getPassword()));
+        user.setEmail(userDTORegister.getEmail());
+        user.setUsername(userDTORegister.getUsername());
+
+        // verificar si existe el usuario y el correo
+        verifyUsernameExisting(user.getUsername());
+        verifyEmailExisting(user.getEmail());
+
+        userRepository.save(user);
+        return String.valueOf(user.getId());
+    }
+
     // verificar si existe el username
     private void verifyUsernameExisting(String username) {
         Optional<User> existingUser = userRepository.findByUsername(username);
@@ -110,5 +125,6 @@ public class AuthService {
             userRepository.save(user);
         }
     }
+
 
 }

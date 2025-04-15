@@ -38,6 +38,18 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/register/organizer")
+    public ResponseEntity<String> registerOrganizer(@RequestBody UserDTORegister userDTORegister) {
+        try {
+            String serviceResponse = authService.registerOrganizer(userDTORegister);
+            String token = jwtUtil.generateToken(serviceResponse);
+            return ResponseEntity.ok(token);
+        }catch (NotValidDataException e){
+            log.error(e.getLocalizedMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserDTOLogin userDTOLogin) {
         try {

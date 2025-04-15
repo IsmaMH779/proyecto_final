@@ -8,11 +8,13 @@ public class TournamentOrganizerDTO {
     private long id;
     private LocalDate startDate;
     private String name;
+    private boolean closed;
 
     public TournamentOrganizerDTO(Tournament tournament) {
         this.id = tournament.getId();
         this.startDate = tournament.getStartDate();
         this.name = tournament.getName();
+        this.closed = tournament.getClosed();
     }
 
     public long getId() {
@@ -37,5 +39,13 @@ public class TournamentOrganizerDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }

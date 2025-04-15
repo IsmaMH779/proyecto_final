@@ -37,6 +37,9 @@ public class Tournament {
     @Column(name = "max_players", nullable = false)
     private int maxPlayers;
 
+    @Column(name = "max_players", nullable = false)
+    private boolean closed;
+
     // Relación con los jugadores (inscripciones)
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerRegistration> registrations = new ArrayList<>();
@@ -122,5 +125,13 @@ public class Tournament {
 
     public void setRegistrations(List<PlayerRegistration> registrations) {
         this.registrations = registrations;
+    }
+
+    public boolean getClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }

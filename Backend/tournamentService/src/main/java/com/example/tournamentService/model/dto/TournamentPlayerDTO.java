@@ -8,6 +8,7 @@ public class TournamentPlayerDTO {
     private long id;
     private LocalDate startDate;
     private String name;
+    private String closed;
 
     public TournamentPlayerDTO(Tournament tournament) {
         this.id = tournament.getId();
@@ -37,5 +38,13 @@ public class TournamentPlayerDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getClosed() {
+        return closed;
+    }
+
+    public void setClosed(String closed) {
+        this.closed = closed;
     }
 }

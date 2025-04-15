@@ -37,6 +37,7 @@ public class TournamentService {
         tournament.setLocation(tournamentDTO.getLocation());
         tournament.setOrganizerId(organizerId);
         tournament.setMaxPlayers(tournamentDTO.getMaxPlayers());
+        tournament.setClosed(false);
 
         return tournamentRepository.save(tournament);
     }
@@ -154,6 +155,43 @@ public class TournamentService {
 
         // guardar el torneo (que incluirá la nueva inscripción debido a la cascada)
         tournamentRepository.save(tournament);
+    }
+
+
+    public void removePlayerFromMyTournament(long tournamentId, String playerId) {
+        String organizerId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> DataNotFoundException.of("TOURNAMENT_NOT_FOUND"));
+
+        // comprobacion de que es el mismo organizador el que hace hace la accion
+        if (!tournament.getOrganizerId().equals(organizerId)) {
+            throw DataNotFoundException.of("UNAUTHORIZED_DELETE");
+        }
+
+        // eliminar la inscripcion del jugador
+        List<PlayerRegistration> playerRegistrationList = tournament.getRegistrations();
+        playerRegistrationList = playerRegistrationList.stream().filter(reg -> !reg.getPlayerId().equals(playerId)).toList();
+
+        // guardar el torneo con la lista actualizada
+        tournament.setRegistrations(playerRegistrationList);
+        tournamentRepository.save(tournament);
+    }
+
+    public void closeTournament (long tournamentId) {
+        // obtener id del organizador
+        String organizerId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // obtener el torneo por la id
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> DataNotFoundException.of("TOURNAMENT_NOT_FOUND"));
+
+        // comprobacion de que es el mismo organizador el que cierra el torneo
+        if (!tournament.getOrganizerId().equals(organizerId)) {
+            throw DataNotFoundException.of("UNAUTHORIZED_DELETE");
+        }
+
+        tournamentRepository.markTournamentAsClosed(tournamentId);
     }
 
     public List<Tournament> searchTournaments() {
