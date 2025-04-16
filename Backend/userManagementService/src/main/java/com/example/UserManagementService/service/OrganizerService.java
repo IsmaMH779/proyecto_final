@@ -2,13 +2,24 @@ package com.example.UserManagementService.service;
 
 import com.example.UserManagementService.config.exceptions.DataNotFoundException;
 import com.example.UserManagementService.model.Organizer;
+import com.example.UserManagementService.model.Player;
 import com.example.UserManagementService.model.dto.register.OrganizerRegisterDTO;
 import com.example.UserManagementService.model.dto.update.UpdateOrganizerDTO;
 import com.example.UserManagementService.repository.OrganizerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class OrganizerService {
@@ -77,6 +88,52 @@ public class OrganizerService {
         }
 
         organizerRepository.save(organizer);
+    }
+
+    // guardar la imagen de perfil
+    public String updateProfileImage(MultipartFile file) throws IOException {
+        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Validación de tipo
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IOException("INVALID_FILE_TYPE");
+        }
+
+        // Obtener el organizer y la imagen anterior
+        Organizer organizer = getOrganizerData(userId);
+        String oldImage = organizer.getImageUrl();
+
+        // Carpeta donde guardar (un nivel fuera del proyecto, como pediste)
+        String uploadDir = "../uploads/profile_pics/";
+        Files.createDirectories(Paths.get(uploadDir));
+
+        // Nombre aleatorio para el archivo
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path filePath = Paths.get(uploadDir, fileName);
+
+        // Leer la imagen
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+        if (originalImage == null) throw new IOException("INVALID_IMAGE");
+
+        // Guardar como JPEG
+        try (OutputStream os = Files.newOutputStream(filePath)) {
+            ImageIO.write(originalImage, "jpg", os);
+        }
+
+        // Actualizar imagen del organizer
+        organizer.setImageUrl(fileName);
+        organizerRepository.save(organizer);
+
+        // Borrar imagen anterior si existe
+        if (oldImage != null) {
+            Path oldFilePath = Paths.get(uploadDir, oldImage);
+            if (Files.exists(oldFilePath)) {
+                Files.delete(oldFilePath);
+            }
+        }
+
+        return fileName;
     }
 
 

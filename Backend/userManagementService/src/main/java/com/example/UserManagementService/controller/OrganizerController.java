@@ -9,6 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/organizers")
@@ -43,6 +47,17 @@ public class OrganizerController {
         } catch (DataNotFoundException e){
             log.error(e.getLocalizedMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // para guardar la foto de perfil del usuario
+    @PostMapping("/me/profile-picture")
+    public ResponseEntity<?> uploadProfilePicture(@RequestParam MultipartFile file) {
+        try {
+            String fileName = organizerService.updateProfileImage(file);
+            return ResponseEntity.ok(Map.of("imageUrl", fileName));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(e);
         }
     }
 }
