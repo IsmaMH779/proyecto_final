@@ -71,4 +71,14 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/me/role")
+    public ResponseEntity<?> getRole() {
+        long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            return ResponseEntity.ok().body(authService.getUser(userId));
+        } catch (DeckLyException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

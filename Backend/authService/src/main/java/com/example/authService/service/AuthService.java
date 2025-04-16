@@ -126,5 +126,14 @@ public class AuthService {
         }
     }
 
+    public String getUser(long userId) {
+        Optional<User> user = userRepository.findById(userId);
+
+        if (user.isPresent()) {
+            return user.get().getRole();
+        }
+
+        throw NotValidDataException.of("USER_NOT_FOUND");
+    }
 
 }

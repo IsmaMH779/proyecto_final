@@ -122,23 +122,26 @@
               localStorage.setItem('token', token);
               
               //obtener datos del jugador
-              const playerData = await axios.get("http://localhost:8081/api/players/me", {
+              const playerData = await axios.get("http://localhost:8080/api/auth/me/role", {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
               })
 
+              console.log(playerData.data)
+
               if (playerData.status == 200) {
-                localStorage.setItem('role', playerData.data.role)
+                localStorage.setItem('role', playerData.data)
               } 
 
               // Redirigir al usuario a la página principal en funcion del rol
               if (localStorage.getItem('role') == "player") {
+                alert("player")
                 router.push('/web');
               }
 
               if (localStorage.getItem('role') == "organizer") {
-
+                router.push('/web');
               }
               
             }

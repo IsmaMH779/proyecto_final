@@ -107,11 +107,11 @@ router.beforeEach(async (to, form, next) => {
   //si el usuario intenta acceder a auth estando logueado 
   if (to.meta.requieresGuest && token) {
     try {
-      const response = await axios.get('http://localhost:8081/api/players/me', {
+      const response = await axios.get('http://localhost:8080/api/auth/me/role', {
         headers: { Authorization: `Bearer ${token}` }
       });
   
-      const userRole = response.data.role;
+      const userRole = response.data;
 
       // Redirigir según su rol
       if (userRole === 'player') {
@@ -136,11 +136,11 @@ router.beforeEach(async (to, form, next) => {
 
     if (token) {
       
-      const response = await axios.get('http://localhost:8081/api/players/me', {
+      const response = await axios.get('http://localhost:8080/api/auth/me/role', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      const userRole = response.data.role;
+      const userRole = response.data;
 
       // redirigir al home en funcion del rol del usuario
       if (to.path == '/web') {
