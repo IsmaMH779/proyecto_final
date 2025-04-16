@@ -30,7 +30,7 @@
 
 <script>
 import axios from 'axios'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   IonModal,
   IonContent,
@@ -52,12 +52,25 @@ export default {
     IonButton
   },
   props: {
-    isOpen: Boolean
+    isOpen: {
+      type: Boolean,
+      required: true
+    },
+    profileRole: {
+      type: String,
+      default: 'player'
+    }
   },
   emits: ['close', 'uploaded'],
   setup(props, { emit }) {
     const selectedFile = ref(null)
     const preview = ref(null)
+
+    const uploadEndpoint = computed(() => {
+      return props.profileRole === 'organizer'
+        ? "http://localhost:8081/api/organizers/me/profile-picture"
+        : "http://localhost:8081/api/players/me/profile-picture"
+    })
 
     function onFileSelected(event) {
       const file = event.target.files[0]
@@ -75,7 +88,7 @@ export default {
       const formData = new FormData()
       formData.append("file", selectedFile.value)
 
-      axios.post("http://localhost:8081/api/players/me/profile-picture", formData, {
+      axios.post(uploadEndpoint.value, formData, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
         }
