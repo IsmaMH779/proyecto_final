@@ -1,19 +1,19 @@
 <template>
     <ion-page>
         <div class="header">ORGANIZER HOME
-            <UserProfileButton />
+            <OrganizerProfileButton />
         </div>
     </ion-page>
 </template>
 
 <script>
 import { IonPage } from '@ionic/vue';
-import UserProfileButton from '@/components/UserProfileButton.vue';
+import OrganizerProfileButton from '@/components/OrganizerProfileButton.vue';
 
 export default {
   components: {
     IonPage,
-    UserProfileButton,
+    OrganizerProfileButton,
   },
 };
 </script>
