@@ -135,14 +135,7 @@
               } 
 
               // Redirigir al usuario a la página principal en funcion del rol
-              if (localStorage.getItem('role') == "player") {
-                alert("player")
-                router.push('/web');
-              }
-
-              if (localStorage.getItem('role') == "organizer") {
-                router.push('/web');
-              }
+              router.push('/web');
               
             }
           } catch (error) {
