@@ -90,7 +90,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/organizer/profile/Profile.vue'),
         meta: {role: 'organizer'}
       },
-
+      {
+        path: 'organizer-create-tournament',
+        component: () => import('@/views/organizer/createTournament/MainCreateTournament.vue'),
+        meta: {role: 'organizer'}
+      }
     ]
   }
 ]

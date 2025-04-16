@@ -37,7 +37,7 @@ public class Tournament {
     @Column(name = "max_players", nullable = false)
     private int maxPlayers;
 
-    @Column(name = "max_players", nullable = false)
+    @Column(name = "closed", nullable = false)
     private boolean closed;
 
     // Relación con los jugadores (inscripciones)

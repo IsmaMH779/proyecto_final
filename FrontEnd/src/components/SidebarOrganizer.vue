@@ -10,6 +10,7 @@
             <li><a href="/web/organizer-search-tournament"><div class="button_nav">Buscar torneos</div></a></li>
             <li><a href="/web/organizer-calendar"><div class="button_nav">Calendario</div></a></li>
             <li><a href="/web/organizer-history"><div class="button_nav">Historial</div></a></li>
+            <li><a href="/web/organizer-create-tournament"><div class="button_nav">Crear Torneo</div></a></li>
             <li><div class="button_nav"  @click="logout">logout</div></li>
         </ul>
     </div>
