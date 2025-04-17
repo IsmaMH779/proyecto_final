@@ -6,21 +6,23 @@
       <ion-grid>
         <ion-row>
           <ion-col
-            size="12" 
-            size-sm="12" 
-            size-md="12" 
+            size="12"
+            size-sm="12"
+            size-md="12"
             size-lg="4"
-            v-for="tournament in filteredTournaments" 
+            v-for="tournament in filteredTournaments"
             :key="tournament.id"
           >
-            <div class="box">
+            <div class="box" @click="showTournamentInfo(tournament)">
               <div class="tournament-name-container">
-                <p>[{{ tournament.game }}]   {{ " " +tournament.name }}</p>
+                <p>[{{ tournament.game }}] {{ " " + tournament.name }}</p>
               </div>
-              <span><p>{{ tournament.format }}</p></span>
+              <span
+                ><p>{{ tournament.format }}</p></span
+              >
               <span>
-                <p>{{ tournament.startDate.split('T')[0] }}</p>
-                <p>{{ tournament.startDate.split('T')[1] }}</p>
+                <p>{{ tournament.startDate.split("T")[0] }}</p>
+                <p>{{ tournament.startDate.split("T")[1] }}</p>
               </span>
             </div>
           </ion-col>
@@ -33,6 +35,8 @@
 <script>
 import { IonPage } from "@ionic/vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 export default {
   components: {
@@ -44,39 +48,43 @@ export default {
     };
   },
   computed: {
-  // Filtrar por torneo activo false y torneo cerrado true
-  filteredTournaments() {
-    return this.tournaments.filter(tournament => {
-      // Filtrar torneos con isActive: false e isClosed: false
-      if (!tournament.isActive && !tournament.isClosed) {
-        // Modificar el formato si es "Direct_elimination"
-        if (tournament.format === "Direct_elimination") {
-          tournament.format = "Eliminacion directa";
+    // Filtrar por torneo activo false y torneo cerrado true
+    filteredTournaments() {
+      return this.tournaments.filter((tournament) => {
+        // Filtrar torneos con isActive: false e isClosed: false
+        if (!tournament.isActive && !tournament.isClosed) {
+          // Modificar el formato si es "Direct_elimination"
+          if (tournament.format === "Direct_elimination") {
+            tournament.format = "Eliminacion directa";
+          }
+          return true; // Solo devolver torneos que cumplen con la condición
         }
-        return true;  // Solo devolver torneos que cumplen con la condición
-      }
-      return false;
-    });
+        return false;
+      });
+    },
   },
-},
-
+  methods: {
+    showTournamentInfo(tournament) {
+      this.$router.push(`/web/organizer-tournament-profile/${tournament.id}`)
+    },
+  },
   mounted() {
-    axios.get("http://localhost:8082/api/tournaments/organizer", {
-      headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${localStorage.getItem('token')}`
-            }
-    }).then((response) => {
-      this.tournaments = response.data
-    })
-    .catch((error) => {
+    axios
+      .get("http://localhost:8082/api/tournaments/organizer", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        this.tournaments = response.data;
+      })
+      .catch((error) => {
         console.error("Error al obtener datos:", error);
-    });
-  }
+      });
+  },
 };
-
 </script>
-
 
 <style scoped>
 p {
@@ -93,7 +101,7 @@ p {
 }
 
 .header-title {
-  color: #1B263B;
+  color: #1b263b;
   font-size: 30px;
   width: max-content;
 }
@@ -101,22 +109,25 @@ p {
 .content-container {
   height: 100%;
   padding: 20px 30px;
-
 }
 
 .box {
   color: black;
-  background-color: #E0E1DD;
-  border: 2px solid #415A77;
+  background-color: #e0e1dd;
+  border: 2px solid #415a77;
   border-radius: 16px;
   height: 100%;
   padding: 15px 30px 15px 30px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0px 8px rgba(0, 0, 0, 0.15);
 }
-  
+
+.box:hover {
+  box-shadow: 0 0px 8px #415a77;
+
+}
 
 .tournament-name-container {
-  border-bottom: 2px solid #415A77;
+  border-bottom: 2px solid #415a77;
   padding-bottom: 10px;
   font-weight: bold;
 }
@@ -126,10 +137,9 @@ span {
   flex-direction: row;
   justify-content: space-between;
   gap: 10px;
-
 }
 
-span p{
+span p {
   margin: 15px 0px 0px 0px;
   color: #000;
   font-size: 16px;

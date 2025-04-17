@@ -94,6 +94,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'organizer-create-tournament',
         component: () => import('@/views/organizer/createTournament/MainCreateTournament.vue'),
         meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-tournament-profile/:id',
+        component: () => import('@/views/organizer/createdTournaments/TournamentProfile.vue'),
+        meta: {role: 'organizer'}
       }
     ]
   }
