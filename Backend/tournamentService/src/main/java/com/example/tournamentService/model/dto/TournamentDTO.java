@@ -4,6 +4,7 @@ import lombok.Data;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Future;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class TournamentDTO {
@@ -13,7 +14,7 @@ public class TournamentDTO {
 
     @NotNull(message = "La fecha de inicio es obligatoria")
     @Future(message = "La fecha de inicio debe ser en el futuro")
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     private String format;
 

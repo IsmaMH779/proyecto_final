@@ -2,6 +2,7 @@ package com.example.tournamentService.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class PlayerRegistration {
@@ -19,7 +20,7 @@ public class PlayerRegistration {
     private String playerId;
 
     @Column(name = "registration_date", nullable = false)
-    private LocalDate registrationDate;
+    private LocalDateTime registrationDate;
 
     public PlayerRegistration() {
     }
@@ -48,11 +49,11 @@ public class PlayerRegistration {
         this.playerId = playerId;
     }
 
-    public LocalDate getRegistrationDate() {
+    public LocalDateTime getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(LocalDate registrationDate) {
+    public void setRegistrationDate(LocalDateTime registrationDate) {
         this.registrationDate = registrationDate;
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class TournamentService {
         Tournament tournament = new Tournament();
 
         tournament.setName(tournamentDTO.getName());
-        tournament.setCreationDate(LocalDate.now());
+        tournament.setCreationDate(LocalDateTime.now());
         tournament.setStartDate(tournamentDTO.getStartDate());
         tournament.setFormat(tournamentDTO.getFormat());
         tournament.setGame(tournamentDTO.getGame());
@@ -38,6 +39,7 @@ public class TournamentService {
         tournament.setOrganizerId(organizerId);
         tournament.setMaxPlayers(tournamentDTO.getMaxPlayers());
         tournament.setClosed(false);
+        tournament.setActive(false);
 
         return tournamentRepository.save(tournament);
     }
@@ -145,7 +147,7 @@ public class TournamentService {
         PlayerRegistration newPlayerRegistration = new PlayerRegistration();
         newPlayerRegistration.setTournament(tournament);
         newPlayerRegistration.setPlayerId(playerId);
-        newPlayerRegistration.setRegistrationDate(LocalDate.now());
+        newPlayerRegistration.setRegistrationDate(LocalDateTime.now());
 
         // añadir la inscripción a la lista de registros del torneo
         playerRegistrations.add(newPlayerRegistration);

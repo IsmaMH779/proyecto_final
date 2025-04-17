@@ -3,17 +3,24 @@ package com.example.tournamentService.model.dto;
 import com.example.tournamentService.model.Tournament;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class TournamentPlayerDTO {
     private long id;
-    private LocalDate startDate;
+    private LocalDateTime startDate;
     private String name;
-    private String closed;
+    private boolean closed;
+    private boolean active;
+    private String format;
+    private String game;
 
     public TournamentPlayerDTO(Tournament tournament) {
         this.id = tournament.getId();
         this.startDate = tournament.getStartDate();
         this.name = tournament.getName();
+        this.active = tournament.isActive();
+        this.format = tournament.getFormat();
+        this.game = tournament.getGame();
     }
 
     public long getId() {
@@ -24,11 +31,11 @@ public class TournamentPlayerDTO {
         this.id = id;
     }
 
-    public LocalDate getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
@@ -40,11 +47,35 @@ public class TournamentPlayerDTO {
         this.name = name;
     }
 
-    public String getClosed() {
+    public boolean isClosed() {
         return closed;
     }
 
-    public void setClosed(String closed) {
+    public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public String getGame() {
+        return game;
+    }
+
+    public void setGame(String game) {
+        this.game = game;
     }
 }
