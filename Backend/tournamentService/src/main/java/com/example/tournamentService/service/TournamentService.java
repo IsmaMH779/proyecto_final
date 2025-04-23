@@ -152,7 +152,7 @@ public class TournamentService {
         // añadir la inscripción a la lista de registros del torneo
         playerRegistrations.add(newPlayerRegistration);
 
-        // Como ya tienes CascadeType.ALL, al guardar el torneo, JPA debería guardar también la inscripción
+        // JPA guarda la inscripcion  gracias a tener CascadeType.ALL que guarda el torneo
         tournament.setRegistrations(playerRegistrations);
 
         // guardar el torneo (que incluirá la nueva inscripción debido a la cascada)
