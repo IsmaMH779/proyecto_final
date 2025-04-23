@@ -1,10 +1,17 @@
 <template>
-    <div class="tournament-app">
+  <div class="tournament-app">
+    <!-- Loader -->
+    <div v-if="isLoading" class="loader-container">
+      <div class="loader"></div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div v-else>
       <!-- Header -->
       <div class="header">
         <p class="header-title">Torneos</p>
       </div>
-  
+
       <!-- Store Profile -->
       <div class="store-profile">
         <div class="store-avatar">
@@ -18,9 +25,9 @@
           <p class="store-location">Localidad (calle, número, etc)</p>
         </div>
       </div>
-  
+
       <div class="divider"></div>
-  
+
       <!-- Tabs -->
       <div class="tabs-container">
         <div class="tabs-header">
@@ -37,21 +44,19 @@
             Lista de jugadores
           </button>
         </div>
-  
+
         <!-- Tournament Info Tab -->
         <div v-if="activeTab === 'info'" class="tab-content">
           <div class="content-container">
-            <h1 class="tournament-title">
-              {{ tournament.name }}
-            </h1>
-  
+            <h1 class="tournament-title">{{ tournament.name }}</h1>
+
             <div class="tournament-details">
               <div class="details-column">
                 <p class="detail-item">Fecha: {{ tournament.startDate.split("T")[0] }}</p>
                 <p class="detail-item">Horario: {{ tournament.startDate.split("T")[1] }}</p>
                 <p class="detail-item">Formato: {{ tournament.format }}</p>
               </div>
-  
+
               <div class="details-column">
                 <p class="detail-item">Premio por participar: Sobre x1</p>
                 <p class="detail-item">Premio por ganar: Booster Box x1</p>
@@ -59,7 +64,7 @@
             </div>
           </div>
         </div>
-  
+
         <!-- Players List Tab -->
         <div v-if="activeTab === 'players'" class="tab-content">
           <div class="content-container">
@@ -69,9 +74,10 @@
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
@@ -80,9 +86,9 @@ export default {
   setup() {
     const activeTab = ref("info");
     const tournament = ref();
-    const route = useRoute();  // Obtener la instancia de la ruta
+    const isLoading = ref(true);
+    const route = useRoute();
 
-    // Llamada a la API para obtener el torneo
     onMounted(() => {
       const id = route.params.id;
 
@@ -94,20 +100,24 @@ export default {
         })
         .then((response) => {
           tournament.value = response.data;
-          console.log(tournament.value)
         })
         .catch((error) => {
           console.error("Error al obtener datos:", error);
+        })
+        .finally(() => {
+          isLoading.value = false;
         });
     });
 
     return {
       activeTab,
       tournament,
+      isLoading,
     };
   },
 };
 </script>
+
   
   <style scoped>
   .header {
@@ -258,5 +268,29 @@ export default {
     font-weight: 700;
     margin-bottom: 1.5rem;
   }
+
+  /* ruedita */
+  .loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f9f5f0;
+}
+
+.loader {
+  border: 8px solid #eee;
+  border-top: 8px solid #1a2841;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
   </style>
   
