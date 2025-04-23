@@ -8,7 +8,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="authService" />
         <module name="tournamentService" />
-        <module name="UserManagementService" />
       </profile>
     </annotationProcessing>
   </component>
