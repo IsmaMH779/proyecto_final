@@ -30,7 +30,7 @@ public class OrganizerService {
         Organizer organizer = new Organizer();
 
         organizer.setId(userId);
-        organizer.setRole("Organizer");
+        organizer.setRole("organizer");
         organizer.setUsername(organizerRegisterDTO.getUsername());
         organizer.setMail(organizerRegisterDTO.getMail());
         organizer.setLocation(organizerRegisterDTO.getLocation());
