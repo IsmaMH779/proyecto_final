@@ -1,7 +1,5 @@
 <template>
-    <ion-page>
-        <div class="header">HISTORY</div>
-    </ion-page>
+    
 </template>
 
 <script>

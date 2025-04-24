@@ -1,7 +1,5 @@
 <template>
-    <ion-page>
-        <div class="header">ORGANIZER CALENDAR</div>
-    </ion-page>
+
 </template>
 
 <script>

@@ -1,7 +1,5 @@
 <template>
   <ion-page>
-    <div class="header"><p class="header-title">Torneos</p></div>
-
     <div class="content-container">
       <ion-grid>
         <ion-row>

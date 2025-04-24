@@ -1,6 +1,6 @@
 <template>
     <ion-page>
-      <div class="header">SEARCH TOURNAMENTS</div>
+      
     </ion-page>
   </template>
   

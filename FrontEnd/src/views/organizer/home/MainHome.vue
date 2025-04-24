@@ -1,8 +1,6 @@
 <template>
     <ion-page>
-        <div class="header">ORGANIZER HOME
-            <OrganizerProfileButton />
-        </div>
+        
     </ion-page>
 </template>
 

@@ -7,11 +7,6 @@
 
     <!-- Contenido principal -->
     <div v-else>
-      <!-- Header -->
-      <div class="header">
-        <p class="header-title">Torneos</p>
-      </div>
-
       <!-- Store Profile -->
       <div class="store-profile">
         <div class="store-avatar">

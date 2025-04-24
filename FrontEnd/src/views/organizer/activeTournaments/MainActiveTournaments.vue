@@ -1,7 +1,5 @@
 <template>
-    <ion-page>
-      <div class="header">ACTIVE TOURNAMENTS</div>
-    </ion-page>
+
   </template>
   
   <script>
