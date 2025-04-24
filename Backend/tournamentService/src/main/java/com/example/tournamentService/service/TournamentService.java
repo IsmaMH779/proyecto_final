@@ -9,6 +9,7 @@ import com.example.tournamentService.model.dto.TournamentPlayerDTO;
 import com.example.tournamentService.repository.PlayerRegistrationRepository;
 import com.example.tournamentService.repository.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -197,7 +198,37 @@ public class TournamentService {
         tournamentRepository.markTournamentAsClosed(tournamentId);
     }
 
-    public List<Tournament> searchTournaments() {
-        return null;
+    public List<Tournament> searchTournaments(String location, String game, LocalDate date) {
+        Specification<Tournament> spec = Specification.where(null);
+
+        if (location != null && !location.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(cb.lower(root.get("location")), location.toLowerCase())
+            );
+        }
+
+        if (game != null && !game.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(cb.lower(root.get("game")), game.toLowerCase())
+            );
+        }
+
+        if (date != null) {
+            LocalDateTime startOfDay     = date.atStartOfDay();
+            LocalDateTime startOfNextDay = date.plusDays(1).atStartOfDay();
+
+            spec = spec.and((root, query, cb) ->
+                    cb.and(
+                            cb.greaterThanOrEqualTo(root.get("startDate"), startOfDay),
+                            cb.lessThan(root.get("startDate"), startOfNextDay)
+                    )
+            );
+        }
+
+        List<Tournament> resultados = tournamentRepository.findAll(spec);
+        if (resultados.isEmpty()) {
+            throw DataNotFoundException.of("NO_TOURNAMENTS_FOUND");
+        }
+        return resultados;
     }
 }

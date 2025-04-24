@@ -8,10 +8,12 @@ import com.example.tournamentService.model.dto.TournamentPlayerDTO;
 import com.example.tournamentService.service.TournamentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -121,6 +123,24 @@ public class TournamentController {
             return ResponseEntity.ok().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchTournaments(
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String game,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        try {
+            List<Tournament> tournaments =
+                    tournamentService.searchTournaments(location, game, date);
+            return ResponseEntity.ok(tournaments);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity
+                    .status(404)
+                    .body(e.getMessage());
         }
     }
 
