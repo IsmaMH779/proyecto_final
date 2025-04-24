@@ -6,12 +6,10 @@
 
 <script>
 import { IonPage } from '@ionic/vue';
-import OrganizerProfileButton from '@/components/OrganizerProfileButton.vue';
 
 export default {
   components: {
-    IonPage,
-    OrganizerProfileButton,
+    IonPage
   },
 };
 </script>

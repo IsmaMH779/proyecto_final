@@ -10,7 +10,7 @@
           v-for="(p, i) in appPages" 
           :key="i"
           @click="handleItemClick(p)" 
-          :router-link="p.url !== 'logout' ? p.url : undefined" 
+          :router-link="p.url" 
           lines="none" 
           :detail="false" 
           class="hydrated"
@@ -33,7 +33,7 @@
             <ion-menu-toggle :auto-hide="false" v-for="(p, i) in appPages" :key="i">
               <ion-item 
                 @click="handleItemClick(p)" 
-                :router-link="p.url !== 'logout' ? p.url : undefined" 
+                :router-link="p.url" 
                 lines="none" 
                 :detail="false" 
                 class="hydrated" 
@@ -150,8 +150,7 @@ const appPages = ref([
   { title: 'Home', url: '/web/player-home', iosIcon: homeOutline, mdIcon: homeSharp },
   { title: 'Torneos', url: '/web/player-tournament', iosIcon: trophyOutline, mdIcon: trophySharp },
   { title: 'Calendario', url: '/web/player-calendar', iosIcon: calendarOutline, mdIcon: calendarSharp },
-  { title: 'Historial', url: '/web/player-history', iosIcon: timeOutline, mdIcon: timeSharp },
-  { title: 'Logout', url: 'logout', iosIcon: logOutOutline, mdIcon: logOutSharp }
+  { title: 'Historial', url: '/web/player-history', iosIcon: timeOutline, mdIcon: timeSharp }
 ]);
 
 const iosIcon = computed(() => appPages.value.map(p => p.iosIcon));

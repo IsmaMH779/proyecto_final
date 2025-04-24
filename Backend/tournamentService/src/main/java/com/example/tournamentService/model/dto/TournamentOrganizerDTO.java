@@ -18,7 +18,7 @@ public class TournamentOrganizerDTO {
         this.id = tournament.getId();
         this.startDate = tournament.getStartDate();
         this.name = tournament.getName();
-        this.closed = tournament.getClosed();
+        this.closed = tournament.isClosed();
         this.active = tournament.isActive();
         this.format = tournament.getFormat();
         this.game = tournament.getGame();

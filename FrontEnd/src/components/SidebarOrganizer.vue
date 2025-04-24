@@ -10,7 +10,7 @@
           v-for="(p, i) in appPages" 
           :key="i"
           @click="handleItemClick(p)" 
-          :router-link="p.url !== 'logout' ? p.url : undefined" 
+          :router-link="p.url" 
           lines="none" 
           :detail="false" 
           class="hydrated"
@@ -157,8 +157,7 @@ const appPages = [
   { title: 'Buscar torneos', url: '/web/organizer-search-tournament', iosIcon: searchOutline, mdIcon: searchSharp },
   { title: 'Calendario', url: '/web/organizer-calendar', iosIcon: calendarOutline, mdIcon: calendarSharp },
   { title: 'Historial', url: '/web/organizer-history', iosIcon: timeOutline, mdIcon: timeSharp },
-  { title: 'Crear Torneo', url: '/web/organizer-create-tournament', iosIcon: addOutline, mdIcon: addSharp },
-  { title: 'Logout', url: 'logout', iosIcon: logOutOutline, mdIcon: logOutSharp }
+  { title: 'Crear Torneo', url: '/web/organizer-create-tournament', iosIcon: addOutline, mdIcon: addSharp }
 ];
 
 // Titulo del header
@@ -285,6 +284,11 @@ watch(() => route.path, () => {
   padding: 0px 15px;
 }
 
+
+.header ion-toolbar {
+  height: 84.5px;
+}
+
 .header-title {
   margin-bottom: 0;
   font-weight: bold;
@@ -301,6 +305,10 @@ watch(() => route.path, () => {
 
   .username {
     display: none;
+  }
+
+  .header ion-toolbar {
+    height: max-content;
   }
 }
 

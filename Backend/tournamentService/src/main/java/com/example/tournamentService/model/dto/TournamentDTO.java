@@ -24,6 +24,9 @@ public class TournamentDTO {
     @NotNull(message = "La ubicación es obligatoria")
     private String location;
 
+    @NotNull(message = "La direccion es obligatoria")
+    private String address;
+
     @NotNull(message = "El número máximo de jugadores es obligatorio")
     private Integer maxPlayers;
 }

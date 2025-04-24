@@ -32,6 +32,9 @@ public class Tournament {
     @Column(name = "location", nullable = false)
     private String location;
 
+    @Column(name = "address", nullable = false)
+    private String address;
+
     @Column(name = "id_organizer", nullable = false)
     private String organizerId;
 
@@ -43,7 +46,6 @@ public class Tournament {
 
     @Column(name = "active", nullable = false)
     private boolean active;
-
 
     // Relación con los jugadores (inscripciones)
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -108,6 +110,14 @@ public class Tournament {
         this.location = location;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String getOrganizerId() {
         return organizerId;
     }
@@ -124,24 +134,12 @@ public class Tournament {
         this.maxPlayers = maxPlayers;
     }
 
-    public List<PlayerRegistration> getRegistrations() {
-        return registrations;
-    }
-
-    public void setRegistrations(List<PlayerRegistration> registrations) {
-        this.registrations = registrations;
-    }
-
-    public boolean getClosed() {
+    public boolean isClosed() {
         return closed;
     }
 
     public void setClosed(boolean closed) {
         this.closed = closed;
-    }
-
-    public boolean isClosed() {
-        return closed;
     }
 
     public boolean isActive() {
@@ -150,5 +148,13 @@ public class Tournament {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public List<PlayerRegistration> getRegistrations() {
+        return registrations;
+    }
+
+    public void setRegistrations(List<PlayerRegistration> registrations) {
+        this.registrations = registrations;
     }
 }

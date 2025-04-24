@@ -36,6 +36,7 @@ public class TournamentService {
         tournament.setFormat(tournamentDTO.getFormat());
         tournament.setGame(tournamentDTO.getGame());
         tournament.setLocation(tournamentDTO.getLocation());
+        tournament.setAddress(tournamentDTO.getAddress());
         tournament.setOrganizerId(organizerId);
         tournament.setMaxPlayers(tournamentDTO.getMaxPlayers());
         tournament.setClosed(false);
