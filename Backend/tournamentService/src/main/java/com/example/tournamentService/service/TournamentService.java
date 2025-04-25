@@ -6,6 +6,7 @@ import com.example.tournamentService.model.Tournament;
 import com.example.tournamentService.model.dto.TournamentDTO;
 import com.example.tournamentService.model.dto.TournamentOrganizerDTO;
 import com.example.tournamentService.model.dto.TournamentPlayerDTO;
+import com.example.tournamentService.model.dto.TournamentSearchDTO;
 import com.example.tournamentService.repository.PlayerRegistrationRepository;
 import com.example.tournamentService.repository.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class TournamentService {
     private PlayerRegistrationRepository playerRegistrationRepository;
 
     public Tournament createTournament(TournamentDTO tournamentDTO, String organizerId) {
+        String organizerName = SecurityContextHolder.getContext().getAuthentication().getName();
+
         Tournament tournament = new Tournament();
 
         tournament.setName(tournamentDTO.getName());
@@ -39,6 +42,7 @@ public class TournamentService {
         tournament.setLocation(tournamentDTO.getLocation());
         tournament.setAddress(tournamentDTO.getAddress());
         tournament.setOrganizerId(organizerId);
+        tournament.setOrganizerName(organizerName);
         tournament.setMaxPlayers(tournamentDTO.getMaxPlayers());
         tournament.setClosed(false);
         tournament.setActive(false);
@@ -198,25 +202,22 @@ public class TournamentService {
         tournamentRepository.markTournamentAsClosed(tournamentId);
     }
 
-    public List<Tournament> searchTournaments(String location, String game, LocalDate date) {
-        Specification<Tournament> spec = Specification.where(null);
+    public List<TournamentSearchDTO> searchTournaments(String location, String game, LocalDate date) {
+        Specification<Tournament> spec = (root, query, cb) -> cb.conjunction();
 
         if (location != null && !location.isBlank()) {
             spec = spec.and((root, query, cb) ->
-                    cb.equal(cb.lower(root.get("location")), location.toLowerCase())
+                        cb.equal(cb.lower(root.get("location")), location.toLowerCase())
             );
         }
-
         if (game != null && !game.isBlank()) {
             spec = spec.and((root, query, cb) ->
-                    cb.equal(cb.lower(root.get("game")), game.toLowerCase())
+                        cb.equal(cb.lower(root.get("game")), game.toLowerCase())
             );
         }
-
         if (date != null) {
             LocalDateTime startOfDay     = date.atStartOfDay();
             LocalDateTime startOfNextDay = date.plusDays(1).atStartOfDay();
-
             spec = spec.and((root, query, cb) ->
                     cb.and(
                             cb.greaterThanOrEqualTo(root.get("startDate"), startOfDay),
@@ -225,10 +226,18 @@ public class TournamentService {
             );
         }
 
-        List<Tournament> resultados = tournamentRepository.findAll(spec);
-        if (resultados.isEmpty()) {
-            throw DataNotFoundException.of("NO_TOURNAMENTS_FOUND");
-        }
-        return resultados;
+        List<Tournament> results = tournamentRepository.findAll(spec);
+
+        return results.stream()
+                .map(t -> new TournamentSearchDTO(
+                        t.getName(),
+                        t.getGame(),
+                        t.getOrganizerName(),
+                        t.getLocation(),
+                        t.getStartDate()
+                ))
+                .collect(Collectors.toList());
     }
+
+
 }

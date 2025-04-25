@@ -5,6 +5,7 @@ import com.example.tournamentService.model.Tournament;
 import com.example.tournamentService.model.dto.TournamentDTO;
 import com.example.tournamentService.model.dto.TournamentOrganizerDTO;
 import com.example.tournamentService.model.dto.TournamentPlayerDTO;
+import com.example.tournamentService.model.dto.TournamentSearchDTO;
 import com.example.tournamentService.service.TournamentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,15 +134,8 @@ public class TournamentController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
-        try {
-            List<Tournament> tournaments =
-                    tournamentService.searchTournaments(location, game, date);
-            return ResponseEntity.ok(tournaments);
-        } catch (DataNotFoundException e) {
-            return ResponseEntity
-                    .status(404)
-                    .body(e.getMessage());
-        }
+        List<TournamentSearchDTO> tournaments = tournamentService.searchTournaments(location, game, date);
+        return ResponseEntity.ok(tournaments);
     }
 
 }
