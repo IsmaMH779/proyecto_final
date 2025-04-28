@@ -114,7 +114,7 @@ public class TournamentController {
         }
     }
 
-    // Registrar al usuario autenticado en un torneo específico
+    // Registrar al jugador autenticado en un torneo específico
     @PostMapping("/{tournamentID}/register")
     public ResponseEntity<?> registerPlayerOnTournament(@PathVariable Long tournamentID) {
         String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

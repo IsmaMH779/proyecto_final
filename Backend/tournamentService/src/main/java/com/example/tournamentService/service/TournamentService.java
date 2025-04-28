@@ -179,10 +179,10 @@ public class TournamentService {
 
         // eliminar la inscripcion del jugador
         List<PlayerRegistration> playerRegistrationList = tournament.getRegistrations();
-        playerRegistrationList = playerRegistrationList.stream().filter(reg -> !reg.getPlayerId().equals(playerId)).toList();
+        playerRegistrationList.removeIf(reg -> reg.getPlayerId().equals(playerId));
 
         // guardar el torneo con la lista actualizada
-        tournament.setRegistrations(playerRegistrationList);
+
         tournamentRepository.save(tournament);
     }
 

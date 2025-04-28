@@ -1,5 +1,6 @@
 package com.example.tournamentService.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,8 +13,10 @@ public class PlayerRegistration {
     @Column(name = "id_inscription")
     private Long id;
 
+    // Relación obligatoria con Tournament y con anotaciones para evitar recursividad
     @ManyToOne
-    @JoinColumn(name = "id_tournament", nullable = false) // Relación obligatoria con Tournament
+    @JoinColumn(name = "id_tournament", nullable = false)
+    @JsonBackReference
     private Tournament tournament;
 
     @Column(name = "id_player", nullable = false)

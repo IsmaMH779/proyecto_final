@@ -47,6 +47,21 @@ public class PlayerController {
         }
     }
 
+    // obtener jugador por id
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPlayerByID(@PathVariable("id") int userId) {
+
+        try {
+            Player player = playerService.getPlayerData(userId);
+            return ResponseEntity.ok(player);
+        } catch (DataNotFoundException e){
+            log.error(e.getLocalizedMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
     // Actualizar datos del jugador autenticado
     @PutMapping("/me")
     public ResponseEntity<?> updatePlayerData(@RequestBody UpdatePlayerDTO updatePlayerDTO) {

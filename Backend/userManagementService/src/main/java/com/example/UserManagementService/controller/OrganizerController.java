@@ -36,6 +36,19 @@ public class OrganizerController {
         }
     }
 
+    // obtener organizador por id
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPlayerById(@PathVariable("id") int userId) {
+
+        try {
+            Organizer organizer = organizerService.getOrganizerData(userId);
+            return ResponseEntity.ok(organizer);
+        } catch (DataNotFoundException e){
+            log.error(e.getLocalizedMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     // Actualizar datos del organizador autenticado
     @PutMapping("/me")
     public ResponseEntity<?> updatePlayerData(@RequestBody UpdateOrganizerDTO updateOrganizerDTO) {

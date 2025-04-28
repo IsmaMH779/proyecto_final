@@ -1,5 +1,6 @@
 package com.example.tournamentService.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,6 +53,7 @@ public class Tournament {
 
     // Relación con los jugadores (inscripciones)
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<PlayerRegistration> registrations = new ArrayList<>();
 
     public Tournament() {
