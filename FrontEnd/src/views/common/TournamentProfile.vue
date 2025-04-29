@@ -49,12 +49,48 @@
           <h1 class="tournament-title">{{ tournament.name }}</h1>
           <div class="tournament-details">
             <div class="detail-item">
-              <strong>Fecha:</strong>
-              {{ tournament.startDate.split("T")[0] }}
+              <div class="detail-header">
+                <strong>Fecha:</strong>
+                <button 
+                  v-if="isOrganizer" 
+                  class="edit-button"
+                  @click="openDateTimeEditor('date')"
+                >
+                  {{ isEditingDate ? 'Guardar' : 'Editar' }}
+                </button>
+              </div>
+              <div class="detail-content">
+                {{ tournament.startDate.split("T")[0] }}
+                <div v-if="isEditingDate" class="edit-container">
+                  <input 
+                    type="date" 
+                    v-model="editedDate" 
+                    class="date-input"
+                  />
+                </div>
+              </div>
             </div>
             <div class="detail-item">
-              <strong>Horario:</strong>
-              {{ tournament.startDate.split("T")[1] }}
+              <div class="detail-header">
+                <strong>Horario:</strong>
+                <button 
+                  v-if="isOrganizer" 
+                  class="edit-button"
+                  @click="openDateTimeEditor('time')"
+                >
+                  {{ isEditingTime ? 'Guardar' : 'Editar' }}
+                </button>
+              </div>
+              <div class="detail-content">
+                {{ tournament.startDate.split("T")[1] }}
+                <div v-if="isEditingTime" class="edit-container">
+                  <input 
+                    type="time" 
+                    v-model="editedTime" 
+                    class="time-input"
+                  />
+                </div>
+              </div>
             </div>
             <div class="detail-item">
               <strong>Formato:</strong> {{ tournament.format }}
@@ -105,7 +141,7 @@
       </div>
     </div>
 
-    <!-- Modal Confirmación -->
+    <!-- Modal Confirmación para eliminar jugador -->
     <div v-if="showDeleteModal" class="modal-overlay">
       <div class="modal">
         <p>¿Seguro que quieres eliminar este jugador?</p>
@@ -115,15 +151,26 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Confirmación para Fecha/Hora -->
+    <div v-if="showDateTimeModal" class="modal-overlay">
+      <div class="modal">
+        <p>¿Confirmar cambios en la {{ editingType === 'date' ? 'fecha' : 'hora' }} del torneo?</p>
+        <div class="modal-actions">
+          <button class="confirm-btn" @click="confirmDateTimeChange">Confirmar</button>
+          <button class="cancel-btn" @click="cancelDateTimeChange">Cancelar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
-import { useRoute } from "vue-router";
+import { ref, onMounted } from "vue"
+import axios from "axios"
+import { useRoute } from "vue-router"
 
-const activeTab = ref("info");
+const activeTab = ref("info")
 const tournament = ref({
   name: "",
   startDate: "",
@@ -132,138 +179,207 @@ const tournament = ref({
   address: "",
   registrations: [],
   organizerId: null,
-});
-const isLoading = ref(true);
-const playerNames = ref({});
-const organizerName = ref("");
-const profileImageUrl = ref();
-const route = useRoute();
-const isOrganizer = ref(false);
+})
+const isLoading = ref(true)
+const playerNames = ref({})
+const organizerName = ref("")
+const profileImageUrl = ref()
+const route = useRoute()
+const isOrganizer = ref(false)
 
-const showDeleteModal = ref(false);
-const registrationToDelete = ref(null);
+// Variables para eliminar jugador
+const showDeleteModal = ref(false)
+const registrationToDelete = ref(null)
+
+// Variables para editar fecha/hora
+const isEditingDate = ref(false)
+const isEditingTime = ref(false)
+const editedDate = ref("")
+const editedTime = ref("")
+const showDateTimeModal = ref(false)
+const editingType = ref(null)
+const me = ref(null) // Definir 'me' aquí
 
 // obtiene username de jugador
 async function fetchPlayerName(playerId) {
   try {
-    const { data } = await axios.get(
-      `http://localhost:8081/api/players/${playerId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    return data.username;
+    const { data } = await axios.get(`http://localhost:8081/api/players/${playerId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+    return data.username
   } catch {
-    return "— error —";
+    return "— error —"
   }
 }
 
 // obtiene info del organizador
 async function fetchOrganizerData(organizerId) {
   try {
-    const { data } = await axios.get(
-      `http://localhost:8081/api/organizers/${organizerId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    profileImageUrl.value = data.imageUrl;
-    return data.username;
+    const { data } = await axios.get(`http://localhost:8081/api/organizers/${organizerId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+    profileImageUrl.value = data.imageUrl
+    return data.username
   } catch {
-    return "— error —";
+    return "— error —"
   }
 }
 
 // carga nombres de todos los jugadores
 async function loadAllPlayerNames(registrations) {
   const promises = registrations.map(async (r) => {
-    const name = await fetchPlayerName(r.playerId);
-    playerNames.value[r.playerId] = name;
-  });
-  await Promise.all(promises);
+    const name = await fetchPlayerName(r.playerId)
+    playerNames.value[r.playerId] = name
+  })
+  await Promise.all(promises)
 }
 
-// abre modal de confirmacion
+// abre modal de confirmacion para eliminar
 function openDeleteModal(registrationId) {
-  registrationToDelete.value = registrationId;
-  showDeleteModal.value = true;
+  registrationToDelete.value = registrationId
+  showDeleteModal.value = true
 }
 
 // confirma y borra jugador
 async function confirmDelete() {
   try {
-    await axios.delete(
-      `http://localhost:8082/api/tournaments/${tournament.value.id}/${registrationToDelete.value}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    await axios.delete(`http://localhost:8082/api/tournaments/${tournament.value.id}/${registrationToDelete.value}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
     // refresca la lista de jugadores
-    tournament.value.registrations = tournament.value.registrations.filter(
-      (r) => r.id !== registrationToDelete.value
-    );
+    tournament.value.registrations = tournament.value.registrations.filter((r) => r.id !== registrationToDelete.value)
   } catch (e) {
-    console.error("Error eliminando registro:", e);
+    console.error("Error eliminando registro:", e)
   } finally {
-    showDeleteModal.value = false;
+    showDeleteModal.value = false
   }
 }
 
 // cancelar borrado
 function cancelDelete() {
-  registrationToDelete.value = null;
-  showDeleteModal.value = false;
+  registrationToDelete.value = null
+  showDeleteModal.value = false
+}
+
+// Abre el editor de fecha/hora
+function openDateTimeEditor(type) {
+  if (type === "date") {
+    if (isEditingDate.value) {
+      // Si ya estaba editando, mostrar modal de confirmación
+      editingType.value = "date"
+      showDateTimeModal.value = true
+    } else {
+      // Iniciar edición
+      editedDate.value = tournament.value.startDate.split("T")[0]
+      isEditingDate.value = true
+    }
+  } else if (type === "time") {
+    if (isEditingTime.value) {
+      // Si ya estaba editando, mostrar modal de confirmación
+      editingType.value = "time"
+      showDateTimeModal.value = true
+    } else {
+      // Iniciar edición
+      editedTime.value = tournament.value.startDate.split("T")[1].substring(0, 5)
+      isEditingTime.value = true
+    }
+  }
+}
+
+// Confirma y guarda los cambios de fecha/hora
+async function confirmDateTimeChange() {
+  try {
+    let newStartDate = tournament.value.startDate
+
+    if (editingType.value === "date") {
+      // Actualizar solo la fecha
+      const timePart = newStartDate.split("T")[1]
+      newStartDate = `${editedDate.value}T${timePart}`
+    } else if (editingType.value === "time") {
+      // Actualizar solo la hora
+      const datePart = newStartDate.split("T")[0]
+      newStartDate = `${datePart}T${editedTime.value}:00`
+    }
+
+    // Llamar al endpoint para actualizar
+    await axios.put(
+      `http://localhost:8082/api/tournaments/${tournament.value.id}`,
+      {
+        ...tournament.value,
+        startDate: newStartDate,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      },
+    )
+
+    // Actualizar datos locales
+    tournament.value.startDate = newStartDate
+
+    // Cerrar editor
+    isEditingDate.value = false
+    isEditingTime.value = false
+  } catch (e) {
+    console.error("Error actualizando fecha/hora:", e)
+  } finally {
+    showDateTimeModal.value = false
+  }
+}
+
+// Cancelar edición de fecha/hora
+function cancelDateTimeChange() {
+  isEditingDate.value = false
+  isEditingTime.value = false
+  showDateTimeModal.value = false
 }
 
 onMounted(async () => {
   try {
-    const { data: tournamentData } = await axios.get(
-      `http://localhost:8082/api/tournaments/${route.params.id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    tournament.value = tournamentData;
+    const { data: tournamentData } = await axios.get(`http://localhost:8082/api/tournaments/${route.params.id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+    tournament.value = tournamentData
 
     if (tournamentData.registrations?.length) {
-      await loadAllPlayerNames(tournamentData.registrations);
+      await loadAllPlayerNames(tournamentData.registrations)
     }
 
     if (tournamentData.organizerId) {
-      organizerName.value = await fetchOrganizerData(tournamentData.organizerId);
+      organizerName.value = await fetchOrganizerData(tournamentData.organizerId)
     }
 
     // verificar si el usuario logeado es el organizador
-    const { data: me } = await axios.get(
-      `http://localhost:8081/api/organizers/me`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-  
-    isOrganizer.value = me.id == tournamentData.organizerId;
+    const { data: meData } = await axios.get(`http://localhost:8081/api/organizers/me`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+
+    me.value = meData
+    isOrganizer.value = me.value?.id == tournamentData.organizerId
     console.log(isOrganizer.value)
   } catch (e) {
-    console.error("Error cargando datos:", e);
+    console.error("Error cargando datos:", e)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-});
+})
 </script>
 
 <style scoped>
@@ -515,5 +631,46 @@ onMounted(async () => {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
+}
+
+/* Estilos para edición de fecha/hora */
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.detail-content {
+  position: relative;
+}
+
+.edit-button {
+  background: #3d5a80;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+  background: #2c3e50;
+}
+
+.edit-container {
+  margin-top: 0.5rem;
+}
+
+.date-input, .time-input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  color: #ffffff;
+  background-color: #1a2841;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  width: 100%;
 }
 </style>
