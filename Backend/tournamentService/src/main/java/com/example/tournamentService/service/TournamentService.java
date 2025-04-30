@@ -30,8 +30,6 @@ public class TournamentService {
     private PlayerRegistrationRepository playerRegistrationRepository;
 
     public Tournament createTournament(TournamentDTO tournamentDTO, String organizerId) {
-        String organizerName = SecurityContextHolder.getContext().getAuthentication().getName();
-
         Tournament tournament = new Tournament();
 
         tournament.setName(tournamentDTO.getName());
@@ -42,7 +40,6 @@ public class TournamentService {
         tournament.setLocation(tournamentDTO.getLocation());
         tournament.setAddress(tournamentDTO.getAddress());
         tournament.setOrganizerId(organizerId);
-        tournament.setOrganizerName(organizerName);
         tournament.setMaxPlayers(tournamentDTO.getMaxPlayers());
         tournament.setClosed(false);
         tournament.setActive(false);
@@ -202,42 +199,48 @@ public class TournamentService {
         tournamentRepository.markTournamentAsClosed(tournamentId);
     }
 
-    public List<TournamentSearchDTO> searchTournaments(String location, String game, LocalDate date) {
+    public List<TournamentSearchDTO> searchTournaments(
+            String location,
+            String game,
+            LocalDate fromDate,
+            LocalDate toDate
+    ) {
         Specification<Tournament> spec = (root, query, cb) -> cb.conjunction();
 
         if (location != null && !location.isBlank()) {
             spec = spec.and((root, query, cb) ->
-                        cb.equal(cb.lower(root.get("location")), location.toLowerCase())
+                    cb.equal(cb.lower(root.get("location")), location.toLowerCase())
             );
         }
         if (game != null && !game.isBlank()) {
             spec = spec.and((root, query, cb) ->
-                        cb.equal(cb.lower(root.get("game")), game.toLowerCase())
+                    cb.equal(cb.lower(root.get("game")), game.toLowerCase())
             );
         }
-        if (date != null) {
-            LocalDateTime startOfDay     = date.atStartOfDay();
-            LocalDateTime startOfNextDay = date.plusDays(1).atStartOfDay();
+        // Rango de fechas para poder buscar torneos en un mes
+        if (fromDate != null) {
+            LocalDateTime start = fromDate.atStartOfDay();
             spec = spec.and((root, query, cb) ->
-                    cb.and(
-                            cb.greaterThanOrEqualTo(root.get("startDate"), startOfDay),
-                            cb.lessThan(root.get("startDate"), startOfNextDay)
-                    )
+                    cb.greaterThanOrEqualTo(root.get("startDate"), start)
+            );
+        }
+        if (toDate != null) {
+            LocalDateTime end = toDate.plusDays(1).atStartOfDay();
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThan(root.get("startDate"), end)
             );
         }
 
         List<Tournament> results = tournamentRepository.findAll(spec);
-
         return results.stream()
                 .map(t -> new TournamentSearchDTO(
+                        t.getId(),
                         t.getName(),
                         t.getGame(),
-                        t.getOrganizerName(),
+                        t.getOrganizerId(),
                         t.getLocation(),
                         t.getStartDate()
                 ))
                 .collect(Collectors.toList());
     }
-
-
 }

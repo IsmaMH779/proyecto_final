@@ -490,6 +490,9 @@ export default {
   box-sizing: border-box;
 }
 
+ion-content {
+  --background: #f9f5f0;
+}
 /* Contenedor principal */
 .organizer-app {
   background-color: #f9f5f0;

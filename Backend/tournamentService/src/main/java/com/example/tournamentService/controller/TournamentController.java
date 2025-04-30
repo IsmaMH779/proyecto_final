@@ -132,10 +132,14 @@ public class TournamentController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String game,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate
     ) {
-        List<TournamentSearchDTO> tournaments = tournamentService.searchTournaments(location, game, date);
+        List<TournamentSearchDTO> tournaments =
+                tournamentService.searchTournaments(location, game, fromDate, toDate);
         return ResponseEntity.ok(tournaments);
     }
+
 
 }

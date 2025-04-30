@@ -49,8 +49,18 @@ const routes: Array<RouteRecordRaw> = [
         meta: {role: 'player'}
       },
       {
+        path: 'player-search-tournament',
+        component: () => import('@/views/common/SearchTournaments.vue'),
+        meta: {role: 'player'}
+      },
+      {
         path: 'player-profile',
         component: () => import('@/views/player/profile/Profile.vue'),
+        meta: {role: 'player'}
+      },
+      {
+        path: 'player-tournament-profile/:id',
+        component: () => import('@/views/common/TournamentProfile.vue'),
         meta: {role: 'player'}
       },
 
@@ -72,7 +82,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'organizer-search-tournament',
-        component: () => import('@/views/organizer/searchTournament/MainSearchTournaments.vue'),
+        component: () => import('@/views/common/SearchTournaments.vue'),
         meta: {role: 'organizer'}
       },
       {

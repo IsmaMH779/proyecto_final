@@ -3,18 +3,27 @@ package com.example.tournamentService.model.dto;
 import java.time.LocalDateTime;
 
 public class TournamentSearchDTO {
+    private Long id;
     private String name;
     private String game;
-    private String organizerName;
+    private String organizerId;
     private String location;
     private LocalDateTime startDate;
 
-    public TournamentSearchDTO(String name, String game, String organizerName, String location, LocalDateTime startDate) {
+    public TournamentSearchDTO(Long id, String name, String game, String organizerId, String location, LocalDateTime startDate) {
+        this.id = id;
         this.name = name;
         this.game = game;
-        this.organizerName = organizerName;
+        this.organizerId = organizerId;
         this.location = location;
         this.startDate = startDate;
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -33,12 +42,12 @@ public class TournamentSearchDTO {
         this.game = game;
     }
 
-    public String getOrganizerName() {
-        return organizerName;
+    public String getOrganizerId() {
+        return organizerId;
     }
 
-    public void setOrganizerName(String organizerName) {
-        this.organizerName = organizerName;
+    public void setOrganizerId(String organizerName) {
+        this.organizerId = organizerName;
     }
 
     public String getLocation() {

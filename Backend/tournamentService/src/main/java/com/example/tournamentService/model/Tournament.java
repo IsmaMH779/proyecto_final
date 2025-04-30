@@ -39,8 +39,10 @@ public class Tournament {
     @Column(name = "id_organizer", nullable = false)
     private String organizerId;
 
+    /* No usar de momento
     @Column(name = "organizer_name", nullable = false)
     private String organizerName;
+     */
 
     @Column(name = "max_players", nullable = false)
     private int maxPlayers;
@@ -131,11 +133,14 @@ public class Tournament {
         this.organizerId = organizerId;
     }
 
+    /*
     public String getOrganizerName() { return organizerName; }
 
     public void setOrganizerName(String organizerName) {
         this.organizerName = organizerName;
     }
+
+     */
 
     public int getMaxPlayers() {
         return maxPlayers;
