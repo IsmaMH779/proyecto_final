@@ -11,17 +11,35 @@
       <div class="card store-profile">
         <div class="store-avatar">
           <img
-            :src="'http://localhost:8081/images/profile/' + profileImageUrl" 
+            :src="`http://localhost:8081/images/profile/${profileImageUrl}`"
             alt="Store"
           />
         </div>
         <div class="store-info">
           <h2 class="store-name">
-            {{ organizerName || "Cargando nombre..." }}
+            {{ organizerName || 'Cargando nombre...' }}
           </h2>
           <p class="store-location">
             {{ `${tournament.location}, ${tournament.address}` }}
           </p>
+          <!-- Premios recuperados desde el backend -->
+          <p class="store-prize">
+            <strong>Premio inscripción:</strong> {{ tournament.entryFee }}
+          </p>
+          <p class="store-prize">
+            <strong>Premio ganador:</strong> {{ tournament.winnerPrize }}
+          </p>
+          <!-- Botón de inscripción en perfil para jugadores -->
+          <button
+            v-if="isPlayer && !alreadyRegistered"
+            @click="registerToTournament"
+            class="register-btn"
+          >
+            Inscribirme
+          </button>
+          <span v-else-if="isPlayer && alreadyRegistered" class="already-registered">
+            ¡Ya estás inscrito!
+          </span>
         </div>
       </div>
 
@@ -48,11 +66,12 @@
         <div v-show="activeTab === 'info'" class="card tab-content">
           <h1 class="tournament-title">{{ tournament.name }}</h1>
           <div class="tournament-details">
+            <!-- Fecha y hora -->
             <div class="detail-item">
               <div class="detail-header">
                 <strong>Fecha:</strong>
-                <button 
-                  v-if="isOrganizer" 
+                <button
+                  v-if="isOrganizer"
                   class="edit-button"
                   @click="openDateTimeEditor('date')"
                 >
@@ -60,21 +79,22 @@
                 </button>
               </div>
               <div class="detail-content">
-                {{ tournament.startDate.split("T")[0] }}
+                {{ tournament.startDate.split('T')[0] }}
                 <div v-if="isEditingDate" class="edit-container">
-                  <input 
-                    type="date" 
-                    v-model="editedDate" 
+                  <input
+                    type="date"
+                    v-model="editedDate"
                     class="date-input"
                   />
                 </div>
               </div>
             </div>
+
             <div class="detail-item">
               <div class="detail-header">
                 <strong>Horario:</strong>
-                <button 
-                  v-if="isOrganizer" 
+                <button
+                  v-if="isOrganizer"
                   class="edit-button"
                   @click="openDateTimeEditor('time')"
                 >
@@ -82,24 +102,19 @@
                 </button>
               </div>
               <div class="detail-content">
-                {{ tournament.startDate.split("T")[1] }}
+                {{ tournament.startDate.split('T')[1] }}
                 <div v-if="isEditingTime" class="edit-container">
-                  <input 
-                    type="time" 
-                    v-model="editedTime" 
+                  <input
+                    type="time"
+                    v-model="editedTime"
                     class="time-input"
                   />
                 </div>
               </div>
             </div>
+
             <div class="detail-item">
               <strong>Formato:</strong> {{ tournament.format }}
-            </div>
-            <div class="detail-item">
-              <strong>Premio inscripción:</strong> Sobre x1
-            </div>
-            <div class="detail-item">
-              <strong>Premio ganador:</strong> Booster Box x1
             </div>
           </div>
         </div>
@@ -120,14 +135,13 @@
             >
               <div class="player-info">
                 <p class="player-name">
-                  {{ playerNames[registration.playerId] || "Cargando..." }}
+                  {{ playerNames[registration.playerId] || 'Cargando...' }}
                 </p>
                 <p class="player-date">
-                  Inscrito el {{ registration.registrationDate.split("T")[0] }}
+                  Inscrito el {{ registration.registrationDate.split('T')[0] }}
                 </p>
               </div>
 
-              <!-- Botón de borrar solo si es organizador -->
               <button
                 v-if="isOrganizer"
                 class="delete-button"
@@ -155,7 +169,10 @@
     <!-- Modal Confirmación para Fecha/Hora -->
     <div v-if="showDateTimeModal" class="modal-overlay">
       <div class="modal">
-        <p>¿Confirmar cambios en la {{ editingType === 'date' ? 'fecha' : 'hora' }} del torneo?</p>
+        <p>
+          ¿Confirmar cambios en la
+          {{ editingType === 'date' ? 'fecha' : 'hora' }} del torneo?
+        </p>
         <div class="modal-actions">
           <button class="confirm-btn" @click="confirmDateTimeChange">Confirmar</button>
           <button class="cancel-btn" @click="cancelDateTimeChange">Cancelar</button>
@@ -166,219 +183,177 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"
-import axios from "axios"
-import { useRoute } from "vue-router"
+import { ref, onMounted, computed } from 'vue'
+import axios from 'axios'
+import { useRoute } from 'vue-router'
 
-const activeTab = ref("info")
+const route = useRoute()
+const activeTab = ref('info')
 const tournament = ref({
-  name: "",
-  startDate: "",
-  format: "",
-  location: "",
-  address: "",
+  name: '',
+  startDate: '',
+  format: '',
+  location: '',
+  address: '',
   registrations: [],
   organizerId: null,
+  entryFee: '',
+  winnerPrize: ''
 })
 const isLoading = ref(true)
 const playerNames = ref({})
-const organizerName = ref("")
-const profileImageUrl = ref()
-const route = useRoute()
+const organizerName = ref('')
+const profileImageUrl = ref('')
 const isOrganizer = ref(false)
+const isPlayer = ref(false)
+const me = ref(null)
 
-// Variables para eliminar jugador
+// Editores de fecha/hora
+const isEditingDate = ref(false)
+const isEditingTime = ref(false)
+const editedDate = ref('')
+const editedTime = ref('')
+const showDateTimeModal = ref(false)
+const editingType = ref(null)
+
+// Eliminar jugador
 const showDeleteModal = ref(false)
 const registrationToDelete = ref(null)
 
-// Variables para editar fecha/hora
-const isEditingDate = ref(false)
-const isEditingTime = ref(false)
-const editedDate = ref("")
-const editedTime = ref("")
-const showDateTimeModal = ref(false)
-const editingType = ref(null)
-const me = ref(null) // Definir 'me' aquí
+// Computed: ¿ya inscrito?
+const alreadyRegistered = computed(() => {
+  if (!me.value || !tournament.value.registrations) return false
+  return tournament.value.registrations.some(
+    r => String(r.playerId) === String(me.value.id)
+  )
+})
 
-// obtiene username de jugador
+// Fetch nombres
 async function fetchPlayerName(playerId) {
   try {
-    const { data } = await axios.get(`http://localhost:8081/api/players/${playerId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
+    const { data } = await axios.get(
+      `http://localhost:8081/api/players/${playerId}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    )
     return data.username
   } catch {
-    return "— error —"
+    return '— error —'
   }
 }
-
-// obtiene info del organizador
-async function fetchOrganizerData(organizerId) {
-  try {
-    const { data } = await axios.get(`http://localhost:8081/api/organizers/${organizerId}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-    profileImageUrl.value = data.imageUrl
-    return data.username
-  } catch {
-    return "— error —"
-  }
-}
-
-// carga nombres de todos los jugadores
-async function loadAllPlayerNames(registrations) {
-  const promises = registrations.map(async (r) => {
-    const name = await fetchPlayerName(r.playerId)
+async function loadAllPlayerNames(regs) {
+  const promises = regs.map(r => fetchPlayerName(r.playerId).then(name => {
     playerNames.value[r.playerId] = name
-  })
+  }))
   await Promise.all(promises)
 }
 
-// abre modal de confirmacion para eliminar
-function openDeleteModal(registrationId) {
-  registrationToDelete.value = registrationId
-  showDeleteModal.value = true
+// Fetch organizador
+async function fetchOrganizerData(id) {
+  try {
+    const { data } = await axios.get(
+      `http://localhost:8081/api/organizers/${id}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    )
+    profileImageUrl.value = data.imageUrl
+    return data.username
+  } catch {
+    return '— error —'
+  }
 }
 
-// confirma y borra jugador
+// Registrar jugador
+async function registerToTournament() {
+  try {
+    await axios.post(
+      `http://localhost:8082/api/tournaments/${tournament.value.id}/register`,
+      {},
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    )
+    const { data: refreshed } = await axios.get(
+      `http://localhost:8082/api/tournaments/${tournament.value.id}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    )
+    tournament.value = refreshed
+    if (refreshed.registrations.length) await loadAllPlayerNames(refreshed.registrations)
+  } catch (e) {
+    console.error('Error al inscribir:', e)
+    alert('No se pudo inscribir. Puede que el torneo esté lleno o ya estés inscrito.')
+  }
+}
+
+// Eliminar
+function openDeleteModal(pid) { registrationToDelete.value = pid; showDeleteModal.value = true }
 async function confirmDelete() {
   try {
-    await axios.delete(`http://localhost:8082/api/tournaments/${tournament.value.id}/${registrationToDelete.value}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-    // refresca la lista de jugadores
-    tournament.value.registrations = tournament.value.registrations.filter((r) => r.id !== registrationToDelete.value)
+    await axios.delete(
+      `http://localhost:8082/api/tournaments/${tournament.value.id}/${registrationToDelete.value}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    )
+    tournament.value.registrations = tournament.value.registrations.filter(r => r.id !== registrationToDelete.value)
   } catch (e) {
-    console.error("Error eliminando registro:", e)
-  } finally {
-    showDeleteModal.value = false
-  }
+    console.error('Error eliminando registro:', e)
+  } finally { showDeleteModal.value = false }
 }
+function cancelDelete() { showDeleteModal.value = false }
 
-// cancelar borrado
-function cancelDelete() {
-  registrationToDelete.value = null
-  showDeleteModal.value = false
-}
-
-// Abre el editor de fecha/hora
+// Editar fecha/hora
 function openDateTimeEditor(type) {
-  if (type === "date") {
-    if (isEditingDate.value) {
-      // Si ya estaba editando, mostrar modal de confirmación
-      editingType.value = "date"
-      showDateTimeModal.value = true
-    } else {
-      // Iniciar edición
-      editedDate.value = tournament.value.startDate.split("T")[0]
-      isEditingDate.value = true
-    }
-  } else if (type === "time") {
-    if (isEditingTime.value) {
-      // Si ya estaba editando, mostrar modal de confirmación
-      editingType.value = "time"
-      showDateTimeModal.value = true
-    } else {
-      // Iniciar edición
-      editedTime.value = tournament.value.startDate.split("T")[1].substring(0, 5)
-      isEditingTime.value = true
-    }
+  if (type === 'date') {
+    isEditingDate.value
+      ? (editingType.value = 'date', showDateTimeModal.value = true)
+      : (editedDate.value = tournament.value.startDate.split('T')[0], isEditingDate.value = true)
+  } else {
+    isEditingTime.value
+      ? (editingType.value = 'time', showDateTimeModal.value = true)
+      : (editedTime.value = tournament.value.startDate.split('T')[1].substring(0,5), isEditingTime.value = true)
   }
 }
-
-// Confirma y guarda los cambios de fecha/hora
 async function confirmDateTimeChange() {
   try {
-    let newStartDate = tournament.value.startDate
+    let newDate = tournament.value.startDate
+    if (editingType.value === 'date') newDate = `${editedDate.value}T${newDate.split('T')[1]}`
+    else newDate = `${newDate.split('T')[0]}T${editedTime.value}:00`
 
-    if (editingType.value === "date") {
-      // Actualizar solo la fecha
-      const timePart = newStartDate.split("T")[1]
-      newStartDate = `${editedDate.value}T${timePart}`
-    } else if (editingType.value === "time") {
-      // Actualizar solo la hora
-      const datePart = newStartDate.split("T")[0]
-      newStartDate = `${datePart}T${editedTime.value}:00`
-    }
-
-    // Llamar al endpoint para actualizar
     await axios.put(
       `http://localhost:8082/api/tournaments/${tournament.value.id}`,
-      {
-        ...tournament.value,
-        startDate: newStartDate,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      },
+      { ...tournament.value, startDate: newDate },
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     )
-
-    // Actualizar datos locales
-    tournament.value.startDate = newStartDate
-
-    // Cerrar editor
-    isEditingDate.value = false
-    isEditingTime.value = false
-  } catch (e) {
-    console.error("Error actualizando fecha/hora:", e)
-  } finally {
-    showDateTimeModal.value = false
-  }
+    tournament.value.startDate = newDate
+    isEditingDate.value = false; isEditingTime.value = false
+  } catch (e) { console.error('Error actualizando fecha/hora:', e) }
+  finally { showDateTimeModal.value = false }
 }
+function cancelDateTimeChange() { isEditingDate.value = false; isEditingTime.value = false; showDateTimeModal.value = false }
 
-// Cancelar edición de fecha/hora
-function cancelDateTimeChange() {
-  isEditingDate.value = false
-  isEditingTime.value = false
-  showDateTimeModal.value = false
-}
-
+// Carga inicial
 onMounted(async () => {
   try {
-    const { data: tournamentData } = await axios.get(`http://localhost:8082/api/tournaments/${route.params.id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-    tournament.value = tournamentData
+    const { data } = await axios.get(
+      `http://localhost:8082/api/tournaments/${route.params.id}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    )
+    tournament.value = data
+    if (data.registrations.length) await loadAllPlayerNames(data.registrations)
+    if (data.organizerId) organizerName.value = await fetchOrganizerData(data.organizerId)
 
-    if (tournamentData.registrations?.length) {
-      await loadAllPlayerNames(tournamentData.registrations)
+    let meData
+    try {
+      const res = await axios.get(
+        `http://localhost:8081/api/players/me`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      )
+      meData = res.data; isPlayer.value = true
+    } catch {
+      const res = await axios.get(
+        `http://localhost:8081/api/organizers/me`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      )
+      meData = res.data; isOrganizer.value = String(meData.id) === String(data.organizerId)
     }
-
-    if (tournamentData.organizerId) {
-      organizerName.value = await fetchOrganizerData(tournamentData.organizerId)
-    }
-
-    // verificar si el usuario logeado es el organizador
-    const { data: meData } = await axios.get(`http://localhost:8081/api/organizers/me`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-
     me.value = meData
-    isOrganizer.value = me.value?.id == tournamentData.organizerId
-    console.log(isOrganizer.value)
-  } catch (e) {
-    console.error("Error cargando datos:", e)
-  } finally {
-    isLoading.value = false
-  }
+  } catch (e) { console.error('Error cargando datos:', e) }
+  finally { isLoading.value = false }
 })
 </script>
 
@@ -673,4 +648,39 @@ onMounted(async () => {
   font-size: 1rem;
   width: 100%;
 }
+.content-container {
+   max-width: 1200px;
+    width: 100%;
+     margin: 0 auto;
+      padding: 0 1rem 
+}
+.register-btn {
+  background: #38a169;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.already-registered {
+  color: #4a5568;
+  font-style: italic;
+}
+.register-btn {
+  background: #3d5a80;
+  color: #e0e1dd;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+}
+.register-btn:hover { background: #2c3e50 }
+
+.already-registered { color: #4a5568; font-style: italic; margin-top: 1rem; display: inline-block }
+.content-container { max-width: 1200px; width: 100%; margin: 0 auto; padding: 0 1rem }
+.store-prize { margin-top: 0.5rem; font-size: 0.9rem; color: #415a77 }
 </style>

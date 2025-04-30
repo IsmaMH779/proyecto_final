@@ -435,6 +435,10 @@ ion-toolbar {
   align-items: center;
 }
 
+.header ion-toolbar {
+  height: 84.5px;
+}
+
 /* dropdown */
 .dropdown-menu {
   margin-top: 5px;
