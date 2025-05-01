@@ -1,145 +1,153 @@
 <template>
-    <ion-page>
-      <div class="custom-calendar">
-        <Qalendar :selected-date="new Date()" :events="events" :config="config" />
-      </div>
-    </ion-page>
-  </template>
-  
-  <script>
-  import { IonPage } from '@ionic/vue';
-  import { Qalendar } from "qalendar";
-  import "qalendar/dist/style.css";
-  
-  export default {
-    components: {
-      IonPage,
-      Qalendar,
-    },
-  
-    data() {
+  <ion-page>
+    <div class="custom-calendar">
+      <Qalendar :selected-date="new Date()" :events="events" :config="config" />
+    </div>
+  </ion-page>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { IonPage } from "@ionic/vue";
+import { Qalendar } from "qalendar";
+import "qalendar/dist/style.css";
+import axios from "axios";
+
+// Lista reactiva de eventos
+const events = ref([]);
+
+// Configuración del calendario
+const config = {
+  defaultMode: "month",
+};
+
+// Función para traer eventos desde la API
+async function fetchEvents() {
+  try {
+    const { data } = await axios.get(
+      "http://localhost:8082/api/tournaments/organizer",
+      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+    );
+    events.value = data;
+    // Mapeamos cada torneo al formato que Qalendar necesita
+    events.value = data.map((tournament, index) => {
+      // Convertir la fecha ISO a "YYYY-MM-DD hh:mm"
+      const fecha = tournament.startDate.replace("T", " ").slice(0, 16);
       return {
-        events: [
-          {
-            title: "Meeting with Dora",
-            with: "Albert Einstein",
-            time: { start: "2025-04-27 04:52", end: "2025-04-30 05:37" },
-            color: "green",
-            isEditable: true,
-            id: "de471c78cb5c",
-            description:
-              "Think of me as Yoda. Only instead of being little and green, I wear suits and I'm awesome.",
-          }
-        ],
-  
-        config: {
-          defaultMode: "month",
+        title: tournament.name,
+        time: {
+          start: fecha,
+          end: fecha,
         },
+        id: tournament.id ?? index,
+        description: null, // por ahora nulo
       };
-    },
-  };
-  </script>
-  
-  <style scoped>
+    });
+  } catch (error) {
+    console.error("Error al obtener eventos:", error);
+  }
+}
+
+// Lanza la consulta al montar el componente
+onMounted(() => {
+  fetchEvents();
+});
+</script>
+
+<style scoped>
+.custom-calendar {
+  margin: 15px auto 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 1022px) {
   .custom-calendar {
-    margin: auto;
-    width: 100%;
-    /* Usar calc para restar la altura del navbar */
-    height: calc(100dvh - var(--ion-navbar-height, 56px));
-    /* Alternativa con CSS moderno */
-    height: 100dvh;
-    max-height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Hacer que el calendario ocupe todo el espacio disponible */
-  :deep(.calendar-root-wrapper) {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  :deep(.calendar-root) {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  :deep(.calendar-month) {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  :deep(.calendar-month__wrapper) {
-    flex: 1;
-  }
-  
-  ion-page {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Ocultar parte del header */
-  :deep(.calendar-header__period) {
-    display: none;
-  }
-  
-  /* Resaltar el día actual */
-  :deep(.calendar-month__weekday.is-today .calendar-month__day-date) {
-    background-color: #16596F;
-    /* Azul oscuro */
-    color: white !important;
-    /* Día actual en blanco */
-    font-weight: bold;
-    border-radius: 50%;
-  }
-  
-  /* Resaltar día seleccionado */
-  :deep(.qalendar-is-small .calendar-month__weekday.is-selected) {
-    box-shadow: inset 0 0 0 3px #16596F;
-  }
-  
-  /* Fondo general del calendario */
-  :deep(.calendar-root-wrapper .calendar-root) {
-    background-color: #EBEBEA !important;
-    /* Blanco */
-    color: black !important;
-  }
-  
-  /* Color del mes y año en el header */
-  :deep(.calendar-header__period-name) {
-    color: black !important;
-    font-weight: bold;
-  }
-  
-  /* Cambiar el color de los días (todos en negro excepto el actual) */
-  :deep(.calendar-month__day-date) {
-    color: #000000 !important;
-    /* Negro */
-    font-weight: bold;
-  }
-  
-  /* Cambiar el color del día actual a blanco */
-  :deep(.calendar-month__weekday.is-today .calendar-month__day-date) {
-    color: #FFFFFF !important;
-    /* Blanco */
-  }
-  
-  /* Cambiar el color de los días de la semana */
-  :deep(.calendar-month__day-name) {
-    color: #000000 !important;
-    font-weight: bold;
-  }
-  
-  /* Cambiar color del día actual (evento) */
-  :deep(.agenda__wrapper .agenda__header .agenda__header-date) {
-    background-color: #16596F;
-  }
-  
-  :deep(.agenda__wrapper .agenda__header .agenda__header-day-name) {
-    color: #16596F;
-  }
-  </style>
+  margin: auto;
+  width: 100%;
+  /* Restar la altura del navbar */
+  height: calc(100dvh - var(--ion-navbar-height, 56px));
+  /* Alternativa moderna */
+  height: 100dvh;
+  max-height: 100%;
+}
+}
+
+/* Hacer que el calendario ocupe todo el espacio */
+:deep(.calendar-root-wrapper),
+:deep(.calendar-root),
+:deep(.calendar-month) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+:deep(.agenda__event) {
+  background-color: #1a2841;
+}
+
+:deep(.calendar-month__wrapper) {
+  flex: 1;
+}
+
+ion-page {
+  height: 100%;
+}
+
+/* Ocultar parte del header */
+:deep(.date-picker__value-display),
+:deep(.calendar-header__mode-picker) {
+  display: none;
+}
+
+/* Resaltar el día actual */
+:deep(.calendar-month__weekday.is-today .calendar-month__day-date) {
+  background-color: #1a2841;
+  color: #ffffff !important;
+}
+
+/* Resaltar día seleccionado */
+:deep(.qalendar-is-small .calendar-month__weekday.is-selected) {
+  box-shadow: inset 0 0 0 3px #1a2841;
+}
+
+/* Fondo general del calendario */
+:deep(.calendar-root-wrapper .calendar-root) {
+  background-color: #f5efe7 !important;
+  color: #000000 !important;
+}
+
+/* Color del mes y año en el header */
+:deep(.calendar-header__period-name) {
+  color: #000000 !important;
+  font-weight: bold;
+}
+
+/* Color de los días */
+:deep(.calendar-month__day-date) {
+  color: #000000 !important;
+  font-weight: bold;
+}
+
+/* Color de los nombres de día */
+:deep(.calendar-month__day-name) {
+  color: #1a2841 !important;
+  font-weight: bold;
+}
+
+/* Estilos de la vista Agenda */
+:deep(.agenda__wrapper .agenda__header .agenda__header-date) {
+  background-color: #1a2841;
+}
+
+:deep(.agenda__wrapper .agenda__header .agenda__header-day-name) {
+  color: #1a2841;
+}
+
+/* Modal */
+:deep(.event-flyout__info-wrapper) {
+  background-color: #E0E1DD;
+}
+:deep(.qalendar-is-small .calendar-month__event .calendar-month__event-color) {
+  background-color: #1a2841;
+}
+</style>
