@@ -1,10 +1,10 @@
-package com.example.bracketService;
+package com.example.matchmakingService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BracketServiceApplicationTests {
+class MatchmakingServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

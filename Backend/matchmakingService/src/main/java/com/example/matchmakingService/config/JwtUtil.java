@@ -1,4 +1,4 @@
-package com.example.bracketService.config;
+package com.example.matchmakingService.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +16,15 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}") // Tiempo de expiración del token
     private Long expiration;
+
+    public String generateToken(String userID) {
+        return Jwts.builder()
+                .setSubject(userID)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
 
     public String getIDFromToken(String token) {
         Claims claims = Jwts.parser()

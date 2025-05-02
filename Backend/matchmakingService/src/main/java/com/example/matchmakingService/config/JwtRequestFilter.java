@@ -1,4 +1,4 @@
-package com.example.bracketService.config;
+package com.example.matchmakingService.config;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,12 +30,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        String userID = null;
+        Long userID = null;
         String jwt = null;
 
         if (authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            userID = jwtUtil.getIDFromToken(jwt);
+            try {
+                userID = Long.parseLong(jwtUtil.getIDFromToken(jwt));
+            } catch (Exception e) {
+                System.out.println("JWT inválido: " + e.getMessage());
+            }
         }
 
         if (userID != null && SecurityContextHolder.getContext().getAuthentication() == null) {
