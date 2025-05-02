@@ -35,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'player-tournament',
-        component: () => import('@/views/player/tournament/MainTournamnet.vue'),
+        component: () => import('@/views/player/tournament/MainTournaments.vue'),
         meta: {role: 'player'}
       },
       {
