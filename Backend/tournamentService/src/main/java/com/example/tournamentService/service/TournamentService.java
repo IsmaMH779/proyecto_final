@@ -243,4 +243,24 @@ public class TournamentService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public Tournament startTournament(Long tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> DataNotFoundException.of("TOURNAMENT_NOT_FOUND"));
+        tournament.setActive(true);
+
+        tournamentRepository.save(tournament);
+
+        return tournament;
+    }
+
+    public void endTournament(Long tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> DataNotFoundException.of("TOURNAMENT_NOT_FOUND"));
+
+        tournament.setActive(false);
+        tournament.setClosed(true);
+
+        tournamentRepository.save(tournament);
+    }
 }

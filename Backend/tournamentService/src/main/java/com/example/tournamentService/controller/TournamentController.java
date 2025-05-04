@@ -51,6 +51,24 @@ public class TournamentController {
 
     }
 
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<?> activateTournament(@PathVariable("id") Long tournamentId) {
+        try {
+            return ResponseEntity.ok().body(tournamentService.startTournament(tournamentId));
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/end")
+    public ResponseEntity<?> endTournament(@PathVariable("id") Long tournamentId) {
+        try {
+            return ResponseEntity.ok().build();
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     // Eliminar un torneo
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTournament(@PathVariable("id") Long tournamentId) {

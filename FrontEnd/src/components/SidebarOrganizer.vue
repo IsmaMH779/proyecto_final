@@ -152,8 +152,7 @@ const userData = ref({
 // Paginas disponibles en el menu
 const appPages = [
   { title: 'Home', url: '/web/organizer-home', iosIcon: homeOutline, mdIcon: homeSharp },
-  { title: 'Torneos creados', url: '/web/organizer-tournaments-created', iosIcon: trophyOutline, mdIcon: trophySharp },
-  { title: 'Torneos activos', url: '/web/organizer-tournaments-active', iosIcon: trophyOutline, mdIcon: trophySharp },
+  { title: 'Torneos', url: '/web/organizer-tournaments-created', iosIcon: trophyOutline, mdIcon: trophySharp },
   { title: 'Buscar torneos', url: '/web/organizer-search-tournament', iosIcon: searchOutline, mdIcon: searchSharp },
   { title: 'Calendario', url: '/web/organizer-calendar', iosIcon: calendarOutline, mdIcon: calendarSharp },
   { title: 'Historial', url: '/web/organizer-history', iosIcon: timeOutline, mdIcon: timeSharp },

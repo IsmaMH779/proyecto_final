@@ -8,7 +8,9 @@ import com.example.matchmakingService.model.tournament.PlayerRegistration;
 import com.example.matchmakingService.model.tournament.TournamentDTO;
 import com.example.matchmakingService.repository.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +18,10 @@ import java.util.Optional;
 
 @Service
 public class MatchmakingService {
-
     @Autowired
     private TournamentRepository tournamentRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     /**
      * Genera la estructura inicial del torneo.
@@ -50,6 +53,9 @@ public class MatchmakingService {
                 rounds
         );
         tournamentRepository.save(tournament);
+
+        // Emitir actualización al canal WebSocket específico
+        messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
     }
 
     private List<Game> createFirstRound(TournamentDTO tournamentDTO) {
@@ -133,5 +139,8 @@ public class MatchmakingService {
 
         // Guardar cambios
         tournamentRepository.save(tournament);
+
+        // Emitir actualización al canal WebSocket específico
+        messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
     }
 }

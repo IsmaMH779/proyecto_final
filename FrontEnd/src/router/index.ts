@@ -72,12 +72,7 @@ const routes: Array<RouteRecordRaw> = [
       },
       {
         path: 'organizer-tournaments-created',
-        component: () => import('@/views/organizer/createdTournaments/MainCreatedTournaments.vue'),
-        meta: {role: 'organizer'}
-      },
-      {
-        path: 'organizer-tournaments-active',
-        component: () => import('@/views/organizer/activeTournaments/MainActiveTournaments.vue'),
+        component: () => import('@/views/organizer/Tournament/MainTournaments.vue'),
         meta: {role: 'organizer'}
       },
       {
@@ -108,6 +103,11 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'organizer-tournament-profile/:id',
         component: () => import('@/views/common/TournamentProfile.vue'),
+        meta: {role: 'organizer'}
+      },
+      {
+        path: 'organizer-liveTournament/:id',
+        component: () => import('@/views/organizer/Tournament/LiveTournament.vue'),
         meta: {role: 'organizer'}
       }
     ]
