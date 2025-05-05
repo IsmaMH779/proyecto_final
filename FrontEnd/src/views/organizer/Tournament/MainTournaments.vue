@@ -21,7 +21,7 @@
                 <h2 class="tournament-name">{{ tournament.name }}</h2>
               </div>
 
-              <div class="tournament-details" @click="navigateToTournament(tournament.id)">
+              <div class="tournament-details" @click="navigateToLiveTournament(tournament.id)">
                 <!-- Fecha -->
                 <div class="detail-item">
                   <ion-icon :icon="calendarOutline" />
@@ -170,7 +170,8 @@ import {
   peopleOutline,
   playOutline,
   timeOutline,
-  push
+  push,
+  sync
 } from 'ionicons/icons'
 
 const router = useRouter()
@@ -254,33 +255,43 @@ const startTournament = async () => {
 }
 
 const activateTournament = async () => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token');
 
   try {
-    const { activate } = await axios.put(`http://localhost:8082/api/tournaments/${toStart.value.id}/activate`,
-    {},
-    {
+    await axios.put(`http://localhost:8082/api/tournaments/${toStart.value.id}/activate`, null, {
       headers: { Authorization: `Bearer ${token}` }
-    })
-
-    tournaments.value = activate
-    console.log(tournaments)
-
+    });
   } catch (e) {
-    console.error(e)
+    console.error(e);
   }
 
   try {
-    await axios.post(`http://localhost:8083/api/matchmaking/start`, {
+    const tournament = await fetchTournament();
+    console.log(tournament)
+    await axios.post(`http://localhost:8083/api/matchmaking/start`, tournament, {
       headers: { Authorization: `Bearer ${token}` }
-    }, tournaments )
+    });
   } catch (e) {
-    console.error(e)
+    console.error(e);
   }
-}
+};
 
-const navigateToTournament = id =>
-  router.push(`/web/organizer-tournament-profile/${id}`)
+const fetchTournament = async () => {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await axios.get(`http://localhost:8082/api/tournaments/${toStart.value.id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+
+const navigateToTournament = id => router.push(`/web/organizer-tournament-profile/${id}`)
+const navigateToLiveTournament = id => router.push(`/web/organizer-liveTournament/${id}`)
+
 
 onMounted(() => {
   fetchTournaments()

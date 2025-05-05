@@ -1,5 +1,7 @@
 package com.example.matchmakingService.model.tournament;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ public class TournamentDTO {
     private int maxPlayers;
     private boolean closed;
     private boolean active;
+    @JsonManagedReference
     private List<PlayerRegistration> registrations = new ArrayList<>();
 
     public TournamentDTO() {

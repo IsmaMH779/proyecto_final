@@ -2,6 +2,7 @@ package com.example.matchmakingService.model.bracket;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ public class Tournament {
     private Long id;
     private String organizerId;
     private String name;
+    @Field("rounds")
     private List<Round> rounds;
 
     public Tournament(Long id, String organizerId, String name, List<Round> rounds) {
