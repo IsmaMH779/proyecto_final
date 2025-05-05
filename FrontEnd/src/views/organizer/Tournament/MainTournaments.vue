@@ -5,6 +5,10 @@
         <div class="content-container">
 
           <!-- Torneos Activos (active = true) -->
+          <div class="section-header">
+              <h1 class="section-title">Torneos Activos</h1>
+            </div>
+
           <div v-if="activeTournaments.length === 0" class="empty-state">
             <ion-icon :icon="trophyOutline" class="empty-icon" />
             <p>No tienes torneos activos actualmente</p>
@@ -355,6 +359,17 @@ onUnmounted(() => {
   color: #3d5a80;
   margin-bottom: 1rem;
 }
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0 1.5rem;
+  }
+  .section-title {
+    font-size: 1.75rem;
+    color: #1a2841;
+    margin: 0;
+  }
 .tournaments-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill,minmax(300px,1fr));

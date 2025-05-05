@@ -6,13 +6,6 @@
             <!-- Sección de Torneos Activos -->
             <div class="section-header">
               <h1 class="section-title">Torneos Activos</h1>
-              <div class="filter-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 11.07V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="23 3 12 14 9 11"></polyline>
-                </svg>
-                <span>En progreso</span>
-              </div>
             </div>
             
             <div v-if="activeTournaments.length === 0" class="empty-state">

@@ -22,8 +22,8 @@
       </ion-list>
     </div>
     
-    <div class="desktop-sidebar-mobile">
-      <ion-menu content-id="main-content" type="overlay" :swipe-gesture="true">
+    <div class="desktop-sidebar-mobile" v-if="isMobile">
+      <ion-menu content-id="main-content" type="overlay" :swipe-gesture="isMobile">
         <ion-content>
           <ion-list id="player-list-mobile">
             <div class="logo_container">
@@ -133,6 +133,7 @@ import axios from 'axios';
 const router = useRouter();
 const route = useRoute();
 
+const isMobile = ref(window.innerWidth <= 768);
 const selectedIndex = ref(0);
 const headerTitle = ref('');
 const isUserMenuOpen = ref(false);
@@ -146,6 +147,10 @@ const userData = ref({
   username: "USERNAME",
   imageUrl: null
 });
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
 
 // Paginas disponibles en el menu
 const appPages = ref([
@@ -251,12 +256,14 @@ onMounted(() => {
   updateHeader();
   document.addEventListener('click', closeUserMenu);
   window.addEventListener('resize', updateDropdownPosition);
+  window.addEventListener('resize', handleResize);
   getUserData();
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeUserMenu);
   window.removeEventListener('resize', updateDropdownPosition);
+  window.removeEventListener('resize', handleResize);
 });
 
 watch(() => route.path, () => {
@@ -291,7 +298,7 @@ watch(() => route.path, () => {
 /* mediaqueries movil */
 @media (max-width: 768px) {
   .desktop-sidebar {
-    display: none;
+    display: none !important;
   }
   .header-title {
     margin: 0 0 15px 0;
