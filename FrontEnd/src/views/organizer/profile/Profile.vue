@@ -17,7 +17,7 @@
             <div class="profile-header-content">
               <div 
                 class="profile-avatar"
-                @click="handleProfileImageClicker"
+                @click="handleProfileImageClicker"  
               >
                 <img 
                   v-if="userData.imageUrl" 

@@ -14,8 +14,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -263,4 +265,29 @@ public class TournamentService {
 
         tournamentRepository.save(tournament);
     }
+
+    // obetener los torneos semanales
+    public List<TournamentOrganizerDTO> getWeeklyTournaments() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfWeek = today.with(DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime endOfWeek   = today.with(DayOfWeek.SUNDAY).atTime(23,59,59);
+        return tournamentRepository.findByStartDateBetween(startOfWeek, endOfWeek)
+                .stream()
+                .map(TournamentOrganizerDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    // contar los torneos de este mes
+    public long countCreatedThisMonth() {
+        YearMonth ym = YearMonth.now();
+        LocalDateTime from = ym.atDay(1).atStartOfDay();
+        LocalDateTime to   = ym.atEndOfMonth().atTime(23,59,59);
+        return tournamentRepository.countByCreationDateBetween(from, to);
+    }
+
+    // contar los jugadores inscritos este mes
+    public long countTotalPlayers() {
+        return playerRegistrationRepository.countAllRegistrations();
+    }
+
 }

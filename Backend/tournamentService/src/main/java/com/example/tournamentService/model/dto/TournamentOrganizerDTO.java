@@ -13,6 +13,7 @@ public class TournamentOrganizerDTO {
     private boolean active;
     private String format;
     private String game;
+    private String location;
 
     public TournamentOrganizerDTO(Tournament tournament) {
         this.id = tournament.getId();
@@ -22,6 +23,7 @@ public class TournamentOrganizerDTO {
         this.active = tournament.isActive();
         this.format = tournament.getFormat();
         this.game = tournament.getGame();
+        this.location = tournament.getLocation();
     }
 
     public long getId() {
@@ -78,5 +80,13 @@ public class TournamentOrganizerDTO {
 
     public void setGame(String game) {
         this.game = game;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

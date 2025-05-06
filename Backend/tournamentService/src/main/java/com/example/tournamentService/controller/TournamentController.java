@@ -15,7 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tournaments")
@@ -158,6 +160,22 @@ public class TournamentController {
                 tournamentService.searchTournaments(location, game, fromDate, toDate);
         return ResponseEntity.ok(tournaments);
     }
+
+    // obtener los torneos de la semana
+    @GetMapping("/weekly")
+    public ResponseEntity<List<TournamentOrganizerDTO>> weeklyTournaments() {
+        return ResponseEntity.ok(tournamentService.getWeeklyTournaments());
+    }
+
+    // obtener estadisticas, tanto de torneos creados este mes, como de jugadores inscritos este mes
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Object>> statsThisMonth() {
+        Map<String,Object> stats = new HashMap<>();
+        stats.put("createdThisMonth", tournamentService.countCreatedThisMonth());
+        stats.put("totalPlayers",    tournamentService.countTotalPlayers());
+        return ResponseEntity.ok(stats);
+    }
+
 
 
 }

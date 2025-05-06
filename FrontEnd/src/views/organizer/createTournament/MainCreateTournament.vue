@@ -253,7 +253,7 @@ onMounted(async () => {
 <style scoped>
 /* Contenedor principal */
 .create-tournament-app {
-  background-color: #f9f5f0;
+  background-color: #F5EFE7;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   color: #1a2841;

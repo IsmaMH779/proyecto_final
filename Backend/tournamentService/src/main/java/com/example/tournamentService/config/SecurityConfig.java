@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/tournaments/weekly", "/api/tournaments/stats").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

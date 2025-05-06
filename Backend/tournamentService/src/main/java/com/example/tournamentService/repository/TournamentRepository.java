@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,12 @@ public interface TournamentRepository extends JpaRepository<Tournament, Long>, J
     @Modifying
     @Query("UPDATE Tournament t SET t.closed = true WHERE t.id = :id")
     int markTournamentAsClosed(@Param("id") Long id);
+
+    // Torneos entre dos fechas
+    List<Tournament> findByStartDateBetween(LocalDateTime from, LocalDateTime to);
+
+    // Conteo de torneos creados en un rango
+    long countByCreationDateBetween(LocalDateTime from, LocalDateTime to);
+
+
 }
