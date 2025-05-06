@@ -29,5 +29,10 @@ public class MatchmakingController {
         }
     }
 
+    @GetMapping("/{tournamentID}")
+    public ResponseEntity<?> getTournament(@PathVariable("tournamentID") String tournamentID) {
+        return ResponseEntity.ok().body(matchmakingService.getTournament(tournamentID));
+    }
+
 
 }

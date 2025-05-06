@@ -3,9 +3,9 @@ package com.example.matchmakingService.model.bracket;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class Game {
-    @Field("player1")
+    @Field(write = Field.Write.ALWAYS)
     private Player player1;
-    @Field("player2")
+    @Field(write = Field.Write.ALWAYS)
     private Player player2;
 
     public Game(Player player1, Player player2) {

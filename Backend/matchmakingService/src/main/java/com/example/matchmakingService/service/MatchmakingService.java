@@ -7,9 +7,12 @@ import com.example.matchmakingService.model.bracket.Tournament;
 import com.example.matchmakingService.model.tournament.PlayerRegistration;
 import com.example.matchmakingService.model.tournament.TournamentDTO;
 import com.example.matchmakingService.repository.TournamentRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.ArrayList;
@@ -55,7 +58,7 @@ public class MatchmakingService {
         tournamentRepository.save(tournament);
 
         // Emitir actualización al canal WebSocket específico
-        messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
+        //messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
     }
 
     private List<Game> createFirstRound(TournamentDTO tournamentDTO) {
@@ -63,10 +66,10 @@ public class MatchmakingService {
         List<Game> games = new ArrayList<>();
         int i = 0;
         while (i < players.size()) {
-            Player p1 = new Player(players.get(i).getId(), null);
+            Player p1 = new Player(Long.parseLong(players.get(i).getPlayerId()), null);
             Player p2 = null;
             if (i + 1 < players.size()) {
-                p2 = new Player(players.get(i + 1).getId(), null);
+                p2 = new Player(Long.parseLong(players.get(i + 1).getPlayerId()), null);
             }
             games.add(new Game(p1, p2));
             i += 2;
@@ -80,7 +83,7 @@ public class MatchmakingService {
      * y lo coloca en la siguiente ronda en la posición nula.
      */
     public void advancePlayer(String tournamentId, Long playerId) {
-        Optional<Tournament> opt = tournamentRepository.findById(tournamentId);
+        Optional<Tournament> opt = tournamentRepository.findById(Long.parseLong(tournamentId));
         if (!opt.isPresent()) {
             throw new IllegalArgumentException("Torneo no encontrado: " + tournamentId);
         }
@@ -141,6 +144,12 @@ public class MatchmakingService {
         tournamentRepository.save(tournament);
 
         // Emitir actualización al canal WebSocket específico
-        messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
+       // messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
     }
+
+    public Object getTournament(String tournamentID) {
+        return tournamentRepository.findById(Long.parseLong(tournamentID))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Torneo no encontrado"));
+    }
+
 }

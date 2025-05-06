@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
 
 public class Round {
-    @Field("games")
+    @Field(write = Field.Write.ALWAYS)
     private List<Game> games;
 
     public Round(List<Game> games) {

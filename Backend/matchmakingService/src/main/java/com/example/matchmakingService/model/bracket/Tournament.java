@@ -6,13 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
-@Document(collation = "tournament")
+@Document(collection = "tournament")
 public class Tournament {
     @Id
     private Long id;
     private String organizerId;
     private String name;
-    @Field("rounds")
+
+    @Field(write = Field.Write.ALWAYS)
     private List<Round> rounds;
 
     public Tournament(Long id, String organizerId, String name, List<Round> rounds) {
