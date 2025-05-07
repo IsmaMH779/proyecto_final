@@ -12,17 +12,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // prefijo que usa el broker para enviar mensajes
-        config.enableSimpleBroker("/topic");
-        // prefijo para rutas que reciben mensajes del cliente
+        config.enableSimpleBroker("/topic", "/queue");
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // endpoint al que se conectará el cliente
-        registry.addEndpoint("/ws-tournaments")
-                .setAllowedOriginPatterns("*")
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:8100")
+                // .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
 }

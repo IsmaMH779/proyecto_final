@@ -37,6 +37,7 @@
               'player-pending': player?.winner === null,
               'player-empty': !player?.id
             }"
+            @click="handlePlayerClick(player.id)"
           >
             <div class="player-info">
               <div class="player-avatar" v-if="player?.id">
@@ -60,17 +61,19 @@
  
 <script setup>
 import Bracket from "vue-tournament-bracket";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
+import WebSocketService from "@/services/websocket.service";
 
 const route = useRoute();
 const tournamentData = ref(null);
 const rounds = ref([]);
 const isLoading = ref(true);
 const playerDataCache = ref({});
+const isConnected = ref(false);
 
-// Número de participantes (calculado a partir de los datos)
+// Número de participantes
 const participantsCount = computed(() => {
   if (!tournamentData.value || !tournamentData.value.rounds || !tournamentData.value.rounds.length) {
     return 0;
@@ -175,36 +178,54 @@ const transformDataToRounds = async (data) => {
   }
 };
 
-const fetchBracket = async () => {
-  isLoading.value = true;
-  
+const connectWebSocket = async () => {
   try {
-    const token = localStorage.getItem('token');
-    const { data } = await axios.get(`http://localhost:8083/api/matchmaking/${route.params.id}`, {
-      headers: { Authorization: `Bearer ${token}` }
+    await WebSocketService.connect();
+    isConnected.value = true;
+    
+    // Suscribirse a actualizaciones del torneo
+    WebSocketService.subscribe(`/topic/tournament/${route.params.id}`, async (data) => {
+      tournamentData.value = data;
+      console.log('Actualización del torneo recibida:', data);
+      
+      // Transformar los datos recibidos (esperar a que termine)
+      rounds.value = await transformDataToRounds(data);
+      
+      // Ocultar el loader una vez que todo está listo
+      isLoading.value = false;
     });
     
-    tournamentData.value = data;
-    console.log('Datos del torneo recibidos:', data);
-    
-    // Transformar los datos recibidos (esperar a que termine)
-    rounds.value = await transformDataToRounds(data);
-    
-    console.log('Bracket transformado y listo:', rounds.value);
-    
-    // Ocultar el loader una vez que todo está listo
-    isLoading.value = false;
-    
-  } catch (e) {
-    console.error('Error al cargar el bracket:', e);
-    rounds.value = [];
-    isLoading.value = false;
+    // Solicitar datos iniciales del torneo
+    WebSocketService.send(`/app/tournament/${route.params.id}`, {});
+  } catch (error) {
+    console.error('Error al conectar:', error);
+    isConnected.value = false;
   }
 };
 
+const handlePlayerClick = async (playerId) => {
+  const token = localStorage.getItem('token');
+
+  await axios.put(
+    `http://localhost:8083/api/matchmaking/advance/${route.params.id}/${playerId}`,
+    null,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+};
+
+
+
 onMounted(() => {
-  fetchBracket();
+  connectWebSocket();
 });
+
+onUnmounted(() => {
+  // desconectarse del canal cuando se cierre la pagina
+  WebSocketService.unsubscribe(`/topic/tournament/${route.params.id}`);
+  WebSocketService.disconnect();
+})
 </script>
 
 <style scoped>

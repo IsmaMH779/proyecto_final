@@ -58,7 +58,7 @@ public class MatchmakingService {
         tournamentRepository.save(tournament);
 
         // Emitir actualización al canal WebSocket específico
-        //messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
+        messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
     }
 
     private List<Game> createFirstRound(TournamentDTO tournamentDTO) {
@@ -144,7 +144,7 @@ public class MatchmakingService {
         tournamentRepository.save(tournament);
 
         // Emitir actualización al canal WebSocket específico
-       // messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
+       messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
     }
 
     public Object getTournament(String tournamentID) {

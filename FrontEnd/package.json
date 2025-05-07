@@ -19,9 +19,11 @@
     "@capacitor/status-bar": "7.0.0",
     "@ionic/vue": "^8.0.0",
     "@ionic/vue-router": "^8.0.0",
+    "@stomp/stompjs": "^7.1.1",
     "axios": "^1.7.9",
     "ionicons": "^7.0.0",
     "qalendar": "^3.9.0",
+    "sockjs-client": "^1.5.1",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0",
     "vue-tournament-bracket": "^3.0.0"

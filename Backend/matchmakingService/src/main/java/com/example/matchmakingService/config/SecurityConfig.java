@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .cors(c -> c.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -58,7 +59,7 @@ public class SecurityConfig {
         corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration); // Aplica la configuración a todas las rutas
+        source.registerCorsConfiguration("/**", corsConfiguration);
 
         return source;
     }
