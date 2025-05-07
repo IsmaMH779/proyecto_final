@@ -167,15 +167,12 @@ public class TournamentController {
         return ResponseEntity.ok(tournamentService.getWeeklyTournaments());
     }
 
-    // obtener estadisticas, tanto de torneos creados este mes, como de jugadores inscritos este mes
+    // obtener estadisticas, tanto de torneos que se jugaran este mes, como de jugadores inscritos a torneos de este mes
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> statsThisMonth() {
         Map<String,Object> stats = new HashMap<>();
-        stats.put("createdThisMonth", tournamentService.countCreatedThisMonth());
-        stats.put("totalPlayers",    tournamentService.countTotalPlayers());
+        stats.put("tournamentsThisMonth", tournamentService.countTournamentsThisMonth());
+        stats.put("playersThisMonth",     tournamentService.countPlayersThisMonth());
         return ResponseEntity.ok(stats);
     }
-
-
-
 }

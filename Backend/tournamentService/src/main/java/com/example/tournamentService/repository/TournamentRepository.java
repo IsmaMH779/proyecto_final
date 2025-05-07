@@ -25,8 +25,6 @@ public interface TournamentRepository extends JpaRepository<Tournament, Long>, J
     // Torneos entre dos fechas
     List<Tournament> findByStartDateBetween(LocalDateTime from, LocalDateTime to);
 
-    // Conteo de torneos creados en un rango
-    long countByCreationDateBetween(LocalDateTime from, LocalDateTime to);
-
-
+    // Conteo de torneos que se juegan en un rango
+    long countByStartDateBetween(LocalDateTime from, LocalDateTime to);
 }

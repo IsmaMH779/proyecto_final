@@ -277,17 +277,20 @@ public class TournamentService {
                 .collect(Collectors.toList());
     }
 
-    // contar los torneos de este mes
-    public long countCreatedThisMonth() {
+    // numero de torneos que se van a jugar este mes
+    // (startDate cae entre el primer y último día del mes actual)
+    public long countTournamentsThisMonth() {
         YearMonth ym = YearMonth.now();
         LocalDateTime from = ym.atDay(1).atStartOfDay();
-        LocalDateTime to   = ym.atEndOfMonth().atTime(23,59,59);
-        return tournamentRepository.countByCreationDateBetween(from, to);
+        LocalDateTime to   = ym.atEndOfMonth().atTime(23, 59, 59);
+        return tournamentRepository.countByStartDateBetween(from, to);
     }
 
-    // contar los jugadores inscritos este mes
-    public long countTotalPlayers() {
-        return playerRegistrationRepository.countAllRegistrations();
+    // numero de inscripciones a torneos que se jugarán este mes
+    public long countPlayersThisMonth() {
+        YearMonth ym = YearMonth.now();
+        LocalDateTime from = ym.atDay(1).atStartOfDay();
+        LocalDateTime to   = ym.atEndOfMonth().atTime(23, 59, 59);
+        return playerRegistrationRepository.countByTournamentStartDateBetween(from, to);
     }
-
 }

@@ -149,14 +149,16 @@ async function fetchWeeklyTournaments() {
 async function fetchStats() {
   try {
     const res = await fetch(`${API_URL}/api/tournaments/stats`, {
-      headers:{'Authorization':`Bearer ${getToken()}`}, credentials:'include'
-    })
-    if (!res.ok) throw new Error(await res.text())
-    const d = await res.json()
-    monthlyCreatedTournaments.value = d.createdThisMonth
-    totalPlayers.value = d.totalPlayers
-  } catch(e){ console.error('ST:',e) }
+      headers: { 'Authorization': `Bearer ${getToken()}` },
+      credentials: 'include'
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const d = await res.json();
+    monthlyCreatedTournaments.value = d.tournamentsThisMonth;
+    totalPlayers.value = d.playersThisMonth;
+  } catch(e) { console.error('ST:', e) }
 }
+
 
 const weeklyEvents = ref([
   { id:1, name:'Reunión de organizadores', startDate:new Date().toISOString() },
