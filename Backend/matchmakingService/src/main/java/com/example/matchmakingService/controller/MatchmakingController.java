@@ -33,6 +33,4 @@ public class MatchmakingController {
     public ResponseEntity<?> getTournament(@PathVariable("tournamentID") String tournamentID) {
         return ResponseEntity.ok().body(matchmakingService.getTournament(tournamentID));
     }
-
-
 }

@@ -28,33 +28,58 @@
 
     <!-- Bracket -->
     <div v-else class="bracket-section">
-      <bracket :rounds="rounds">
-        <template #player="{ player }">
-          <div 
-            class="player-card" 
-            :class="{
-              'player-winner': player?.winner === true,
-              'player-pending': player?.winner === null,
-              'player-empty': !player?.id
-            }"
-            @click="handlePlayerClick(player.id)"
-          >
-            <div class="player-info">
-              <div class="player-avatar" v-if="player?.id">
-                <img :src="`http://localhost:8081/images/profile/${player?.img}`" alt="Avatar" />
+      <div class="bracket-container">
+        <bracket :rounds="rounds">
+          <template #player="{ player }">
+            <div 
+              class="player-card" 
+              :class="{
+                'player-winner': player?.winner === true,
+                'player-pending': player?.winner === null,
+                'player-empty': !player?.id
+              }"
+              @click="handlePlayerClick(player?.id)"
+            >
+              <div class="player-info">
+                <div class="player-avatar" v-if="player?.id">
+                  <img :src="`http://localhost:8081/images/profile/${player?.img}`" alt="Avatar" />
+                </div>
+                <div class="player-name">
+                  {{ player?.name || "Por determinar" }}
+                </div>
               </div>
-              <div class="player-name">
-                {{ player?.name || "Por determinar" }}
+              <div class="player-status" v-if="player?.winner === true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6 9 17l-5-5"></path>
+                </svg>
               </div>
             </div>
-            <div class="player-status" v-if="player?.winner === true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 6 9 17l-5-5"></path>
+          </template>
+        </bracket>
+        
+        <!-- Tarjeta del ganador final -->
+        <div v-if="tournamentWinner" class="winner-card-container">
+          <div class="winner-card">
+            <div class="winner-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
               </svg>
+              <h3>Ganador del Torneo</h3>
+            </div>
+            <div class="winner-content">
+              <div class="winner-avatar">
+                <img :src="`http://localhost:8081/images/profile/${tournamentWinner.img}`" alt="Ganador" />
+              </div>
+              <div class="winner-name">{{ tournamentWinner.name }}</div>
             </div>
           </div>
-        </template>
-      </bracket>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -72,6 +97,7 @@ const rounds = ref([]);
 const isLoading = ref(true);
 const playerDataCache = ref({});
 const isConnected = ref(false);
+const tournamentWinner = ref(null);
 
 // Número de participantes
 const participantsCount = computed(() => {
@@ -128,26 +154,28 @@ const transformDataToRounds = async (data) => {
     const roundsPromises = data.rounds.map(async (round) => {
       // Crear un array de promesas para todos los partidos de esta ronda
       const gamesPromises = round.games.map(async (match) => {
-        // Obtener datos de player1 (si existe)
+        // Obtener datos de player1
         let player1 = { id: null, name: "Por determinar", winner: null };
         if (match.player1) {
           const player1Data = await fetchPlayerData(match.player1.playerId);
+
           player1 = {
             id: match.player1.playerId,
             name: player1Data.username || `Player ${match.player1.playerId}`,
-            winner: match.winner === match.player1.playerId,
+            winner: match.player1.winner,
             img: player1Data.imageUrl
           };
         }
         
-        // Obtener datos de player2 (si existe)
+        // Obtener datos de player2
         let player2 = { id: null, name: "Por determinar", winner: null };
         if (match.player2) {
           const player2Data = await fetchPlayerData(match.player2.playerId);
+
           player2 = {
             id: match.player2.playerId,
             name: player2Data.username || `Player ${match.player2.playerId}`,
-            winner: match.winner === match.player2.playerId,
+            winner: match.player2.winner,
             img: player2Data.imageUrl
           };
         }
@@ -168,6 +196,22 @@ const transformDataToRounds = async (data) => {
     
     // Esperar a que se resuelvan todas las promesas de las rondas
     const transformedRounds = await Promise.all(roundsPromises);
+    
+    // Buscar al ganador del torneo (última ronda, último partido)
+    if (transformedRounds.length > 0) {
+      const lastRound = transformedRounds[transformedRounds.length - 1];
+      console.log(lastRound)
+      if (lastRound.games && lastRound.games.length > 0) {
+        const finalMatch = lastRound.games[0];
+        if (finalMatch.player1.winner) {
+          tournamentWinner.value = finalMatch.player1;
+        } else if (finalMatch.player2.winner) {
+          tournamentWinner.value = finalMatch.player2;
+        } else {
+          tournamentWinner.value = null;
+        }
+      }
+    }
     
     console.log('Transformación de datos completada:', transformedRounds);
     return transformedRounds;
@@ -204,6 +248,7 @@ const connectWebSocket = async () => {
 };
 
 const handlePlayerClick = async (playerId) => {
+  if (!playerId) return;
   const token = localStorage.getItem('token');
 
   await axios.put(
@@ -214,8 +259,6 @@ const handlePlayerClick = async (playerId) => {
     }
   );
 };
-
-
 
 onMounted(() => {
   connectWebSocket();
@@ -339,6 +382,11 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(26, 40, 65, 0.1);
   margin-bottom: 2rem;
   overflow-x: auto;
+}
+
+.bracket-container {
+  display: flex;
+  align-items: center;
 }
 
 /* Estilos para el bracket */
@@ -478,6 +526,78 @@ onUnmounted(() => {
   opacity: 0.7;
 }
 
+/* Tarjeta del ganador */
+.winner-card-container {
+  margin-left: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.winner-card {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 15px rgba(61, 90, 128, 0.2);
+  padding: 1.5rem;
+  min-width: 220px;
+  border-left: 5px solid #3d5a80;
+  animation: winner-glow 3s infinite;
+}
+
+@keyframes winner-glow {
+  0% {
+    box-shadow: 0 4px 15px rgba(61, 90, 128, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(61, 90, 128, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 15px rgba(61, 90, 128, 0.2);
+  }
+}
+
+.winner-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  color: #3d5a80;
+}
+
+.winner-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.winner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.winner-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #3d5a80;
+  box-shadow: 0 4px 10px rgba(61, 90, 128, 0.3);
+}
+
+.winner-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.winner-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a2841;
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .tournament-header-content {
@@ -492,6 +612,22 @@ onUnmounted(() => {
   
   :deep(.vue-tournament-bracket__round) {
     margin-right: 1.5rem; /* Aún más reducido en móviles */
+  }
+  
+  .bracket-container {
+    flex-direction: column;
+  }
+  
+  .winner-card-container {
+    margin-left: 0;
+    margin-top: 2rem;
+    width: 100%;
+  }
+  
+  .winner-card {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
   }
 }
 

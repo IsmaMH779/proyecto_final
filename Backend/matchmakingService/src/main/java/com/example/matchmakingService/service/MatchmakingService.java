@@ -118,9 +118,13 @@ public class MatchmakingService {
 
         if (currentGame.getPlayer1() != null && currentGame.getPlayer1().getPlayerId().equals(playerId)) {
             currentGame.getPlayer1().setWinner(true);
+            currentGame.getPlayer2().setWinner(false);
+
             player = currentGame.getPlayer1();
         } else if (currentGame.getPlayer2() != null && currentGame.getPlayer2().getPlayerId().equals(playerId)) {
             currentGame.getPlayer2().setWinner(true);
+            currentGame.getPlayer1().setWinner(false);
+
             player = currentGame.getPlayer2();
         }
 
@@ -132,9 +136,17 @@ public class MatchmakingService {
             Game nextGame = nextGames.get(targetIndex);
 
             if (nextGame.getPlayer1() == null) {
-                nextGame.setPlayer1(player);
+                Player playerTemplate = new Player(playerId,null);
+
+                playerTemplate.setWinner(null);
+
+                nextGame.setPlayer1(playerTemplate);
             } else if (nextGame.getPlayer2() == null) {
-                nextGame.setPlayer2(player);
+                Player playerTemplate = new Player(playerId,null);
+
+                playerTemplate.setWinner(null);
+
+                nextGame.setPlayer2(playerTemplate);
             } else {
                 throw new IllegalStateException("Ambas posiciones ocupadas en la siguiente ronda");
             }
@@ -143,7 +155,7 @@ public class MatchmakingService {
         // Guardar cambios
         tournamentRepository.save(tournament);
 
-        // Emitir actualización al canal WebSocket específico
+        // Emitir actualización al canal WebSocket
        messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
     }
 
