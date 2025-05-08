@@ -31,7 +31,10 @@
                 v-for="tournament in chunk"
                 :key="tournament.id"
                 class="tournament-card-week"
-                :class="{ 'today-tournament': isToday(tournament.startDate) }"
+                :class="{
+                  'active-tournament': tournament.active,
+                  'today-tournament': !tournament.active && isToday(tournament.startDate)
+                }"
               >
                 <div class="tournament-header">
                   <div class="tournament-game-badge">{{ tournament.game }}</div>
@@ -119,19 +122,21 @@
               :key="idx"
               class="event-chunk"
             >
-              <div
-                v-for="event in chunk"
-                :key="event.id"
-                class="calendar-event-card"
-                :class="{ 'today-event': isToday(event.startDate) }"
-              >
-                <div class="event-date">
-                  <div class="day">{{ formatDay(event.startDate) }}</div>
-                  <div class="month">{{ formatMonth(event.startDate) }}</div>
-                </div>
-                <div class="event-details">
-                  <h3 class="event-name">{{ event.name }}</h3>
-                  <p class="event-time">{{ formatTime(event.startDate) }}</p>
+              <div class="event-grid">
+                <div
+                  v-for="event in chunk"
+                  :key="event.id"
+                  class="calendar-event-card"
+                  :class="{ 'today-event': isToday(event.startDate) }"
+                >
+                  <div class="event-date">
+                    <div class="day">{{ formatDay(event.startDate) }}</div>
+                    <div class="month">{{ formatMonth(event.startDate) }}</div>
+                  </div>
+                  <div class="event-details">
+                    <h3 class="event-name">{{ event.name }}</h3>
+                    <p class="event-time">{{ formatTime(event.startDate) }}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -187,8 +192,9 @@ const eventsContainer = ref(null)
 const currentPage = ref(0)
 const tournamentChunks = computed(() => {
   const chunks = []
-  for (let i = 0; i < weeklyTournaments.value.length; i += 3) {
-    chunks.push(weeklyTournaments.value.slice(i, i + 3))
+  const arr = filteredSortedTournaments.value
+  for (let i = 0; i < arr.length; i += 3) {
+    chunks.push(arr.slice(i, i + 3))
   }
   return chunks
 })
@@ -209,6 +215,14 @@ const visiblePages = computed(() => {
 // Indicadores de overflow para torneos
 const showLeftIndicator = computed(() => currentPage.value > 1)
 const showRightIndicator = computed(() => currentPage.value < pageCount.value - 2)
+
+const filteredSortedTournaments = computed(() =>
+  weeklyTournaments.value
+    // 1. Quitar cerrados
+    .filter(t => !t.closed)
+    // 2. Ordenar por fecha de inicio ascendente
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+)
 
 // Scroll manual para torneos
 const onWeekScroll = () => {
@@ -244,18 +258,18 @@ const scrollWeekTournaments = (direction) => {
   })
 }
 
-// Paginación en chunks de 2 para eventos
+// Paginación en chunks de 4 para eventos (2x2)
 const currentEventPage = ref(0)
 const eventChunks = computed(() => {
   const chunks = []
-  for (let i = 0; i < weeklyEvents.value.length; i += 2) {
-    chunks.push(weeklyEvents.value.slice(i, i + 2))
+  for (let i = 0; i < weeklyEvents.value.length; i += 4) {
+    chunks.push(weeklyEvents.value.slice(i, i + 4))
   }
   return chunks
 })
 const eventPageCount = computed(() => eventChunks.value.length)
 
-// Ventana de 3 dots para eventos
+// Ventana de 3 dots para eventos (siguiendo la misma lógica que torneos)
 const visibleEventPages = computed(() => {
   const total = eventPageCount.value
   if (total <= 3) {
@@ -267,7 +281,7 @@ const visibleEventPages = computed(() => {
   return [ start, start + 1, start + 2 ]
 })
 
-// Indicadores de overflow para eventos
+// Indicadores de overflow para eventos (siguiendo la misma lógica que torneos)
 const showLeftEventIndicator = computed(() => currentEventPage.value > 1)
 const showRightEventIndicator = computed(() => currentEventPage.value < eventPageCount.value - 2)
 
@@ -341,13 +355,18 @@ async function fetchStats() {
   } catch (e) { console.error(e) }
 }
 
-// Eventos de ejemplo con fechas diferentes
+// Eventos de ejemplo con fechas diferentes (añadidos más eventos)
 const weeklyEvents = ref([
   { id: 1, name: 'Reunión de organizadores', startDate: new Date().toISOString() },
   { id: 2, name: 'Taller de reglamentos', startDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString() },
   { id: 3, name: 'Presentación de nuevos juegos', startDate: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString() },
   { id: 4, name: 'Torneo amistoso', startDate: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString() },
-  { id: 5, name: 'Sesión de estrategias', startDate: new Date(new Date().setDate(new Date().getDate() + 4)).toISOString() }
+  { id: 5, name: 'Sesión de estrategias', startDate: new Date(new Date().setDate(new Date().getDate() + 4)).toISOString() },
+  { id: 6, name: 'Demostración de juegos', startDate: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString() },
+  { id: 7, name: 'Competición casual', startDate: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString() },
+  { id: 8, name: 'Charla sobre reglas', startDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString() },
+  { id: 9, name: 'Encuentro de jugadores', startDate: new Date(new Date().setDate(new Date().getDate() + 8)).toISOString() },
+  { id: 10, name: 'Presentación de expansión', startDate: new Date(new Date().setDate(new Date().getDate() + 9)).toISOString() }
 ])
 </script>
 
@@ -358,7 +377,6 @@ ion-content {
   overflow-y: auto;
 }
 
-/* Evitar scroll horizontal del viewport */
 .no-horizontal-scroll {
   overflow-x: hidden;
 }
@@ -375,8 +393,8 @@ ion-content {
   grid-template-rows: auto auto auto;
   gap: 1rem;
   box-sizing: border-box;
-  position: relative; /* Añadido para contener elementos absolutos */
-  overflow-x: hidden; /* Evitar que el contenido se desborde horizontalmente */
+  position: relative; 
+  overflow-x: hidden; 
 }
 
 /* ==== SECCIONES ==== */
@@ -441,42 +459,46 @@ ion-content {
 }
 
 /* ==== TORNEOS SEMANALES ==== */
-.weekly-tournaments-container {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  max-width: 100%; /* Asegurar que no exceda el ancho del contenedor */
-  width: 100%;
-  position: relative; /* Contener el scroll dentro de sus límites */
-}
-.weekly-tournaments-container::-webkit-scrollbar {
-  display: none;
-}
+  /* Ajustar el contenedor de torneos semanales */
+  .weekly-tournaments-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    max-width: 100%;
+    width: 100%;
+    position: relative;
+    padding: 10px 0; 
+    margin: 0; 
+    overflow-y: visible; 
+  }
 
-.tournament-chunk {
-  flex: 0 0 100%;
-  display: flex;
-  gap: 1rem;
-  scroll-snap-align: start;
-  padding: 0 1rem;
-  width: 100%; /* Asegurar que cada chunk tenga el ancho correcto */
-  min-width: 100%; /* Forzar el ancho mínimo */
-  box-sizing: border-box; /* Incluir padding en el cálculo del ancho */
-}
+  .tournament-chunk {
+    flex: 0 0 100%;
+    display: flex;
+    gap: 1rem;
+    scroll-snap-align: start;
+    padding: 10px 1rem; 
+    width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+    justify-content: flex-start; 
+  }
 
-.tournament-card-week {
-  flex: 0 0 calc((100% - 2rem) / 3);
-  background: #fff;
-  border-radius: 16px;
-  padding: 1.25rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  transform-origin: center center;
-}
+  /* Ajustar la tarjeta para evitar desplazamientos */
+  .tournament-card-week {
+    flex: 0 0 calc((100% - 2rem) / 3);
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: visible; 
+    transform-origin: center center;
+    margin: 0; 
+  }
 
 .tournament-card-week:hover {
   transform: translateY(-5px);
@@ -535,26 +557,24 @@ ion-content {
 }
 
 .today-tournament {
-  border-left: 6px solid #3d5a80;
-  animation: pulse-highlight 2s infinite;
   position: relative;
 }
 
-.today-tournament::before {
-  content: "Hoy";
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: #3d5a80;
-  color: white;
-  padding: 0.3rem 0.8rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  border-radius: 0 0 0 8px;
-  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  .today-tournament::before {
+    content: "Hoy";
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #3d5a80;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 0 16px 0 8px; 
+    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
 /* ==== PUNTOS E INDICADORES ==== */
 .dots-container {
@@ -659,6 +679,7 @@ ion-content {
 }
 
 /* ==== EVENTOS SEMANALES ==== */
+/* Contenedor principal de eventos */
 .events-container {
   display: flex;
   overflow-x: auto;
@@ -668,23 +689,33 @@ ion-content {
   max-width: 100%;
   width: 100%;
   position: relative;
+  padding: 10px 0; 
+  overflow-y: visible; 
 }
+
 .events-container::-webkit-scrollbar {
   display: none;
 }
 
 .event-chunk {
   flex: 0 0 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   scroll-snap-align: start;
-  padding: 0 1rem;
+  padding: 10px 1rem;
   width: 100%;
   min-width: 100%;
   box-sizing: border-box;
 }
 
+/* Grid para mostrar 2x2 eventos */
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Tarjeta de evento */
 .calendar-event-card {
   display: flex;
   background: #fff;
@@ -693,57 +724,68 @@ ion-content {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   transform-origin: center center;
+  overflow: visible; 
 }
+
 .calendar-event-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
+
 .event-date {
   background: linear-gradient(135deg, #3d5a80, #2c4366);
   color: white;
   border-radius: 12px;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 0.75rem;
   text-align: center;
-  min-width: 70px;
+  min-width: 60px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
+
 .event-date.today-event {
   background: linear-gradient(135deg, #3d5a80, #2c4366);
 }
+
 .day {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   line-height: 1;
 }
+
 .month {
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   letter-spacing: 1px;
   margin-top: 0.25rem;
   opacity: 0.9;
 }
+
 .event-details {
-  padding-left: 1.25rem;
+  padding-left: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex: 1;
 }
+
 .event-name {
   color: #1a2841;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
 }
+
 .event-time {
   color: #4a5568;
   margin: 0.25rem 0 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
 }
+
 .event-time::before {
   content: "";
   display: inline-block;
@@ -754,8 +796,43 @@ ion-content {
   margin-right: 0.5rem;
 }
 
+.active-tournament {
+  border-left: 6px solid #3d5a80;
+  box-shadow: 0 6px 16px rgba(65, 90, 119, 0.2);
+  animation: pulse-active 2s infinite;
+  position: relative;
+}
+
+  .active-tournament::before {
+    content: "Activo";
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #415a77;
+    color: white;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 0 16px 0 8px;
+    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
 /* ==== ANIMACIONES ==== */
 @keyframes pulse-highlight {
+  0%   { box-shadow: 0 0 0 0 rgba(61, 90, 128, 0.4); }
+  70%  { box-shadow: 0 0 0 10px rgba(61, 90, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(61, 90, 128, 0); }
+}
+
+@keyframes shadow-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(65, 90, 119, 0.7); }
+  70%  { box-shadow: 0 0 15px 10px rgba(65, 90, 119, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(65, 90, 119, 0); }
+}
+
+@keyframes pulse-active {
   0%   { box-shadow: 0 0 0 0 rgba(61, 90, 128, 0.4); }
   70%  { box-shadow: 0 0 0 10px rgba(61, 90, 128, 0); }
   100% { box-shadow: 0 0 0 0 rgba(61, 90, 128, 0); }
@@ -783,6 +860,11 @@ ion-content {
     width: 100%;
     margin-bottom: 1rem;
     max-width: none;
+  }
+  
+  .event-grid {
+    grid-template-columns: 1fr; 
+    grid-template-rows: auto;
   }
 }
 
@@ -874,6 +956,8 @@ ion-content {
     font-size: 0.85rem;
   }
   .stats {
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.5rem;
     padding: 0.75rem;
   }
@@ -891,26 +975,25 @@ ion-content {
     padding: 0.75rem;
   }
   .event-date {
-    padding: 0.5rem 0.75rem;
-    min-width: 60px;
+    padding: 0.5rem 0.5rem;
+    min-width: 50px;
   }
   .day {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
   .month {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
   .event-details {
     padding-left: 0.75rem;
   }
   .event-name {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   .event-time {
     font-size: 0.8rem;
   }
   
-  /* Asegurar que los elementos no se desborden */
   .weekly-tournaments-container,
   .tournament-chunk,
   .tournament-card-week,
@@ -961,7 +1044,7 @@ ion-content {
     font-size: 0.65rem;
   }
   .event-date {
-    min-width: 50px;
+    min-width: 45px;
   }
   .day {
     font-size: 1.25rem;
@@ -973,7 +1056,6 @@ ion-content {
     font-size: 0.9rem;
   }
   
-  /* Ajustes específicos para evitar desbordamiento */
   .tournament-card-week {
     padding: 0.75rem;
   }
@@ -1015,7 +1097,6 @@ ion-content {
     max-width: 100%;
   }
   
-  /* Asegurar que el contenedor de torneos no cause overflow */
   .tournaments,
   .events {
     width: 100%;
@@ -1023,4 +1104,13 @@ ion-content {
     overflow: hidden;
   }
 }
+
+  .section.tournaments {
+    overflow: hidden; 
+    padding: 1rem; 
+  }
+
+  .weekly-tournaments-container {
+    overflow-y: visible;
+  }
 </style>

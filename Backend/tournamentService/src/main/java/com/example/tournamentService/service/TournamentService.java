@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -185,6 +186,7 @@ public class TournamentService {
         tournamentRepository.save(tournament);
     }
 
+    @Transactional
     public void closeTournament (long tournamentId) {
         // obtener id del organizador
         String organizerId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -198,7 +200,8 @@ public class TournamentService {
             throw DataNotFoundException.of("UNAUTHORIZED_DELETE");
         }
 
-        tournamentRepository.markTournamentAsClosed(tournamentId);
+        tournament.setActive(false);
+        tournament.setClosed(true);
     }
 
     public List<TournamentSearchDTO> searchTournaments(
@@ -254,16 +257,6 @@ public class TournamentService {
         tournamentRepository.save(tournament);
 
         return tournament;
-    }
-
-    public void endTournament(Long tournamentId) {
-        Tournament tournament = tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> DataNotFoundException.of("TOURNAMENT_NOT_FOUND"));
-
-        tournament.setActive(false);
-        tournament.setClosed(true);
-
-        tournamentRepository.save(tournament);
     }
 
     // obetener los torneos semanales

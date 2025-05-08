@@ -62,15 +62,6 @@ public class TournamentController {
         }
     }
 
-    @PutMapping("/{id}/end")
-    public ResponseEntity<?> endTournament(@PathVariable("id") Long tournamentId) {
-        try {
-            return ResponseEntity.ok().build();
-        } catch (DataNotFoundException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     // Eliminar un torneo
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTournament(@PathVariable("id") Long tournamentId) {
