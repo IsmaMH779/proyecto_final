@@ -62,6 +62,10 @@ const routes: Array<RouteRecordRaw> = [
         path: 'player-tournament-profile/:id',
         component: () => import('@/views/common/TournamentProfile.vue'),
         meta: {role: 'player'}
+      },{
+        path: 'player-liveTournament/:id',
+        component: () => import('@/views/player/tournament/LiveTournament.vue'),
+        meta: {role: 'player'}
       },
 
       // rutas del organizador

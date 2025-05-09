@@ -18,7 +18,7 @@
                 v-for="tournament in activeTournaments" 
                 :key="tournament.id"
                 class="tournament-card active"
-                @click="navigateToTournament(tournament.id)"
+                @click="navigateToLiveTournament(tournament.id)"
               >
                 <div class="tournament-header">
                     <div class="tournament-game-badge">[{{ tournament.game }}]</div>
@@ -169,6 +169,8 @@
   const navigateToTournament = (id) => {
     router.push(`/web/player-tournament-profile/${id}`);
   };
+
+  const navigateToLiveTournament = (id) => router.push(`/web/player-liveTournament/${id}`)
   
   const navigateToSearch = () => {
     router.push('/web/tournament-search');
