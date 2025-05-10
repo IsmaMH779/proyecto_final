@@ -3,10 +3,7 @@ package com.example.tournamentService.service;
 import com.example.tournamentService.config.exceptions.DataNotFoundException;
 import com.example.tournamentService.model.PlayerRegistration;
 import com.example.tournamentService.model.Tournament;
-import com.example.tournamentService.model.dto.TournamentDTO;
-import com.example.tournamentService.model.dto.TournamentOrganizerDTO;
-import com.example.tournamentService.model.dto.TournamentPlayerDTO;
-import com.example.tournamentService.model.dto.TournamentSearchDTO;
+import com.example.tournamentService.model.dto.*;
 import com.example.tournamentService.repository.PlayerRegistrationRepository;
 import com.example.tournamentService.repository.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,7 +184,7 @@ public class TournamentService {
     }
 
     @Transactional
-    public void closeTournament (long tournamentId) {
+    public void closeTournament (long tournamentId, long winnerId) {
         // obtener id del organizador
         String organizerId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -200,8 +197,11 @@ public class TournamentService {
             throw DataNotFoundException.of("UNAUTHORIZED_DELETE");
         }
 
+        tournament.setWinnerId(winnerId);
         tournament.setActive(false);
         tournament.setClosed(true);
+
+        tournamentRepository.save(tournament);
     }
 
     public List<TournamentSearchDTO> searchTournaments(
@@ -285,5 +285,53 @@ public class TournamentService {
         LocalDateTime from = ym.atDay(1).atStartOfDay();
         LocalDateTime to   = ym.atEndOfMonth().atTime(23, 59, 59);
         return playerRegistrationRepository.countByTournamentStartDateBetween(from, to);
+    }
+
+    // obtener historial del organizador mediante su id
+    public List<TournamentHistorialDTO> getHistorialOrganizer() {
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        List<Tournament> tournaments = tournamentRepository.findByOrganizerId(userId);
+
+        // extraer datos necesarios en una lista por cada torneo
+        List<TournamentHistorialDTO> tournamentHistorialDTO = tournaments.stream()
+                .filter(t -> t.isClosed() && !t.isActive())
+                .map(TournamentHistorialDTO::new)
+                .toList();
+
+        return tournamentHistorialDTO;
+    }
+
+    // obtener historial del player mediante su id
+    public List<TournamentHistorialDTO> getHistorialPlayer() {
+        // Obtener el userId
+        String userId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Obtener las inscripciones del jugador
+        List<PlayerRegistration> listOfRegistrations = playerRegistrationRepository.findByPlayerId(userId);
+
+        if (listOfRegistrations.isEmpty()) {
+            throw new DataNotFoundException("PLAYER_NOT_REGISTERED_IN_TOURNAMENTS");
+        }
+
+        // Extraer los torneos asociados a esas inscripciones
+        List<Long> tournamentIds = listOfRegistrations.stream()
+                .map(registration -> registration.getTournament().getId())
+                .collect(Collectors.toList());
+
+        // Buscar los torneos por sus id
+        List<Tournament> tournaments = tournamentRepository.findAllById(tournamentIds);
+
+        // extraer datos necesarios en una lista por cada torneo
+        List<TournamentHistorialDTO> tournamentHistorialDTO = tournaments.stream()
+                .filter(t -> t.isClosed() && !t.isActive())
+                .map(TournamentHistorialDTO::new)
+                .toList();
+
+        if (tournaments.isEmpty()) {
+            throw new DataNotFoundException("TOURNAMENTS_NOT_FOUND");
+        }
+
+        return tournamentHistorialDTO;
     }
 }

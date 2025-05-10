@@ -12,14 +12,18 @@ public class Tournament {
     private Long id;
     private String organizerId;
     private String name;
+    private Boolean active;
+    private Boolean closed;
 
     @Field(write = Field.Write.ALWAYS)
     private List<Round> rounds;
 
-    public Tournament(Long id, String organizerId, String name, List<Round> rounds) {
+    public Tournament(Long id, String organizerId, String name, boolean active, boolean closed, List<Round> rounds) {
         this.id = id;
         this.organizerId = organizerId;
         this.name = name;
+        this.active = active;
+        this.closed = closed;
         this.rounds = rounds;
     }
 
@@ -45,6 +49,22 @@ public class Tournament {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Boolean getClosed() {
+        return closed;
+    }
+
+    public void setClosed(Boolean closed) {
+        this.closed = closed;
     }
 
     public List<Round> getRounds() {

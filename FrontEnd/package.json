@@ -21,6 +21,7 @@
     "@ionic/vue-router": "^8.0.0",
     "@stomp/stompjs": "^7.1.1",
     "axios": "^1.7.9",
+    "canvas-confetti": "^1.9.3",
     "ionicons": "^7.0.0",
     "qalendar": "^3.9.0",
     "sockjs-client": "^1.5.1",

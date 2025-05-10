@@ -3,17 +3,13 @@
     <div class="tournament-header">
       <div class="header-background"></div>
       <div class="tournament-header-content">
-        <h1 class="tournament-title">Bracket del Torneo</h1>
+        <h1 class="tournament-title">{{ tournamentData?.name }}</h1>
         <div class="tournament-info">
           <div class="tournament-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"></path>
-              <path d="M8 2v20"></path>
-              <path d="M16 2v20"></path>
-              <path d="M2 12h4"></path>
-              <path d="M18 12h4"></path>
-              <path d="M10 12h4"></path>
-            </svg>
+            <span v-if="tournamentData?.active">Activo</span>
+            <span v-else>Cerrado</span>
+          </div>
+          <div class="tournament-badge">
             <span>{{ participantsCount }} Participantes</span>
           </div>
         </div>
@@ -30,18 +26,25 @@
     <div v-else class="bracket-section">
       <div class="bracket-container">
         <bracket :rounds="rounds">
-          <template #player="{ player }">
+          <template #player="{ player, opponent }">
             <div 
               class="player-card" 
               :class="{
                 'player-winner': player?.winner === true,
+                'player-loser': opponent?.winner === true,
                 'player-pending': player?.winner === null,
                 'player-empty': !player?.id
               }"
+              @click="!tournamentWinner && player?.id ? confirmPlayerAdvance(player?.id) : null"
+              :style="tournamentWinner ? { cursor: 'default' } : {}"
             >
               <div class="player-info">
                 <div class="player-avatar" v-if="player?.id">
-                  <img :src="`http://localhost:8081/images/profile/${player?.img}`" alt="Avatar" />
+                  <img 
+                    :src="player?.img ? `http://localhost:8081/images/profile/${player.img}` : defaultProfileImage"
+                    alt="Avatar"
+                    onerror="this.onerror=null; this.src=defaultProfileImage"
+                  />
                 </div>
                 <div class="player-name">
                   {{ player?.name || "Por determinar" }}
@@ -72,7 +75,11 @@
             </div>
             <div class="winner-content">
               <div class="winner-avatar">
-                <img :src="`http://localhost:8081/images/profile/${tournamentWinner.img}`" alt="Ganador" />
+                <img 
+                    :src="player?.img ? `http://localhost:8081/images/profile/${player.img}` : defaultProfileImage"
+                    alt="Avatar"
+                    onerror="this.onerror=null; this.src=defaultProfileImage"
+                  />
               </div>
               <div class="winner-name">{{ tournamentWinner.name }}</div>
             </div>
@@ -85,10 +92,12 @@
  
 <script setup>
 import Bracket from "vue-tournament-bracket";
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import axios from "axios";
 import WebSocketService from "@/services/websocket.service";
+import confetti from 'canvas-confetti';
+import defaultProfileImage from '@/assets/profile_assets/default-profile-image.svg';
 
 const route = useRoute();
 const tournamentData = ref(null);
@@ -97,6 +106,9 @@ const isLoading = ref(true);
 const playerDataCache = ref({});
 const isConnected = ref(false);
 const tournamentWinner = ref(null);
+const showConfirmModal = ref(false);
+const selectedPlayerId = ref(null);
+const confettiShown = ref(false);
 
 // Número de participantes
 const participantsCount = computed(() => {
@@ -221,6 +233,56 @@ const transformDataToRounds = async (data) => {
   }
 };
 
+// Función para lanzar confeti
+const launchConfetti = () => {
+  const duration = 5 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  const interval = setInterval(function() {
+    const timeLeft = animationEnd - Date.now();
+
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+
+    const particleCount = 50 * (timeLeft / duration);
+    
+    // Confeti desde la izquierda
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: { x: 0.1, y: 0.5 },
+      colors: ['#3d5a80', '#98c1d9', '#e0fbfc', '#ee6c4d', '#293241'],
+      angle: randomInRange(55, 125)
+    });
+    
+    // Confeti desde la derecha
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: { x: 0.9, y: 0.5 },
+      colors: ['#3d5a80', '#98c1d9', '#e0fbfc', '#ee6c4d', '#293241'],
+      angle: randomInRange(235, 305)
+    });
+  }, 250);
+};
+
+// Observar cambios en el ganador del torneo
+watch(tournamentWinner, (newValue) => {
+  if (newValue && !confettiShown.value) {
+    // Esperar un momento para que la UI se actualice antes de mostrar el confeti
+    setTimeout(() => {
+      launchConfetti();
+      confettiShown.value = true;
+    }, 500);
+  }
+});
+
 const connectWebSocket = async () => {
   try {
     await WebSocketService.connect();
@@ -270,7 +332,6 @@ onUnmounted(() => {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   color: #1a2841;
-  background-color: #f9f5f0;
   padding: 1rem 0;
   max-width: 1200px;
   margin: 0 auto;
@@ -368,11 +429,74 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(26, 40, 65, 0.1);
   margin-bottom: 2rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%; 
+  position: relative;
 }
 
+/* Contenedor del bracket con espacio adicional */
 .bracket-container {
   display: flex;
   align-items: center;
+  min-width: min-content;
+  padding: 0 1rem;
+}
+
+/* Ajustes específicos para móvil */
+@media (max-width: 768px) {
+  .bracket-section {
+    padding: 1.5rem 0.5rem; 
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
+  }
+  
+  .bracket-container {
+    padding: 0 1rem 1rem 1rem;
+  }
+  
+  /* Ajustar el bracket para móvil */
+  :deep(.vue-tournament-bracket) {
+    padding-left: 0.5rem;
+  }
+  
+  /* Asegurar que las tarjetas de jugador tengan suficiente espacio */
+  .player-card {
+    min-width: 140px;
+    margin-left: 0.25rem;
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .bracket-section {
+    padding: 1rem 0.25rem;
+  }
+  
+  .bracket-container {
+    padding: 0 0.5rem 0.5rem 0.5rem;
+  }
+  
+  /* Hacer que el bracket sea más compacto */
+  :deep(.vue-tournament-bracket__round) {
+    margin-right: 1.25rem;
+  }
+  
+  /* Hacer las tarjetas más pequeñas pero legibles */
+  .player-card {
+    min-width: 130px;
+    padding: 0.5rem 0.5rem;
+  }
+}
+
+/* Asegurar que el bracket tenga suficiente espacio para renderizarse */
+:deep(.vue-tournament-bracket) {
+  min-width: min-content;
+}
+
+/* Mejorar la visualización de las líneas del bracket */
+:deep(.vue-tournament-bracket__line) {
+  min-width: 20px;
 }
 
 /* Estilos para el bracket */
@@ -383,7 +507,7 @@ onUnmounted(() => {
 }
 
 :deep(.vue-tournament-bracket__round) {
-  margin-right: 2.5rem; /* Reducido de 4rem a 2.5rem */
+  margin-right: 2.5rem;
 }
 
 :deep(.vue-tournament-bracket__round:last-child) {
@@ -394,6 +518,14 @@ onUnmounted(() => {
   margin: 1.5rem 0;
 }
 
+/* Sobrescribir los estilos de la librería que añaden bordes rojos/verdes */
+:deep(.vtb-item-players .winner),
+:deep(.vtb-item-players .defeated),
+:deep(.vtb-item-players),
+:deep(.vtb-item-players .defeatedAttachment) {
+  background: transparent !important;
+}
+
 /* Tarjeta de jugador */
 .player-card {
   display: flex;
@@ -402,12 +534,13 @@ onUnmounted(() => {
   background-color: #fff;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  min-width: 180px; /* Reducido de 200px a 180px */
+  min-width: 180px;
   box-shadow: 0 2px 6px rgba(26, 40, 65, 0.08);
   transition: all 0.3s ease;
   border-left: 3px solid #3d5a80;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .player-card::before {
@@ -462,20 +595,22 @@ onUnmounted(() => {
   color: white;
 }
 
-/* Estilos para jugadores ganadores */
+/* Estilos para jugadores ganadores  */
 .player-winner {
   border-left-color: #3d5a80;
-  background: linear-gradient(to right, rgba(61, 90, 128, 0.05), transparent);
+  background: #fff;
   box-shadow: 0 0 15px rgba(61, 90, 128, 0.5);
-  animation: winner-pulse 2s infinite;
+  animation: winner-glow 3s infinite;
+  transform: scale(1.05);
+  z-index: 5;
 }
 
-@keyframes winner-pulse {
+@keyframes winner-glow {
   0% {
     box-shadow: 0 0 10px rgba(61, 90, 128, 0.5);
   }
   50% {
-    box-shadow: 0 0 20px rgba(61, 90, 128, 0.8);
+    box-shadow: 0 0 20px rgba(61, 90, 128, 0.8), 0 0 30px rgba(61, 90, 128, 0.4);
   }
   100% {
     box-shadow: 0 0 10px rgba(61, 90, 128, 0.5);
@@ -499,6 +634,68 @@ onUnmounted(() => {
   }
 }
 
+/* Estilos para jugadores perdedores - Fondo grisáceo y menos prominente */
+:deep(.vtb-item-players .defeated) .player-card,
+:deep(.vtb-item-players .defeatedAttachment) .player-card,
+.player-loser {
+  border-left-color: #ccc !important;
+  background-color: #e9e9e9 !important;
+  opacity: 0.8 !important;
+  box-shadow: none !important;
+  filter: grayscale(40%) !important;
+  transition: all 0.3s ease !important;
+  transform: scale(0.98) !important;
+  z-index: 1 !important;
+}
+
+:deep(.vtb-item-players .defeated) .player-name,
+:deep(.vtb-item-players .defeatedAttachment) .player-name,
+.player-loser .player-name {
+  color: #777 !important;
+}
+
+:deep(.vtb-item-players .defeated) .player-avatar,
+:deep(.vtb-item-players .defeatedAttachment) .player-avatar,
+.player-loser .player-avatar {
+  opacity: 0.7 !important;
+}
+
+:deep(.vtb-item-players .defeated):hover .player-card,
+:deep(.vtb-item-players .defeatedAttachment):hover .player-card,
+.player-loser:hover {
+  transform: scale(0.98) !important;
+  box-shadow: none !important;
+}
+
+/* Estilos para jugadores ganadores a través de las clases de la biblioteca */
+:deep(.vtb-item-players .winner) .player-card {
+  transform: scale(1.05) !important;
+  z-index: 5 !important;
+}
+
+/* Estilos para jugadores perdedores - Nuevo estilo apagado */
+.player-loser {
+  border-left-color: #ccc;
+  background-color: #f5f5f5;
+  opacity: 0.7;
+  box-shadow: none;
+  filter: grayscale(40%);
+  transition: all 0.3s ease;
+}
+
+.player-loser .player-name {
+  color: #777;
+}
+
+.player-loser .player-avatar {
+  opacity: 0.7;
+}
+
+.player-loser:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 /* Estilos para jugadores pendientes */
 .player-pending {
   border-left-color: #415a77;
@@ -510,6 +707,7 @@ onUnmounted(() => {
   border-left-color: #e0e1dd;
   background-color: rgba(255, 255, 255, 0.7);
   opacity: 0.7;
+  cursor: default;
 }
 
 /* Tarjeta del ganador */
@@ -527,15 +725,15 @@ onUnmounted(() => {
   padding: 1.5rem;
   min-width: 220px;
   border-left: 5px solid #3d5a80;
-  animation: winner-glow 3s infinite;
+  animation: winner-card-glow 3s infinite;
 }
 
-@keyframes winner-glow {
+@keyframes winner-card-glow {
   0% {
     box-shadow: 0 4px 15px rgba(61, 90, 128, 0.2);
   }
   50% {
-    box-shadow: 0 4px 25px rgba(61, 90, 128, 0.5);
+    box-shadow: 0 4px 25px rgba(61, 90, 128, 0.5), 0 0 40px rgba(61, 90, 128, 0.3);
   }
   100% {
     box-shadow: 0 4px 15px rgba(61, 90, 128, 0.2);
@@ -584,6 +782,96 @@ onUnmounted(() => {
   text-align: center;
 }
 
+/* Modal de confirmación */
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-modal {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+.confirm-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: #3d5a80;
+  color: #fff;
+}
+
+.confirm-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.confirm-modal-content {
+  padding: 1.5rem;
+}
+
+.confirm-modal-content p {
+  margin-bottom: 1.5rem;
+  color: #1a2841;
+}
+
+.confirm-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancel-button, .confirm-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background-color: #e0e1dd;
+  color: #1a2841;
+  border: none;
+}
+
+.cancel-button:hover {
+  background-color: #d1d2ce;
+}
+
+.confirm-button {
+  background-color: #3d5a80;
+  color: #fff;
+  border: none;
+}
+
+.confirm-button:hover {
+  background-color: #2d4a70;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .tournament-header-content {
@@ -597,7 +885,7 @@ onUnmounted(() => {
   }
   
   :deep(.vue-tournament-bracket__round) {
-    margin-right: 1.5rem; /* Aún más reducido en móviles */
+    margin-right: 1.5rem; 
   }
   
   .bracket-container {
@@ -641,7 +929,7 @@ onUnmounted(() => {
   }
   
   :deep(.vue-tournament-bracket__round) {
-    margin-right: 1rem; /* Mínimo margen en móviles pequeños */
+    margin-right: 1rem; 
   }
 }
 </style>

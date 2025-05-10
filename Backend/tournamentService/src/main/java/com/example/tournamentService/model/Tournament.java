@@ -39,6 +39,9 @@ public class Tournament {
     @Column(name = "id_organizer", nullable = false)
     private String organizerId;
 
+    @Column(name = "id_winner")
+    private Long winnerId;
+
     /* No usar de momento
     @Column(name = "organizer_name", nullable = false)
     private String organizerName;
@@ -172,5 +175,13 @@ public class Tournament {
 
     public void setRegistrations(List<PlayerRegistration> registrations) {
         this.registrations = registrations;
+    }
+
+    public Long getWinnerId() {
+        return winnerId;
+    }
+
+    public void setWinnerId(Long winnerId) {
+        this.winnerId = winnerId;
     }
 }

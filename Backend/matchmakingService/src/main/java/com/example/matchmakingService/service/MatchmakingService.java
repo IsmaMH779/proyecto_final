@@ -1,5 +1,6 @@
 package com.example.matchmakingService.service;
 
+import com.example.matchmakingService.config.exceptions.DeckLyException;
 import com.example.matchmakingService.model.bracket.Game;
 import com.example.matchmakingService.model.bracket.Player;
 import com.example.matchmakingService.model.bracket.Round;
@@ -7,7 +8,6 @@ import com.example.matchmakingService.model.bracket.Tournament;
 import com.example.matchmakingService.model.tournament.PlayerRegistration;
 import com.example.matchmakingService.model.tournament.TournamentDTO;
 import com.example.matchmakingService.repository.TournamentRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,8 +54,11 @@ public class MatchmakingService {
                 tournamentDTO.getId(),
                 tournamentDTO.getOrganizerId(),
                 tournamentDTO.getName(),
+                tournamentDTO.isActive(),
+                tournamentDTO.isClosed(),
                 rounds
         );
+
         tournamentRepository.save(tournament);
 
         // Emitir actualización al canal WebSocket específico
@@ -63,6 +67,7 @@ public class MatchmakingService {
 
     private List<Game> createFirstRound(TournamentDTO tournamentDTO) {
         List<PlayerRegistration> players = tournamentDTO.getRegistrations();
+        Collections.shuffle(players);
         List<Game> games = new ArrayList<>();
         int i = 0;
         while (i < players.size()) {
@@ -162,6 +167,24 @@ public class MatchmakingService {
     public Object getTournament(String tournamentID) {
         return tournamentRepository.findById(Long.parseLong(tournamentID))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Torneo no encontrado"));
+    }
+
+    public void closeTournament(Long id) {
+        Optional<Tournament> op = tournamentRepository.findById(id);
+
+        if (op.isPresent()) {
+            Tournament tournament = op.get();
+            tournament.setClosed(true);
+            tournament.setActive(false);
+            tournamentRepository.save(tournament);
+
+            // Emitir actualización al canal WebSocket
+            messagingTemplate.convertAndSend("/topic/tournament/" + tournament.getId(), tournament);
+
+            return;
+        }
+
+        throw new DeckLyException("TOURNAMENT_NOT_FOUND");
     }
 
 }

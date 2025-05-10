@@ -16,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface TournamentRepository extends JpaRepository<Tournament, Long>, JpaSpecificationExecutor<Tournament> {
     // Optional<Tournament> findByName(String name);
-    public List<Tournament> findByOrganizerId(String organizerId);
+    List<Tournament> findByOrganizerId(String organizerId);
 
     // Torneos entre dos fechas
     List<Tournament> findByStartDateBetween(LocalDateTime from, LocalDateTime to);

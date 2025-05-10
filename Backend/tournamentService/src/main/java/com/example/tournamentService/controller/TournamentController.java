@@ -2,10 +2,7 @@ package com.example.tournamentService.controller;
 
 import com.example.tournamentService.config.exceptions.DataNotFoundException;
 import com.example.tournamentService.model.Tournament;
-import com.example.tournamentService.model.dto.TournamentDTO;
-import com.example.tournamentService.model.dto.TournamentOrganizerDTO;
-import com.example.tournamentService.model.dto.TournamentPlayerDTO;
-import com.example.tournamentService.model.dto.TournamentSearchDTO;
+import com.example.tournamentService.model.dto.*;
 import com.example.tournamentService.service.TournamentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,10 +83,10 @@ public class TournamentController {
     }
 
     // cerrar un torneo
-    @PatchMapping("/{id}/close")
-    public ResponseEntity<?> closeTorunament (@PathVariable long id) {
+    @PutMapping("/{tournamentId}/{winnerId}/close")
+    public ResponseEntity<?> closeTorunament (@PathVariable long tournamentId,@PathVariable long winnerId) {
         try {
-            tournamentService.closeTournament(id);
+            tournamentService.closeTournament(tournamentId, winnerId);
             return ResponseEntity.ok().build();
         } catch (DataNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -166,4 +163,28 @@ public class TournamentController {
         stats.put("playersThisMonth",     tournamentService.countPlayersThisMonth());
         return ResponseEntity.ok(stats);
     }
+
+    //Obtener lista de torneos cerrados organizador (Historial)
+    @GetMapping("/historial/organizer")
+    public ResponseEntity<?> getHistoryOrganizer() {
+        try {
+            List<TournamentHistorialDTO> tournamentDataList = tournamentService.getHistorialOrganizer();
+            return ResponseEntity.ok(tournamentDataList);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //Obtener lista de torneos cerrados jugador (Historial)
+    @GetMapping("/historial/player")
+    public ResponseEntity<?> getHistoryPlayer() {
+        try {
+            List<TournamentHistorialDTO> tournamentDataList = tournamentService.getHistorialPlayer();
+            return ResponseEntity.ok(tournamentDataList);
+        } catch (DataNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
 }
