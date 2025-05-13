@@ -162,6 +162,7 @@ import { IonPage, IonContent, IonIcon } from "@ionic/vue";
 import { Qalendar } from "qalendar";
 import "qalendar/dist/style.css";
 import axios from "axios";
+import { onBeforeUnmount } from "vue";
 
 const selectedDate = ref(new Date());
 const events = ref([]);
@@ -345,10 +346,10 @@ function formatMonth(dateString) {
 // Función para forzar el refresco del calendario
 function forceCalendarRefresh() {
   if (calendarRef.value) {
-    // Forzar un reflow del DOM
-    const width = calendarRef.value.offsetWidth;
-    
-    // Crear un evento de resize para forzar a Qalendar a recalcular su layout
+    const calendarElement = calendarRef.value.$el;
+    calendarElement.style.display = 'none';
+    calendarElement.offsetHeight; // Trigger reflow
+    calendarElement.style.display = 'block';
     window.dispatchEvent(new Event('resize'));
   }
 }
@@ -362,7 +363,12 @@ onMounted(async () => {
   
   // Forzar el refresco del calendario para solucionar el bug de visualización inicial
   setTimeout(forceCalendarRefresh, 100);
+  window.addEventListener('resize', forceCalendarRefresh);
 });
+
+onBeforeUnmount(async () => {
+  window.removeEventListener('resize', forceCalendarRefresh);
+})
 </script>
 
 <style scoped>
@@ -381,6 +387,7 @@ onMounted(async () => {
   padding: 1rem;
   box-sizing: border-box;
   position: relative;
+  overflow: visible !important;
   overflow-x: hidden;
   min-height: calc(100vh - 2rem);
 }
@@ -398,6 +405,9 @@ onMounted(async () => {
   flex: 2;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 2;
+  overflow: visible !important;
 }
 
 /* Sección de eventos (1/3) */
@@ -405,6 +415,7 @@ onMounted(async () => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
 /* Estilos comunes para las secciones */
@@ -414,7 +425,6 @@ onMounted(async () => {
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(26, 40, 65, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
 }
 
 .section:hover {
@@ -443,7 +453,7 @@ onMounted(async () => {
   height: 600px;
   overflow: visible;
   position: relative;
-  flex: 1;
+  flex: 2;
 }
 
 /* Botón para añadir evento */
@@ -799,9 +809,16 @@ onMounted(async () => {
   height: 100%;
 }
 
+:deep(.calendar-month__weekday) {
+  padding: .5rem !important;
+  height: 100px !important;
+  min-height: 100px;
+}
+
 :deep(.calendar-month__wrapper) {
   flex: 1;
   overflow: hidden;
+  pointer-events: auto !important;
 }
 
 /* Puntitos para indicar eventos */
@@ -836,6 +853,15 @@ onMounted(async () => {
 :deep(.calendar-month__day-date) {
   color: #000000 !important;
   font-weight: bold;
+
+}
+
+:deep(.calendar-header__mode-picker) {
+  display: none;
+}
+
+:deep(.date-picker__value-display) {
+  display: none;
 }
 
 /* Color de los nombres de día */
@@ -980,6 +1006,8 @@ onMounted(async () => {
   .calendar-section, .events-section {
     flex: none;
     width: 100%;
+    position: relative;
+    z-index: 0;
   }
   
   .fixed-calendar {
