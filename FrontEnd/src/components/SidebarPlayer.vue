@@ -224,7 +224,7 @@ const navigateToProfile = () => {
 const logout = () => {
   isUserMenuOpen.value = false;
   localStorage.removeItem('token');
-  router.push('/auth/login');
+  router.push('/landing/home');
 };
 
 // Obtener datos del usuario
@@ -232,7 +232,7 @@ const getUserData = async () => {
   try {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push('/auth/login');
+      router.push('/landing/home');
       return;
     }
 

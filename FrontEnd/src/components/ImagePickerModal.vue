@@ -1,5 +1,5 @@
 <template>
-  <ion-modal :is-open="isOpen" @didDismiss="close" class="image-picker-modal">
+  <ion-modal fullscreen :is-open="isOpen" @didDismiss="close" class="image-picker-modal">
     <div class="modal-container">
       <div class="modal-header">
         <h2 class="modal-title">Seleccionar imagen</h2>
@@ -154,9 +154,9 @@ export default {
   background-color: #f9f5f0;
   border-radius: 1rem;
   overflow: hidden;
-  max-width: 500px;
-  width: 90%;
-  margin: 10vh auto;
+  width: 100%;
+  height: 100%;
+  margin: auto auto;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -198,7 +198,8 @@ export default {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
+  height: 100%;
 }
 
 .image-preview-container {
