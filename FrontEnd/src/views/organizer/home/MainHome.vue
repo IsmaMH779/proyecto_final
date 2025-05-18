@@ -61,14 +61,11 @@
           </div>
 
           <transition-group name="dot-move" tag="div" class="dots-container">
-            <!-- indicador izquierdo -->
             <span
               v-if="showLeftIndicator"
               key="left-indicator"
               class="small-dot"
             ></span>
-
-            <!-- 3 dots centrales -->
             <span
               v-for="page in visiblePages"
               :key="page"
@@ -76,8 +73,6 @@
               :class="{ active: currentPage === page }"
               @click="goToPage(page)"
             ></span>
-
-            <!-- indicador derecho -->
             <span
               v-if="showRightIndicator"
               key="right-indicator"
@@ -90,7 +85,7 @@
         <div class="section stats">
           <div class="stat-card">
             <div class="stat-value">{{ monthlyCreatedTournaments }}</div>
-            <div class="stat-label">Torneos este mes</div>
+            <div class="stat-label">Torneos creados este mes</div>
           </div>
           <div class="stat-card">
             <div class="stat-value">{{ totalPlayers }}</div>
@@ -143,14 +138,11 @@
           </div>
           
           <transition-group name="dot-move" tag="div" class="dots-container">
-            <!-- indicador izquierdo -->
             <span
               v-if="showLeftEventIndicator"
               key="left-event-indicator"
               class="small-dot"
             ></span>
-
-            <!-- 3 dots centrales -->
             <span
               v-for="page in visibleEventPages"
               :key="page"
@@ -158,8 +150,6 @@
               :class="{ active: currentEventPage === page }"
               @click="goToEventPage(page)"
             ></span>
-
-            <!-- indicador derecho -->
             <span
               v-if="showRightEventIndicator"
               key="right-event-indicator"
@@ -180,19 +170,25 @@ import { chevronBack, chevronForward } from 'ionicons/icons'
 import { calendarOutline, timeOutline, locationOutline } from 'ionicons/icons'
 
 const API_URL = 'http://localhost:8082'
-function getToken() { return localStorage.getItem('jwt') || '' }
+function getToken() { 
+  return localStorage.getItem('token') || '' 
+}
 
+// --- TORNEOS SEMANALES ---
 const weeklyTournaments = ref([])
 const monthlyCreatedTournaments = ref(0)
 const totalPlayers = ref(0)
 const weeklyTournamentsContainer = ref(null)
-const eventsContainer = ref(null)
 
-// Paginación en chunks de 3 para torneos
 const currentPage = ref(0)
+const filteredSortedTournaments = computed(() =>
+  weeklyTournaments.value
+    .filter(t => !t.closed)
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+)
 const tournamentChunks = computed(() => {
-  const chunks = []
   const arr = filteredSortedTournaments.value
+  const chunks = []
   for (let i = 0; i < arr.length; i += 3) {
     chunks.push(arr.slice(i, i + 3))
   }
@@ -200,175 +196,148 @@ const tournamentChunks = computed(() => {
 })
 const pageCount = computed(() => tournamentChunks.value.length)
 
-// Ventana de 3 dots para torneos
 const visiblePages = computed(() => {
   const total = pageCount.value
-  if (total <= 3) {
-    return Array.from({ length: total }, (_, i) => i)
-  }
+  if (total <= 3) return Array.from({ length: total }, (_, i) => i)
   let start = currentPage.value - 1
   if (start < 0) start = 0
   if (start > total - 3) start = total - 3
-  return [ start, start + 1, start + 2 ]
+  return [start, start + 1, start + 2]
 })
-
-// Indicadores de overflow para torneos
 const showLeftIndicator = computed(() => currentPage.value > 1)
 const showRightIndicator = computed(() => currentPage.value < pageCount.value - 2)
 
-const filteredSortedTournaments = computed(() =>
-  weeklyTournaments.value
-    // 1. Quitar cerrados
-    .filter(t => !t.closed)
-    // 2. Ordenar por fecha de inicio ascendente
-    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-)
-
-// Scroll manual para torneos
-const onWeekScroll = () => {
+function onWeekScroll() {
   const c = weeklyTournamentsContainer.value
   if (!c) return
-  const newPage = Math.round(c.scrollLeft / c.clientWidth)
-  if (newPage !== currentPage.value) {
-    currentPage.value = newPage
-  }
+  const page = Math.round(c.scrollLeft / c.clientWidth)
+  if (page !== currentPage.value) currentPage.value = page
 }
-
-// Puntos click para torneos
-const goToPage = (page) => {
+function goToPage(page) {
   const c = weeklyTournamentsContainer.value
   if (!c) return
   currentPage.value = page
   c.scrollTo({ left: c.clientWidth * page, behavior: 'smooth' })
 }
-
-// Flechas para torneos
-const scrollWeekTournaments = (direction) => {
+function scrollWeekTournaments(dir) {
   const c = weeklyTournamentsContainer.value
   if (!c) return
-  if (direction === 'right' && currentPage.value < pageCount.value - 1) {
-    currentPage.value++
-  }
-  if (direction === 'left' && currentPage.value > 0) {
-    currentPage.value--
-  }
-  c.scrollBy({
-    left: direction === 'right' ? c.clientWidth : -c.clientWidth,
-    behavior: 'smooth'
-  })
+  if (dir === 'right' && currentPage.value < pageCount.value - 1) currentPage.value++
+  if (dir === 'left' && currentPage.value > 0) currentPage.value--
+  c.scrollBy({ left: dir === 'right' ? c.clientWidth : -c.clientWidth, behavior: 'smooth' })
 }
 
-// Paginación en chunks de 4 para eventos (2x2)
-const currentEventPage = ref(0)
-const eventChunks = computed(() => {
-  const chunks = []
-  for (let i = 0; i < weeklyEvents.value.length; i += 4) {
-    chunks.push(weeklyEvents.value.slice(i, i + 4))
-  }
-  return chunks
-})
-const eventPageCount = computed(() => eventChunks.value.length)
-
-// Ventana de 3 dots para eventos (siguiendo la misma lógica que torneos)
-const visibleEventPages = computed(() => {
-  const total = eventPageCount.value
-  if (total <= 3) {
-    return Array.from({ length: total }, (_, i) => i)
-  }
-  let start = currentEventPage.value - 1
-  if (start < 0) start = 0
-  if (start > total - 3) start = total - 3
-  return [ start, start + 1, start + 2 ]
-})
-
-// Indicadores de overflow para eventos (siguiendo la misma lógica que torneos)
-const showLeftEventIndicator = computed(() => currentEventPage.value > 1)
-const showRightEventIndicator = computed(() => currentEventPage.value < eventPageCount.value - 2)
-
-// Scroll manual para eventos
-const onEventScroll = () => {
-  const c = eventsContainer.value
-  if (!c) return
-  const newPage = Math.round(c.scrollLeft / c.clientWidth)
-  if (newPage !== currentEventPage.value) {
-    currentEventPage.value = newPage
-  }
-}
-
-// Puntos click para eventos
-const goToEventPage = (page) => {
-  const c = eventsContainer.value
-  if (!c) return
-  currentEventPage.value = page
-  c.scrollTo({ left: c.clientWidth * page, behavior: 'smooth' })
-}
-
-// Flechas para eventos
-const scrollEvents = (direction) => {
-  const c = eventsContainer.value
-  if (!c) return
-  if (direction === 'right' && currentEventPage.value < eventPageCount.value - 1) {
-    currentEventPage.value++
-  }
-  if (direction === 'left' && currentEventPage.value > 0) {
-    currentEventPage.value--
-  }
-  c.scrollBy({
-    left: direction === 'right' ? c.clientWidth : -c.clientWidth,
-    behavior: 'smooth'
-  })
-}
-
-// Formateos y carga de datos
-const isToday = dateString =>
-  new Date(dateString).toDateString() === new Date().toDateString()
-const formatDay   = ds => new Date(ds).getDate()
-const formatMonth = ds => new Date(ds).toLocaleString('es-ES', { month: 'short' })
-const formatTime  = ds => new Date(ds).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-
-onMounted(async () => {
-  await fetchWeeklyTournaments()
-  await fetchStats()
-})
-
-async function fetchWeeklyTournaments() {
-  try {
-    const res = await fetch(`${API_URL}/api/tournaments/weekly`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` },
-      credentials: 'include'
-    })
-    if (!res.ok) throw new Error(await res.text())
-    weeklyTournaments.value = await res.json()
-  } catch (e) { console.error(e) }
-}
-
+// --- ESTADÍSTICAS RÁPIDAS ---
 async function fetchStats() {
   try {
     const res = await fetch(`${API_URL}/api/tournaments/stats`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` },
-      credentials: 'include'
+      headers: { Authorization: `Bearer ${getToken()}` }
     })
     if (!res.ok) throw new Error(await res.text())
     const d = await res.json()
     monthlyCreatedTournaments.value = d.tournamentsThisMonth
     totalPlayers.value = d.playersThisMonth
-  } catch (e) { console.error(e) }
+  } catch (e) {
+    console.error('Error cargando stats:', e)
+  }
 }
 
-// Eventos de ejemplo con fechas diferentes (añadidos más eventos)
-const weeklyEvents = ref([
-  { id: 1, name: 'Reunión de organizadores', startDate: new Date().toISOString() },
-  { id: 2, name: 'Taller de reglamentos', startDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString() },
-  { id: 3, name: 'Presentación de nuevos juegos', startDate: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString() },
-  { id: 4, name: 'Torneo amistoso', startDate: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString() },
-  { id: 5, name: 'Sesión de estrategias', startDate: new Date(new Date().setDate(new Date().getDate() + 4)).toISOString() },
-  { id: 6, name: 'Demostración de juegos', startDate: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString() },
-  { id: 7, name: 'Competición casual', startDate: new Date(new Date().setDate(new Date().getDate() + 6)).toISOString() },
-  { id: 8, name: 'Charla sobre reglas', startDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString() },
-  { id: 9, name: 'Encuentro de jugadores', startDate: new Date(new Date().setDate(new Date().getDate() + 8)).toISOString() },
-  { id: 10, name: 'Presentación de expansión', startDate: new Date(new Date().setDate(new Date().getDate() + 9)).toISOString() }
-])
+// --- CARGAR TORNEOS SEMANALES ---
+async function fetchWeeklyTournaments() {
+  try {
+    const res = await fetch(`${API_URL}/api/tournaments/weekly`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    })
+    if (!res.ok) throw new Error(await res.text())
+    weeklyTournaments.value = await res.json()
+  } catch (e) {
+    console.error('Error cargando torneos semanales:', e)
+  }
+}
+
+// --- EVENTOS SEMANALES DESDE EL BACKEND ---
+const weeklyEvents = ref([])
+
+async function fetchWeeklyEvents() {
+  try {
+    const res = await fetch(`${API_URL}/api/events/weekly`, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    })
+    if (!res.ok) {
+      console.error('events/weekly status:', res.status, await res.text())
+      return
+    }
+    const body = await res.json()
+    console.log('raw weeklyEvents:', body)
+    weeklyEvents.value = body.map(ev => ({
+      id: ev.id,
+      name: ev.title,
+      startDate: ev.eventTime
+    }))
+  } catch (e) {
+    console.error('Error cargando eventos semanales:', e)
+  }
+}
+
+// --- PAGINACIÓN DE EVENTOS (2x2) ---
+const eventsContainer = ref(null)
+const currentEventPage = ref(0)
+const eventChunks = computed(() => {
+  const arr = weeklyEvents.value
+  const chunks = []
+  for (let i = 0; i < arr.length; i += 4) {
+    chunks.push(arr.slice(i, i + 4))
+  }
+  return chunks
+})
+const eventPageCount = computed(() => eventChunks.value.length)
+const visibleEventPages = computed(() => {
+  const total = eventPageCount.value
+  if (total <= 3) return Array.from({ length: total }, (_, i) => i)
+  let start = currentEventPage.value - 1
+  if (start < 0) start = 0
+  if (start > total - 3) start = total - 3
+  return [start, start + 1, start + 2]
+})
+const showLeftEventIndicator = computed(() => currentEventPage.value > 1)
+const showRightEventIndicator = computed(() => currentEventPage.value < eventPageCount.value - 2)
+
+function onEventScroll() {
+  const c = eventsContainer.value
+  if (!c) return
+  const page = Math.round(c.scrollLeft / c.clientWidth)
+  if (page !== currentEventPage.value) currentEventPage.value = page
+}
+function goToEventPage(page) {
+  const c = eventsContainer.value
+  if (!c) return
+  currentEventPage.value = page
+  c.scrollTo({ left: c.clientWidth * page, behavior: 'smooth' })
+}
+function scrollEvents(dir) {
+  const c = eventsContainer.value
+  if (!c) return
+  if (dir === 'right' && currentEventPage.value < eventPageCount.value - 1) currentEventPage.value++
+  if (dir === 'left' && currentEventPage.value > 0) currentEventPage.value--
+  c.scrollBy({ left: dir === 'right' ? c.clientWidth : -c.clientWidth, behavior: 'smooth' })
+}
+
+// Formateos
+const isToday = ds => new Date(ds).toDateString() === new Date().toDateString()
+const formatDay   = ds => new Date(ds).getDate()
+const formatMonth = ds => new Date(ds).toLocaleString('es-ES', { month: 'short' })
+const formatTime  = ds => new Date(ds).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+
+// Montaje inicial
+onMounted(async () => {
+  await fetchWeeklyTournaments()
+  await fetchStats()
+  await fetchWeeklyEvents()
+})
 </script>
+
+
+
 
 <style scoped>
 /* ==== SCROLL VERTICAL ==== */

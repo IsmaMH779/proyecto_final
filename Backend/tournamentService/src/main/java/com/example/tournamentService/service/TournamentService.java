@@ -244,7 +244,9 @@ public class TournamentService {
                         t.getGame(),
                         t.getOrganizerId(),
                         t.getLocation(),
-                        t.getStartDate()
+                        t.getStartDate(),
+                        t.getMaxPlayers(),
+                        t.getRegistrations().size()
                 ))
                 .collect(Collectors.toList());
     }
@@ -334,4 +336,32 @@ public class TournamentService {
 
         return tournamentHistorialDTO;
     }
+
+    public List<TournamentPlayerDTO> getWeeklyTournamentsForPlayer() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        List<PlayerRegistration> regs = playerRegistrationRepository.findByPlayerId(userId);
+        LocalDate today = LocalDate.now();
+        LocalDateTime from = today.with(DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime to   = today.with(DayOfWeek.SUNDAY).atTime(23,59,59);
+        return regs.stream()
+                .map(PlayerRegistration::getTournament)
+                .filter(t -> !t.getStartDate().isBefore(from) && !t.getStartDate().isAfter(to))
+                .map(TournamentPlayerDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public long countMyTournamentsThisMonth() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        YearMonth ym = YearMonth.now();
+        LocalDateTime from = ym.atDay(1).atStartOfDay();
+        LocalDateTime to   = ym.atEndOfMonth().atTime(23,59,59);
+        return playerRegistrationRepository.findByPlayerId(userId).stream()
+                .map(PlayerRegistration::getTournament)
+                .filter(t -> !t.getStartDate().isBefore(from) && !t.getStartDate().isAfter(to))
+                .map(Tournament::getId)
+                .distinct()
+                .count();
+    }
+
+
 }

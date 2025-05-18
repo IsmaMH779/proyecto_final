@@ -122,7 +122,12 @@
 
         <!-- Tab Jugadores -->
         <div v-show="activeTab === 'players'" class="card tab-content">
-          <h2 class="section-title">Jugadores inscritos</h2>
+          <h2 class="section-title">
+            Jugadores inscritos
+            <span class="players-summary">
+              ({{ tournament.registrations.length }}/{{ tournament.maxPlayers }})
+            </span>
+          </h2>
 
           <p v-if="tournament.registrations.length === 0">
             No hay jugadores inscritos todavía.
@@ -182,6 +187,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
@@ -463,6 +469,12 @@ onMounted(async () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.players-summary {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin-left: 0.5rem;
 }
 
 /* Store Profile */

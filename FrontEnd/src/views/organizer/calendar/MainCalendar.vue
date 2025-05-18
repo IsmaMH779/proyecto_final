@@ -1,17 +1,17 @@
 <template>
   <ion-page>
-    <ion-content class="no-horizontal-scroll">
+    <ion-content>
       <div class="calendar-container">
         <div class="calendar-layout">
-          <!-- Lado izquierdo: Calendario (2/3) -->
+          <!-- Calendario -->
           <div class="section calendar-section">
             <div class="section-header">
               <h2>Calendario de Torneos</h2>
             </div>
             <div class="fixed-calendar qalendar-is-small" ref="calendarRef">
-              <Qalendar 
-                :selected-date="selectedDate" 
-                :events="events" 
+              <Qalendar
+                :selected-date="selectedDate"
+                :events="events"
                 :config="config"
                 @period-change="handlePeriodChange"
                 @click-event="handleEventClick"
@@ -19,23 +19,22 @@
               />
             </div>
           </div>
-          
-          <!-- Lado derecho: Panel de eventos (1/3) -->
+
+          <!-- Panel eventos -->
           <div class="section events-section">
             <div class="section-header">
               <h2>Mis Eventos</h2>
               <button class="add-event-btn" @click="openCreateEventModal">
-                <ion-icon name="add-outline"></ion-icon>
+                <ion-icon name="calendar-outline" class="btn-icon"></ion-icon>
                 Crear Evento
               </button>
             </div>
-            
-            <!-- Lista de eventos creados -->
+
             <div class="events-list-container">
               <div v-if="userEvents.length > 0" class="events-list">
-                <div 
-                  v-for="(event, index) in userEvents" 
-                  :key="index" 
+                <div
+                  v-for="event in userEvents"
+                  :key="event.id"
                   class="event-card"
                 >
                   <div class="event-date">
@@ -43,17 +42,30 @@
                     <div class="event-month">{{ formatMonth(event.date) }}</div>
                   </div>
                   <div class="event-details">
-                    <h3 class="event-title">{{ event.title }}</h3>
+                    <h3 class="event-title">
+                      <ion-icon name="trophy-outline" class="event-icon"></ion-icon>
+                      {{ event.title }}
+                    </h3>
                     <div class="event-info">
                       <div class="event-time">
-                        <ion-icon name="time-outline"></ion-icon>
+                        <ion-icon name="time-outline" class="event-icon"></ion-icon>
                         {{ event.time }}
                       </div>
                       <div class="event-description" v-if="event.description">
-                        <ion-icon name="document-text-outline"></ion-icon>
+                        <ion-icon name="document-text-outline" class="event-icon"></ion-icon>
                         {{ event.description }}
                       </div>
                     </div>
+                  </div>
+                  <div class="event-actions">
+                    <button class="event-action-btn edit-btn" @click="editEvent(event)">
+                      <ion-icon name="create-outline"></ion-icon>
+                      Editar
+                    </button>
+                    <button class="event-action-btn delete-btn" @click="confirmDeleteEvent(event.id)">
+                      <ion-icon name="trash-outline"></ion-icon>
+                      Eliminar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -67,8 +79,8 @@
         </div>
       </div>
     </ion-content>
-    
-    <!-- Modal para ver detalles de evento del calendario -->
+
+    <!-- Modal ver detalles -->
     <div class="modal-overlay" v-if="showEventModal" @click="closeModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
@@ -77,16 +89,16 @@
         </div>
         <div class="modal-body">
           <div class="modal-detail">
-            <ion-icon name="calendar-outline"></ion-icon>
-            <span>{{ formatDate(new Date(selectedEvent.time?.start)) }}</span>
+            <ion-icon name="calendar-outline" class="modal-icon"></ion-icon>
+            <span class="modal-text">{{ formatDate(selectedEvent.time?.start) }}</span>
           </div>
           <div class="modal-detail">
-            <ion-icon name="time-outline"></ion-icon>
-            <span>{{ formatEventTime(selectedEvent.time?.start) }}</span>
+            <ion-icon name="time-outline" class="modal-icon"></ion-icon>
+            <span class="modal-text">{{ formatEventTime(selectedEvent.time?.start) }}</span>
           </div>
           <div class="modal-detail" v-if="selectedEvent.description">
-            <ion-icon name="location-outline"></ion-icon>
-            <span>{{ selectedEvent.description }}</span>
+            <ion-icon name="document-text-outline" class="modal-icon"></ion-icon>
+            <span class="modal-text">{{ selectedEvent.description }}</span>
           </div>
         </div>
         <div class="modal-footer">
@@ -94,62 +106,70 @@
         </div>
       </div>
     </div>
-    
-    <!-- Modal para crear nuevo evento -->
+
+    <!-- Modal crear/editar evento -->
     <div class="modal-overlay" v-if="showCreateModal" @click="closeCreateModal">
       <div class="modal-content create-modal" @click.stop>
         <div class="modal-header">
-          <h3>Crear Nuevo Evento</h3>
+          <h3>{{ newEvent.id ? 'Editar Evento' : 'Crear Nuevo Evento' }}</h3>
           <button class="close-button" @click="closeCreateModal">×</button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="createEvent" class="create-event-form">
+          <form @submit.prevent="saveEvent" class="create-event-form">
             <div class="form-group">
-              <label for="event-title">Título</label>
-              <input 
-                type="text" 
-                id="event-title" 
-                v-model="newEvent.title" 
-                placeholder="Título del evento"
-                required
-              />
+              <label for="event-title">
+                <ion-icon name="trophy-outline" class="form-icon"></ion-icon>
+                Título
+              </label>
+              <input id="event-title" type="text" v-model="newEvent.title" required />
             </div>
-            
             <div class="form-group">
-              <label for="event-date">Fecha</label>
-              <input 
-                type="date" 
-                id="event-date" 
-                v-model="newEvent.date"
-                required
-              />
+              <label for="event-date">
+                <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                Fecha
+              </label>
+              <input id="event-date" type="date" v-model="newEvent.date" required />
             </div>
-            
             <div class="form-group">
-              <label for="event-time">Hora</label>
-              <input 
-                type="time" 
-                id="event-time" 
-                v-model="newEvent.time"
-                required
-              />
+              <label for="event-time">
+                <ion-icon name="time-outline" class="form-icon"></ion-icon>
+                Hora
+              </label>
+              <input id="event-time" type="time" v-model="newEvent.time" required />
             </div>
-            
             <div class="form-group">
-              <label for="event-description">Descripción</label>
-              <textarea 
-                id="event-description" 
-                v-model="newEvent.description" 
-                placeholder="Descripción del evento"
-                rows="3"
-              ></textarea>
+              <label for="event-description">
+                <ion-icon name="document-text-outline" class="form-icon"></ion-icon>
+                Descripción
+              </label>
+              <textarea id="event-description" v-model="newEvent.description" rows="3"></textarea>
             </div>
-            
             <div class="form-actions">
               <button type="button" class="cancel-button" @click="closeCreateModal">Cancelar</button>
-              <button type="submit" class="submit-button">Crear Evento</button>
+              <button type="submit" class="submit-button">{{ newEvent.id ? 'Actualizar' : 'Crear' }}</button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div class="modal-overlay" v-if="showDeleteModal" @click="cancelDelete">
+      <div class="modal-content delete-modal" @click.stop>
+        <div class="modal-header delete-header">
+          <h3>Confirmar eliminación</h3>
+          <button class="close-button" @click="cancelDelete">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="delete-confirmation">
+            <ion-icon name="warning-outline" class="warning-icon"></ion-icon>
+            <p class="delete-text">¿Estás seguro de que deseas eliminar este evento?</p>
+            <p class="delete-subtext">Esta acción no se puede deshacer.</p>
+          </div>
+        </div>
+        <div class="modal-footer delete-footer">
+          <button class="cancel-button" @click="cancelDelete">Cancelar</button>
+          <button class="delete-confirm-btn" @click="proceedWithDelete">Eliminar</button>
         </div>
       </div>
     </div>
@@ -157,108 +177,108 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from "vue";
-import { IonPage, IonContent, IonIcon } from "@ionic/vue";
-import { Qalendar } from "qalendar";
-import "qalendar/dist/style.css";
-import axios from "axios";
-import { onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
+import { IonPage, IonContent, IonIcon } from '@ionic/vue';
+import { Qalendar } from 'qalendar';
+import 'qalendar/dist/style.css';
+import axios from 'axios';
+import { 
+  addOutline,
+  calendarOutline,
+  timeOutline,
+  documentTextOutline,
+  trophyOutline,
+  trashOutline,
+  createOutline,
+  warningOutline
+} from 'ionicons/icons';
+import { addIcons } from 'ionicons';
+
+// Registrar todos los iconos
+addIcons({
+  'add-outline': addOutline,
+  'calendar-outline': calendarOutline,
+  'time-outline': timeOutline,
+  'document-text-outline': documentTextOutline,
+  'trophy-outline': trophyOutline,
+  'trash-outline': trashOutline,
+  'create-outline': createOutline,
+  'warning-outline': warningOutline
+});
 
 const selectedDate = ref(new Date());
 const events = ref([]);
 const showEventModal = ref(false);
 const selectedEvent = ref({});
+const showCreateModal = ref(false);
+const newEvent = ref({ id: null, title: '', date: '', time: '', description: '' });
+const showDeleteModal = ref(false);
+const eventToDeleteId = ref(null);
 const calendarRef = ref(null);
 
-// Lista de eventos creados por el usuario
-const userEvents = ref([]);
-
-// Modal para crear eventos
-const showCreateModal = ref(false);
-const newEvent = ref({
-  title: '',
-  date: '',
-  time: '',
-  description: ''
-});
-
-// Configuración del calendario con indicadores de eventos (puntitos)
 const config = {
-  defaultMode: "month",
-  week: {
-    startsOn: 1, // Semana comienza en lunes
-    nDays: 7,
-  },
-  style: {
-    fontFamily: "'Roboto', sans-serif",
-  },
-  eventDialog: {
-    isCustom: true, // Usamos nuestro propio modal
-    isDisabled: false, // Permitimos que los eventos sean clickables
-  },
-  dayBoundaries: {
-    start: 7,
-    end: 22,
-  },
-  // Mostrar puntitos en lugar de eventos en la vista de mes
-  monthConfig: {
-    showEventsIndicator: true, // Muestra puntitos para indicar eventos
-    showEventTime: false, // No muestra la hora en la vista de mes
-  },
-  // Configuración para la vista de agenda (día/semana)
-  eventList: {
-    showDayName: true,
-    showDate: true,
-  }
+  defaultMode: 'month',
+  week: { startsOn: 1, nDays: 7 },
+  style: { fontFamily: "'Roboto', sans-serif'" },
+  eventDialog: { isCustom: true, isDisabled: false },
+  dayBoundaries: { start: 7, end: 22 },
+  monthConfig: { showEventsIndicator: true, showEventTime: false },
+  eventList: { showDayName: true, showDate: true }
 };
 
-// Eventos del día seleccionado
-const selectedDayEvents = computed(() => {
-  const currentDate = selectedDate.value;
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const day = currentDate.getDate();
-  
-  return events.value.filter(event => {
-    const eventDate = new Date(event.time.start);
-    return eventDate.getFullYear() === year && 
-           eventDate.getMonth() === month && 
-           eventDate.getDate() === day;
-  });
+const userEvents = computed(() => {
+  return events.value.map(e => ({
+    id: e.id,
+    title: e.title,
+    date: e.time.start.split(' ')[0],
+    time: formatEventTime(e.time.start),
+    description: e.description
+  }));
 });
 
-// Función para traer eventos desde la API
+async function fetchTournaments() {
+    try {
+      const { data } = await axios.get(
+        "http://localhost:8082/api/tournaments/player",
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      );
+      events.value = data;
+      // Mapeamos cada torneo al formato que Qalendar necesita
+      events.value = data.map((tournament, index) => {
+        // Convertir la fecha ISO a "YYYY-MM-DD hh:mm"
+        const fecha = tournament.startDate.replace("T", " ").slice(0, 16);
+        return {
+          title: tournament.name,
+          time: {
+            start: fecha,
+            end: fecha,
+          },
+          id: tournament.id ?? index,
+          description: null, // por ahora nulo
+        };
+      });
+    } catch (error) {
+      console.error("Error al obtener eventos:", error);
+    }
+  }
+
 async function fetchEvents() {
   try {
     const { data } = await axios.get(
-      "http://localhost:8082/api/tournaments/organizer",
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      'http://localhost:8082/api/events',
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
     );
-    
-    // Mapeamos cada torneo al formato que Qalendar necesita
-    events.value = data.map((tournament, index) => {
-      // Convertir la fecha ISO a "YYYY-MM-DD hh:mm"
-      const fecha = tournament.startDate.replace("T", " ").slice(0, 16);
-      return {
-        title: tournament.name,
-        time: {
-          start: fecha,
-          end: fecha,
-        },
-        id: tournament.id ?? index,
-        description: tournament.location || 'Ubicación no disponible',
-        color: '#1a2841',
-        isEditable: false,
-      };
+    events.value = data.map(e => {
+      const fecha = e.eventTime.replace('T', ' ').slice(0, 16);
+      return { id: e.id, title: e.title, time: { start: fecha, end: fecha }, description: e.description || '' };
     });
-  } catch (error) {
-    console.error("Error al obtener eventos:", error);
+  } catch (err) {
+    console.error('Error al obtener eventos:', err);
   }
 }
 
-function handlePeriodChange(newDateString) {
-  // newDateString viene en formato ISO, p. ej. "2025-05-10"
-  selectedDate.value = new Date(newDateString);
+function handlePeriodChange(dateStr) {
+  selectedDate.value = new Date(dateStr);
 }
 
 function handleEventClick(event) {
@@ -267,132 +287,142 @@ function handleEventClick(event) {
 }
 
 function handleDateClick(dateStr) {
-  // Actualizar la fecha seleccionada cuando se hace clic en un día
   selectedDate.value = new Date(dateStr);
-  
-  // Pre-llenar la fecha en el formulario de nuevo evento
-  const formattedDate = new Date(dateStr).toISOString().split('T')[0];
-  newEvent.value.date = formattedDate;
+  newEvent.value = { id: null, title: '', date: dateStr.split('T')[0], time: '12:00', description: '' };
 }
 
-function closeModal() {
-  showEventModal.value = false;
-}
+function closeModal() { showEventModal.value = false; }
 
-// Funciones para el modal de crear evento
 function openCreateEventModal() {
-  // Pre-llenar la fecha con la fecha seleccionada en el calendario
-  const formattedDate = selectedDate.value.toISOString().split('T')[0];
+  const d = selectedDate.value.toISOString().split('T')[0];
+  newEvent.value = { id: null, title: '', date: d, time: '12:00', description: '' };
+  showCreateModal.value = true;
+}
+
+function editEvent(event) {
   newEvent.value = {
-    title: '',
-    date: formattedDate,
-    time: '12:00',
-    description: ''
+    id: event.id,
+    title: event.title,
+    date: event.date,
+    time: event.time,
+    description: event.description || ''
   };
   showCreateModal.value = true;
 }
 
-function closeCreateModal() {
-  showCreateModal.value = false;
+function closeCreateModal() { showCreateModal.value = false; }
+
+async function saveEvent() {
+  const dto = {
+    title: newEvent.value.title,
+    description: newEvent.value.description,
+    eventTime: new Date(`${newEvent.value.date}T${newEvent.value.time}`)
+  };
+  try {
+    if (newEvent.value.id) {
+      await axios.put(
+        `http://localhost:8082/api/events/${newEvent.value.id}`,
+        dto,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+    } else {
+      await axios.post(
+        'http://localhost:8082/api/events',
+        dto,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+    }
+    await fetchEvents();
+    closeCreateModal();
+  } catch (err) {
+    console.error('Error al guardar evento:', err);
+  }
 }
 
-function createEvent() {
-  // Añadir el nuevo evento a la lista de eventos del usuario
-  userEvents.value.push({...newEvent.value});
-  
-  // Ordenar eventos por fecha
-  userEvents.value.sort((a, b) => new Date(a.date) - new Date(b.date));
-  
-  // Cerrar el modal
-  closeCreateModal();
+function confirmDeleteEvent(id) {
+  eventToDeleteId.value = id;
+  showDeleteModal.value = true;
 }
 
-// Formatear fecha: DD/MM/YYYY
+function cancelDelete() {
+  showDeleteModal.value = false;
+  eventToDeleteId.value = null;
+}
+
+async function proceedWithDelete() {
+  try {
+    await axios.delete(
+      `http://localhost:8082/api/events/${eventToDeleteId.value}`,
+      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+    );
+    await fetchEvents();
+    showDeleteModal.value = false;
+    eventToDeleteId.value = null;
+  } catch (err) {
+    console.error('Error al eliminar evento:', err);
+  }
+}
+
 function formatDate(date) {
   if (!date) return '';
-  const d = new Date(date);
-  return d.toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
+  return new Date(date).toLocaleDateString('es-ES',{ day:'2-digit', month:'2-digit', year:'numeric' });
 }
 
-// Formatear hora: HH:MM
-function formatEventTime(timeString) {
-  if (!timeString) return '';
-  const date = new Date(timeString);
-  return date.toLocaleTimeString('es-ES', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
+function formatEventTime(timeStr) {
+  if (!timeStr) return '';
+  return new Date(timeStr).toLocaleTimeString('es-ES',{ hour:'2-digit', minute:'2-digit', hour12:false });
 }
 
-// Formatear día: DD
-function formatDay(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.getDate().toString().padStart(2, '0');
+function formatDay(date) {
+  if (!date) return '';
+  return new Date(date).getDate().toString().padStart(2,'0');
 }
 
-// Formatear mes: MMM
-function formatMonth(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleString('es-ES', { month: 'short' });
+function formatMonth(date) {
+  if (!date) return '';
+  return new Date(date).toLocaleString('es-ES',{ month:'short' });
 }
 
-// Función para forzar el refresco del calendario
 function forceCalendarRefresh() {
   if (calendarRef.value) {
     const calendarElement = calendarRef.value.$el;
     calendarElement.style.display = 'none';
-    calendarElement.offsetHeight; // Trigger reflow
-    calendarElement.style.display = 'block';
-    window.dispatchEvent(new Event('resize'));
+    requestAnimationFrame(() => {
+      calendarElement.style.display = 'block';
+      window.dispatchEvent(new Event('resize'));
+    });
   }
 }
 
-// Lanza la consulta al montar el componente
 onMounted(async () => {
+  await fetchTournaments()
   await fetchEvents();
-  
-  // Esperar a que el DOM se actualice
   await nextTick();
-  
-  // Forzar el refresco del calendario para solucionar el bug de visualización inicial
-  setTimeout(forceCalendarRefresh, 100);
+  forceCalendarRefresh();
   window.addEventListener('resize', forceCalendarRefresh);
 });
 
-onBeforeUnmount(async () => {
+onBeforeUnmount(() => {
   window.removeEventListener('resize', forceCalendarRefresh);
-})
+});
 </script>
 
 <style scoped>
 /* Estilos generales */
-.no-horizontal-scroll {
+ion-content {
   --background: #f9f5f0;
-  overflow-x: hidden;
 }
 
 .calendar-container {
   background: #f9f5f0;
-  max-width: 1400px;
+  max-width: 1600px;
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
   padding: 1rem;
   box-sizing: border-box;
-  position: relative;
   overflow: visible !important;
-  overflow-x: hidden;
-  min-height: calc(100vh - 2rem);
 }
 
-/* Layout principal: calendario (2/3) y eventos (1/3) */
 .calendar-layout {
   display: flex;
   gap: 1.5rem;
@@ -400,25 +430,19 @@ onBeforeUnmount(async () => {
   height: 100%;
 }
 
-/* Sección del calendario (2/3) */
 .calendar-section {
-  flex: 2;
+  flex: 1.5;
   display: flex;
   flex-direction: column;
-  position: relative;
-  z-index: 2;
-  overflow: visible !important;
 }
 
-/* Sección de eventos (1/3) */
 .events-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  z-index: 1;
+  min-width: 350px;
 }
 
-/* Estilos comunes para las secciones */
 .section {
   padding: 1.5rem;
   background-color: #e0e1dd;
@@ -447,16 +471,15 @@ onBeforeUnmount(async () => {
   font-weight: 600;
 }
 
-/* Calendario */
 .fixed-calendar {
   width: 100%;
-  height: 600px;
+  height: 650px;
   overflow: visible;
   position: relative;
-  flex: 2;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Botón para añadir evento */
 .add-event-btn {
   display: flex;
   align-items: center;
@@ -477,11 +500,6 @@ onBeforeUnmount(async () => {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
-.add-event-btn ion-icon {
-  font-size: 1.2rem;
-}
-
-/* Contenedor de la lista de eventos */
 .events-list-container {
   flex: 1;
   overflow-y: auto;
@@ -491,16 +509,15 @@ onBeforeUnmount(async () => {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Lista de eventos */
 .events-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-/* Tarjeta de evento */
 .event-card {
   display: flex;
+  flex-wrap: wrap;
   background: #fff;
   border-radius: 12px;
   padding: 1rem;
@@ -513,7 +530,6 @@ onBeforeUnmount(async () => {
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Fecha del evento */
 .event-date {
   background: linear-gradient(135deg, #3d5a80, #2c4366);
   color: white;
@@ -541,13 +557,13 @@ onBeforeUnmount(async () => {
   opacity: 0.9;
 }
 
-/* Detalles del evento */
 .event-details {
   padding-left: 1rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex: 1;
+  min-width: 0; /* Permite que el texto se ajuste */
 }
 
 .event-title {
@@ -555,6 +571,12 @@ onBeforeUnmount(async () => {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .event-info {
@@ -567,16 +589,61 @@ onBeforeUnmount(async () => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #4a5568;
+  color: #1a2841;
   font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.event-time ion-icon, .event-description ion-icon {
+.event-icon {
   color: #3d5a80;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  min-width: 1.1rem;
+  flex-shrink: 0;
 }
 
-/* Mensaje de no eventos */
+.event-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-left: auto;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.event-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  white-space: nowrap;
+}
+
+.edit-btn {
+  background-color: rgba(61, 90, 128, 0.1);
+  color: #3d5a80;
+}
+
+.edit-btn:hover {
+  background-color: rgba(61, 90, 128, 0.2);
+}
+
+.delete-btn {
+  background-color: rgba(230, 57, 70, 0.1);
+  color: #e63946;
+}
+
+.delete-btn:hover {
+  background-color: rgba(230, 57, 70, 0.2);
+}
+
 .no-events-message {
   width: 100%;
   padding: 2rem;
@@ -602,7 +669,6 @@ onBeforeUnmount(async () => {
   margin-top: 0.5rem;
 }
 
-/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -618,7 +684,6 @@ onBeforeUnmount(async () => {
   box-sizing: border-box;
 }
 
-/* Contenido del modal */
 .modal-content {
   background-color: #f5efe7;
   border-radius: 16px;
@@ -633,7 +698,10 @@ onBeforeUnmount(async () => {
   max-width: 600px;
 }
 
-/* Cabecera del modal */
+.delete-modal {
+  max-width: 450px;
+}
+
 .modal-header {
   background: linear-gradient(135deg, #3d5a80, #2c4366);
   color: white;
@@ -641,6 +709,10 @@ onBeforeUnmount(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.delete-header {
+  background: linear-gradient(135deg, #e63946, #c1121f);
 }
 
 .modal-header h3 {
@@ -668,7 +740,6 @@ onBeforeUnmount(async () => {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Cuerpo del modal */
 .modal-body {
   padding: 1.5rem;
 }
@@ -677,25 +748,34 @@ onBeforeUnmount(async () => {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #4a5568;
-  font-size: 1rem;
+  background-color: #ffffff;
+  padding: 0.75rem;
+  border-radius: 8px;
   margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.modal-detail:last-child {
-  margin-bottom: 0;
-}
-
-.modal-detail ion-icon {
+.modal-icon {
   color: #3d5a80;
   font-size: 1.25rem;
+  min-width: 1.25rem;
 }
 
-/* Pie del modal */
+.modal-text {
+  color: #1a2841;
+  font-size: 1rem;
+}
+
 .modal-footer {
   padding: 1rem 1.5rem 1.5rem;
   display: flex;
   justify-content: flex-end;
+  gap: 1rem;
+}
+
+.delete-footer {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.25rem;
 }
 
 .action-button {
@@ -715,7 +795,6 @@ onBeforeUnmount(async () => {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Formulario para crear evento */
 .create-event-form {
   display: flex;
   flex-direction: column;
@@ -732,6 +811,14 @@ onBeforeUnmount(async () => {
   font-weight: 600;
   color: #1a2841;
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-icon {
+  color: #3d5a80;
+  font-size: 1.1rem;
 }
 
 .form-group input, .form-group textarea {
@@ -740,6 +827,7 @@ onBeforeUnmount(async () => {
   border-radius: 8px;
   font-size: 1rem;
   background-color: white;
+  color: #1a2841;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -788,6 +876,49 @@ onBeforeUnmount(async () => {
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
+.delete-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.warning-icon {
+  font-size: 3rem;
+  color: #e63946;
+  margin-bottom: 1rem;
+}
+
+.delete-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a2841;
+  margin-bottom: 0.5rem;
+}
+
+.delete-subtext {
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.delete-confirm-btn {
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.delete-confirm-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
 @keyframes modal-appear {
   from {
     opacity: 0;
@@ -799,31 +930,68 @@ onBeforeUnmount(async () => {
   }
 }
 
-/* Estilos para el calendario */
+/* Estilos específicos del calendario */
 :deep(.calendar-root-wrapper),
-:deep(.calendar-root),
+:deep(.calendar-root) {
+  background-color: #f5efe7 !important;
+  color: #1a2841 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 :deep(.calendar-month) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  background-color: #f5efe7 !important;
+  height: 100% !important;
 }
 
 :deep(.calendar-month__weekday) {
-  padding: .5rem !important;
+  background-color: #f5efe7 !important;
+  border-color: #e0e1dd !important;
+  min-width: 120px !important;
   height: 100px !important;
-  min-height: 100px;
 }
 
-:deep(.calendar-month__wrapper) {
-  flex: 1;
-  overflow: hidden;
-  pointer-events: auto !important;
+:deep(.calendar-month__day-date) {
+  color: #1a2841 !important;
+  font-weight: 600 !important;
 }
 
-/* Puntitos para indicar eventos */
+:deep(.calendar-month__day-name) {
+  color: #3d5a80 !important;
+  font-weight: 600 !important;
+}
+
+:deep(.calendar-header) {
+  background-color: #f5efe7 !important;
+  padding: 0 100px !important;
+  min-width: auto !important;
+  width: 100% !important;
+}
+
+:deep(.calendar-header__period-name) {
+  color: #1a2841 !important;
+  font-weight: 700 !important;
+  font-size: 1.3rem !important;
+}
+
+:deep(.calendar-header__nav-buttons) {
+  position: absolute;
+  right: 20px;
+  gap: 20px;
+}
+
+:deep(.calendar-header__nav-button) {
+  background: linear-gradient(145deg, #3d5a80, #2c4366) !important;
+  transform: scale(1.3);
+  z-index: 1000;
+}
+
+:deep(.calendar-header__nav-icon) {
+  color: white !important;
+}
+
 :deep(.calendar-month__event-indicator) {
-  background-color: #1a2841 !important;
+  background-color: #3d5a80 !important;
   width: 6px !important;
   height: 6px !important;
   border-radius: 50% !important;
@@ -836,90 +1004,24 @@ onBeforeUnmount(async () => {
   margin-top: 4px;
 }
 
-/* Fondo general del calendario */
-:deep(.calendar-root-wrapper .calendar-root) {
-  background-color: #f5efe7 !important;
-  color: #000000 !important;
+:deep(.calendar-month__weekday.is-today) {
+  background-color: rgba(61, 90, 128, 0.05) !important;
 }
 
-/* Color del mes y año en el header */
-:deep(.calendar-header__period-name) {
-  color: #000000 !important;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-/* Color de los días */
-:deep(.calendar-month__day-date) {
-  color: #000000 !important;
-  font-weight: bold;
-
-}
-
-:deep(.calendar-header__mode-picker) {
-  display: none;
-}
-
-:deep(.date-picker__value-display) {
-  display: none;
-}
-
-/* Color de los nombres de día */
-:deep(.calendar-month__day-name) {
-  color: #1a2841 !important;
-  font-weight: bold;
-}
-
-/* Resaltar el día actual */
 :deep(.calendar-month__weekday.is-today .calendar-month__day-date) {
-  background-color: #1a2841;
-  color: #ffffff !important;
+  background-color: #3d5a80 !important;
+  color: white !important;
 }
 
-/* Resaltar día seleccionado */
 :deep(.calendar-month__weekday.is-selected) {
-  box-shadow: inset 0 0 0 3px #1a2841;
-}
-
-/* Hacer que los días sean clickables */
-:deep(.calendar-month__weekday) {
-  cursor: pointer;
-  transition: background-color 0.2s;
+  box-shadow: inset 0 0 0 2px #3d5a80 !important;
 }
 
 :deep(.calendar-month__weekday:hover) {
-  background-color: rgba(61, 90, 128, 0.1);
+  background-color: rgba(61, 90, 128, 0.1) !important;
 }
 
-/* Botones de navegación */
-:deep(.calendar-header__nav-button) {
-  background: linear-gradient(145deg, #3d5a80, #2c4366);
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-:deep(.calendar-header__nav-button:hover) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-:deep(.calendar-header__nav-button:active) {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-:deep(.calendar-header__nav-icon) {
-  color: #ffffff;
-}
-
-/* Estilos para los eventos nativos de Qalendar */
+/* Estilos para los eventos en el calendario */
 :deep(.agenda__event) {
   background: linear-gradient(145deg, #3d5a80, #2c4366) !important;
   border-radius: 8px !important;
@@ -929,30 +1031,6 @@ onBeforeUnmount(async () => {
   transition: all 0.3s ease !important;
 }
 
-:deep(.agenda__event:hover) {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-:deep(.agenda__event-name) {
-  color: white !important;
-  font-weight: 600 !important;
-  font-size: 1rem !important;
-}
-
-:deep(.agenda__event-time) {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-size: 0.85rem !important;
-  margin-top: 4px !important;
-}
-
-:deep(.agenda__event-description) {
-  color: rgba(255, 255, 255, 0.8) !important;
-  font-size: 0.85rem !important;
-  margin-top: 6px !important;
-}
-
-/* Estilos para la vista de día/semana */
 :deep(.day-view__event-container) {
   background: linear-gradient(145deg, #3d5a80, #2c4366) !important;
   border-radius: 6px !important;
@@ -961,90 +1039,88 @@ onBeforeUnmount(async () => {
   transition: all 0.3s ease !important;
 }
 
-:deep(.day-view__event-container:hover) {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+/* Ajustes para la vista responsiva */
+@media (max-width: 1525px) {
+  .calendar-container {
+    max-width: 100%;
+    padding: 20px;
+  }
+  
+  :deep(.calendar-header) {
+    padding: 0 50px !important;
+  }
+  
+  :deep(.calendar-month__weekday) {
+    min-width: 100px !important;
+  }
 }
 
-:deep(.day-view__event-name) {
-  color: white !important;
-  font-weight: 600 !important;
+@media (max-width: 1200px) {
+  :deep(.calendar-month__weekday) {
+    min-width: 80px !important;
+    height: 90px !important;
+  }
 }
 
-:deep(.day-view__event-time) {
-  color: rgba(255, 255, 255, 0.9) !important;
-}
-
-/* Estilos para el header de la agenda */
-:deep(.agenda__header) {
-  background-color: #f5efe7 !important;
-  border-bottom: 2px solid #e0e1dd !important;
-}
-
-:deep(.agenda__header-date) {
-  background-color: #1a2841 !important;
-  color: white !important;
-  border-radius: 50% !important;
-  width: 36px !important;
-  height: 36px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-weight: bold !important;
-}
-
-:deep(.agenda__header-day-name) {
-  color: #1a2841 !important;
-  font-weight: 600 !important;
-}
-
-/* Responsive */
 @media (max-width: 1024px) {
   .calendar-layout {
     flex-direction: column;
   }
   
   .calendar-section, .events-section {
-    flex: none;
     width: 100%;
-    position: relative;
-    z-index: 0;
+    min-width: unset;
   }
   
   .fixed-calendar {
     height: 500px;
   }
+  
+  :deep(.calendar-month__weekday) {
+    min-width: 70px !important;
+    height: 80px !important;
+  }
+  
+  .event-card {
+    flex-wrap: wrap;
+  }
+  
+  .event-details {
+    width: calc(100% - 80px);
+  }
+  
+  .event-actions {
+    width: 100%;
+    flex-direction: row;
+    margin-top: 1rem;
+    margin-left: 0;
+  }
+  
+  .event-action-btn {
+    flex: 1;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 768px) {
-  .fixed-calendar {
-    height: 450px;
+  :deep(.calendar-month__weekday) {
+    min-width: 60px !important;
+    height: 60px !important;
   }
   
   .section {
     padding: 1rem;
   }
-  
-  .section-header h2 {
-    font-size: 1.3rem;
-  }
-  
-  .add-event-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-  }
 }
 
 @media (max-width: 480px) {
-  .fixed-calendar {
-    height: 400px;
+  :deep(.calendar-month__weekday) {
+    min-width: 40px !important;
+    height: 50px !important;
   }
   
   .section {
     padding: 0.75rem;
-  }
-  
-  .section-header h2 {
-    font-size: 1.1rem;
   }
   
   .event-card {
@@ -1052,24 +1128,17 @@ onBeforeUnmount(async () => {
   }
   
   .event-date {
-    margin-bottom: 1rem;
     flex-direction: row;
     justify-content: center;
-    align-items: center;
     gap: 0.5rem;
     padding: 0.5rem;
-  }
-  
-  .event-day, .event-month {
-    font-size: 1rem;
+    margin-bottom: 0.5rem;
   }
   
   .event-details {
+    width: 100%;
     padding-left: 0;
-  } 
-  
-  .modal-content {
-    max-width: 100%;
   }
 }
 </style>
+

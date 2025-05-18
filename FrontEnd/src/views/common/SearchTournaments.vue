@@ -210,8 +210,12 @@
                   </div>
                   <div class="card-body">
                     <div class="detail-item">
-                      <strong>Organizador:</strong> {{ t.organizerId }}
+                      <strong>Jugadores máximos:</strong> {{ t.maxPlayers }}
                     </div>
+                    <div class="detail-item" v-if="t.maxPlayers && t.currentPlayers !== undefined">
+                      <strong>Plazas disponibles:</strong> {{ t.maxPlayers - t.currentPlayers }}
+                    </div>
+
                     <div class="detail-item">
                       <strong>Localidad:</strong> {{ capitalize(t.location) }}
                     </div>

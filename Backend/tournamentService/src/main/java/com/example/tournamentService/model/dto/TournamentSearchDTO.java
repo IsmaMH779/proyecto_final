@@ -9,14 +9,26 @@ public class TournamentSearchDTO {
     private String organizerId;
     private String location;
     private LocalDateTime startDate;
+    private int maxPlayers;
+    private int currentPlayers;
+
+    public TournamentSearchDTO() {}
 
     public TournamentSearchDTO(Long id, String name, String game, String organizerId, String location, LocalDateTime startDate) {
+        this(id, name, game, organizerId, location, startDate, 0, 0);
+    }
+
+
+    public TournamentSearchDTO(Long id, String name, String game, String organizerId, String location, LocalDateTime startDate, int maxPlayers,
+                               int currentPlayers) {
         this.id = id;
         this.name = name;
         this.game = game;
         this.organizerId = organizerId;
         this.location = location;
         this.startDate = startDate;
+        this.maxPlayers = maxPlayers;
+        this.currentPlayers = currentPlayers;
     }
 
     public Long getId() {
@@ -64,5 +76,21 @@ public class TournamentSearchDTO {
 
     public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
+    }
+
+    public int getCurrentPlayers() {
+        return currentPlayers;
+    }
+
+    public void setCurrentPlayers(int currentPlayers) {
+        this.currentPlayers = currentPlayers;
     }
 }

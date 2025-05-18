@@ -159,8 +159,8 @@ public class TournamentController {
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Object>> statsThisMonth() {
         Map<String,Object> stats = new HashMap<>();
-        stats.put("tournamentsThisMonth", tournamentService.countTournamentsThisMonth());
-        stats.put("playersThisMonth",     tournamentService.countPlayersThisMonth());
+        stats.put("tournamentsThisMonth", tournamentService.countTournamentsThisMonth());  // creados este mes
+        stats.put("playersThisMonth",     tournamentService.countPlayersThisMonth());      // inscripciones a MIS torneos
         return ResponseEntity.ok(stats);
     }
 
@@ -185,6 +185,18 @@ public class TournamentController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/weekly/player")
+    public ResponseEntity<List<TournamentPlayerDTO>> getWeeklyPlayerTournaments() {
+        List<TournamentPlayerDTO> dtos = tournamentService.getWeeklyTournamentsForPlayer();
+        return ResponseEntity.ok(dtos);
+    }
 
+    @GetMapping("/stats/player")
+    public ResponseEntity<Map<String, Object>> statsPlayerThisMonth() {
+        Map<String,Object> stats = new HashMap<>();
+        stats.put("tournamentsThisMonth", tournamentService.countMyTournamentsThisMonth()); // apuntados este mes
+        stats.put("playersThisMonth",     tournamentService.countPlayersThisMonth());      // inscripciones totales este mes
+        return ResponseEntity.ok(stats);
+    }
 
 }
