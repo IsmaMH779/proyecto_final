@@ -27,7 +27,8 @@
                 Una plataforma completa para jugadores y organizadores
               </p>
             </div>
-            <div class="hero-cards" v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1, transition: { delay: 600 } }">
+            <div class="hero-cards" v-motion :initial="{ opacity: 0 }"
+              :enter="{ opacity: 1, transition: { delay: 600 } }">
               <div class="card card-1"></div>
               <div class="card card-2"></div>
               <div class="card card-3"></div>
@@ -35,7 +36,9 @@
           </div>
           <div class="hero-wave">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-              <path fill="#f9f5f0" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+              <path fill="#f9f5f0" fill-opacity="1"
+                d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
+              </path>
             </svg>
           </div>
         </section>
@@ -47,26 +50,21 @@
               <h2>Dos experiencias, una plataforma</h2>
               <p>Elige tu rol y descubre todas las funcionalidades diseñadas para ti</p>
             </div>
-            
+
             <div class="roles-tabs">
               <div class="tabs-header">
-                <button 
-                  class="tab-button" 
-                  :class="{ active: activeTab === 'organizer' }" 
-                  @click="activeTab = 'organizer'"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button class="tab-button" :class="{ active: activeTab === 'organizer' }"
+                  @click="activeTab = 'organizer'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                   </svg>
                   <span>Organizador</span>
                 </button>
-                <button 
-                  class="tab-button" 
-                  :class="{ active: activeTab === 'player' }" 
-                  @click="activeTab = 'player'"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <button class="tab-button" :class="{ active: activeTab === 'player' }" @click="activeTab = 'player'">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -75,10 +73,11 @@
                   <span>Jugador</span>
                 </button>
               </div>
-              
+
               <div class="tab-content">
                 <!-- Organizer Tab -->
-                <div v-if="activeTab === 'organizer'" class="tab-pane" v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }">
+                <div v-if="activeTab === 'organizer'" class="tab-pane" v-motion :initial="{ opacity: 0 }"
+                  :enter="{ opacity: 1 }">
                   <div class="tab-grid">
                     <div class="tab-image">
                       <img src="@/assets/landing/landing_home.png" alt="Organizador TCG" />
@@ -86,11 +85,13 @@
                     <div class="tab-info">
                       <h3>Para Organizadores</h3>
                       <p>Crea y gestiona torneos de TCG con herramientas diseñadas para simplificar todo el proceso.</p>
-                      
+
                       <div class="features-list">
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                               <circle cx="9" cy="7" r="4"></circle>
                               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -102,10 +103,12 @@
                             <p>Controla inscripciones, asistencia y datos de los jugadores en un solo lugar.</p>
                           </div>
                         </div>
-                        
+
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
@@ -115,10 +118,12 @@
                             <p>Crea torneos con diferentes formatos: eliminación directa, suizo, round robin y más.</p>
                           </div>
                         </div>
-                        
+
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <path d="M12 20v-6M6 20V10M18 20V4"></path>
                             </svg>
                           </div>
@@ -127,10 +132,12 @@
                             <p>Visualiza datos importantes sobre tus torneos y participantes.</p>
                           </div>
                         </div>
-                        
+
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                               <line x1="16" y1="2" x2="16" y2="6"></line>
                               <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -143,14 +150,15 @@
                           </div>
                         </div>
                       </div>
-                      
+
                       <button class="btn-role">Solicitud para ser organizador</button>
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Player Tab -->
-                <div v-if="activeTab === 'player'" class="tab-pane" v-motion :initial="{ opacity: 0 }" :enter="{ opacity: 1 }">
+                <div v-if="activeTab === 'player'" class="tab-pane" v-motion :initial="{ opacity: 0 }"
+                  :enter="{ opacity: 1 }">
                   <div class="tab-grid">
                     <div class="tab-image">
                       <img src="@/assets/landing/landing_tournament.png" alt="Jugador TCG" />
@@ -158,11 +166,13 @@
                     <div class="tab-info">
                       <h3>Para Jugadores</h3>
                       <p>Encuentra torneos, compite y lleva un seguimiento de tu progreso en tus juegos favoritos.</p>
-                      
+
                       <div class="features-list">
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <circle cx="12" cy="12" r="10"></circle>
                               <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
                             </svg>
@@ -172,10 +182,12 @@
                             <p>Encuentra torneos cercanos a tu ubicación o en línea para tus juegos favoritos.</p>
                           </div>
                         </div>
-                        
+
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                             </svg>
                           </div>
@@ -184,10 +196,12 @@
                             <p>Inscríbete en torneos con un solo clic y recibe notificaciones importantes.</p>
                           </div>
                         </div>
-                        
+
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <path d="M12 20v-6M6 20V10M18 20V4"></path>
                             </svg>
                           </div>
@@ -196,10 +210,12 @@
                             <p>Visualiza tu historial de partidas, victorias y evolución como jugador.</p>
                           </div>
                         </div>
-                        
+
                         <div class="feature-item">
                           <div class="feature-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round">
                               <circle cx="12" cy="8" r="7"></circle>
                               <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
                             </svg>
@@ -210,7 +226,7 @@
                           </div>
                         </div>
                       </div>
-                      
+
                       <button class="btn-role" @click="showRegisterModal = true">Comenzar como Jugador</button>
                     </div>
                   </div>
@@ -227,7 +243,7 @@
               <h2>Cómo funciona</h2>
               <p>Comienza a utilizar nuestra plataforma en tres sencillos pasos</p>
             </div>
-            
+
             <div class="steps">
               <div class="step">
                 <div class="step-number">1</div>
@@ -236,9 +252,9 @@
                   <p>Regístrate en nuestra plataforma y elige tu rol: organizador o jugador.</p>
                 </div>
               </div>
-              
+
               <div class="step-connector"></div>
-              
+
               <div class="step">
                 <div class="step-number">2</div>
                 <div class="step-content">
@@ -246,9 +262,9 @@
                   <p>Completa tu información y personaliza tu experiencia según tus preferencias.</p>
                 </div>
               </div>
-              
+
               <div class="step-connector"></div>
-              
+
               <div class="step">
                 <div class="step-number">3</div>
                 <div class="step-content">
@@ -280,7 +296,7 @@
                 <img src="https://placehold.co/40x120" alt="TCG Logo" />
                 <p>La plataforma definitiva para torneos de TCG</p>
               </div>
-              
+
               <div class="footer-nav">
                 <div class="footer-nav-column">
                   <h4>Plataforma</h4>
@@ -291,7 +307,7 @@
                     <li><a href="#">Soporte</a></li>
                   </ul>
                 </div>
-                
+
                 <div class="footer-nav-column">
                   <h4>Recursos</h4>
                   <ul>
@@ -301,7 +317,7 @@
                     <li><a href="#">Contacto</a></li>
                   </ul>
                 </div>
-                
+
                 <div class="footer-nav-column">
                   <h4>Legal</h4>
                   <ul>
@@ -312,17 +328,21 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="footer-bottom">
               <p>&copy; 2025 TCG Platform. Todos los derechos reservados.</p>
               <div class="social-links">
                 <a href="#" aria-label="Twitter">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z">
+                    </path>
                   </svg>
                 </a>
                 <a href="#" aria-label="Instagram">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
@@ -334,150 +354,109 @@
         </footer>
 
         <!-- Login Modal -->
-  <div class="modal" v-if="showLoginModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Iniciar Sesión</h3>
-        <button class="close-button" @click="closeModal">×</button>
-      </div>
+        <div class="modal" v-if="showLoginModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Iniciar Sesión</h3>
+              <button class="close-button" @click="closeModal">×</button>
+            </div>
 
-      <form @submit.prevent="login">
-        <div :class="['form-group', emailError ? 'has-error' : '']">
-          <label for="email">Correo electrónico</label>
-          <input
-            type="email"
-            id="email"
-            v-model="loginForm.email"
-            :placeholder="emailErrorMessage"
-            class="form-control"
-          />
-        </div>
+            <form @submit.prevent="login">
+              <div :class="['form-group', emailError ? 'has-error' : '']">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" v-model="loginForm.email" :placeholder="emailErrorMessage"
+                  class="form-control" />
+              </div>
 
-        <div :class="['form-group', passwordError ? 'has-error' : '']">
-          <label for="password">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            v-model="loginForm.password"
-            :placeholder="passwordErrorMessage"
-            class="form-control"
-          />
-        </div>
+              <div :class="['form-group', passwordError ? 'has-error' : '']">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" v-model="loginForm.password" :placeholder="passwordErrorMessage"
+                  class="form-control" />
+              </div>
 
-        <button type="submit" class="btn-primary" :disabled="isLoading">
-          <span v-if="!isLoading">Iniciar Sesión</span>
-          <span v-else>
-            <i class="spinner-icon"></i> Cargando...
-          </span>
-        </button>
-      </form>
+              <button type="submit" class="btn-primary" :disabled="isLoading">
+                <span v-if="!isLoading">Iniciar Sesión</span>
+                <span v-else>
+                  <i class="spinner-icon"></i> Cargando...
+                </span>
+              </button>
+            </form>
 
-      <div class="modal-footer">
-        <p style="color: black;">¿Aún no tienes cuenta?
-          <a href="#" @click.prevent="switchToRegister">Regístrate aquí</a>
-        </p>
-      </div>
-    </div>
-  </div>
-
-        <!-- Register Modal -->
-  <div class="modal" v-if="showRegisterModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Registrarse</h3>
-        <button class="close-button" @click="closeModal">×</button>
-      </div>
-
-      <form @submit.prevent="register">
-        <div :class="['form-group', usernameError ? 'has-error' : '']">
-          <label for="reg-username">Nombre de usuario</label>
-          <input
-            type="text"
-            id="reg-username"
-            v-model="registerForm.username"
-            :placeholder="usernameErrorMessage"
-            class="form-control"
-          />
-        </div>
-
-        <div :class="['form-group', emailError ? 'has-error' : '']">
-          <label for="reg-email">Correo electrónico</label>
-          <input
-            type="email"
-            id="reg-email"
-            v-model="registerForm.email"
-            :placeholder="emailErrorMessage"
-            class="form-control"
-          />
-        </div>
-
-        <!-- Campo de Localidad adaptado -->
-      <div :class="['form-group', locationError ? 'has-error' : '']">
-        <label for="reg-location">Localidad</label>
-        <div class="location-select-container">
-          <!-- Input de búsqueda -->
-          <input
-            id="reg-location"
-            type="text"
-            v-model="search"
-            @input="showSuggestions = true"
-            @blur="setTimeout(() => showSuggestions = false, 200)"
-            class="form-control"
-            autocomplete="off"
-            placeholder="Buscar localidad"
-          />
-          
-          <!-- Contenedor de sugerencias -->
-          <div class="suggestions-container" v-if="showSuggestions && filteredProvinces.length">
-            <ul class="suggestions-list">
-              <li
-                v-for="prov in filteredProvinces"
-                :key="prov.code"
-                @click="selectProvince(prov.name)"
-                class="suggestion-item"
-              >
-                {{ prov.name }}
-              </li>
-            </ul>
+            <div class="modal-footer">
+              <p style="color: black;">¿Aún no tienes cuenta?
+                <a href="#" @click.prevent="switchToRegister">Regístrate aquí</a>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-        <div :class="['form-group', passwordError ? 'has-error' : '']">
-          <label for="reg-password">Contraseña</label>
-          <input
-            type="password"
-            id="reg-password"
-            v-model="registerForm.password"
-            placeholder="Contraseña"
-            class="form-control"
-          />
+        <!-- Register Modal -->
+        <div class="modal" v-if="showRegisterModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Registrarse</h3>
+              <button class="close-button" @click="closeModal">×</button>
+            </div>
+
+            <form @submit.prevent="register">
+              <div :class="['form-group', usernameError ? 'has-error' : '']">
+                <label for="reg-username">Nombre de usuario</label>
+                <input type="text" id="reg-username" v-model="registerForm.username" :placeholder="usernameErrorMessage"
+                  class="form-control" />
+              </div>
+
+              <div :class="['form-group', emailError ? 'has-error' : '']">
+                <label for="reg-email">Correo electrónico</label>
+                <input type="email" id="reg-email" v-model="registerForm.email" :placeholder="emailErrorMessage"
+                  class="form-control" />
+              </div>
+
+              <!-- Campo de Localidad -->
+              <div :class="['form-group', locationError ? 'has-error' : '']">
+                <label for="reg-location">Localidad</label>
+                <div class="location-select-container">
+                  <!-- Input de búsqueda -->
+                  <input id="reg-location" type="text" v-model="registerForm.location" @input="showSuggestions = true"
+                    @blur="setTimeout(() => showSuggestions = false, 200)" class="form-control" autocomplete="off"
+                    placeholder="Buscar localidad" />
+
+                  <!-- Contenedor de sugerencias -->
+                  <div class="suggestions-container" v-if="showSuggestions && filteredProvinces.length">
+                    <ul class="suggestions-list">
+                      <li v-for="prov in filteredProvinces" :key="prov.code" @click="selectProvince(prov.name)"
+                        class="suggestion-item">
+                        {{ prov.name }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div :class="['form-group', passwordError ? 'has-error' : '']">
+                <label for="reg-password">Contraseña</label>
+                <input type="password" id="reg-password" v-model="registerForm.password" placeholder="Contraseña"
+                  class="form-control" />
+              </div>
+
+              <div :class="['form-group', confirmPasswordError ? 'has-error' : '']">
+                <label for="reg-confirm-password">Confirmar contraseña</label>
+                <input type="password" id="reg-confirm-password" v-model="registerForm.confirmPassword"
+                  placeholder="Confirmar contraseña" class="form-control" />
+              </div>
+
+              <button type="submit" class="btn-primary" :disabled="isLoading">
+                <span v-if="!isLoading">Registrarse</span>
+                <span v-else><i class="spinner-icon"></i> Cargando...</span>
+              </button>
+            </form>
+
+            <div class="modal-footer">
+              <p style="color: black;">¿Ya tienes cuenta?
+                <a href="#" @click.prevent="switchToLogin">Inicia sesión aquí</a>
+              </p>
+            </div>
+          </div>
         </div>
-
-        <div :class="['form-group', confirmPasswordError ? 'has-error' : '']">
-          <label for="reg-confirm-password">Confirmar contraseña</label>
-          <input
-            type="password"
-            id="reg-confirm-password"
-            v-model="registerForm.confirmPassword"
-            placeholder="Confirmar contraseña"
-            class="form-control"
-          />
-        </div>
-
-        <button type="submit" class="btn-primary" :disabled="isLoading">
-          <span v-if="!isLoading">Registrarse</span>
-          <span v-else><i class="spinner-icon"></i> Cargando...</span>
-        </button>
-      </form>
-
-      <div class="modal-footer">
-        <p style="color: black;">¿Ya tienes cuenta?
-          <a href="#" @click.prevent="switchToLogin">Inicia sesión aquí</a>
-        </p>
-      </div>
-    </div>
-  </div>
       </div>
     </ion-content>
   </ion-page>
@@ -488,9 +467,9 @@ import { ref, computed, onMounted } from 'vue'
 import provincias from '@/assets/data/location/locations.json';
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import { 
-  IonPage, 
-  IonContent 
+import {
+  IonPage,
+  IonContent
 } from '@ionic/vue';
 
 // Tab state
@@ -502,7 +481,6 @@ const router = useRouter()
 // Modal state
 const showLoginModal = ref(false);
 const showRegisterModal = ref(false);
-
 
 // Form data
 const loginForm = ref({
@@ -518,24 +496,23 @@ const registerForm = ref({
   confirmPassword: ''
 });
 
-// Búsqueda de provincias y el modelo
-const search = ref("");
+// Búsqueda de provincias - CORREGIDO
 const showSuggestions = ref(false);
 const provinces = ref([]);
+
+// Computed corregido para usar registerForm.location
 const filteredProvinces = computed(() => {
-  if (!search.value) return [];
+  if (!registerForm.value.location) return [];
   return provinces.value.filter((prov) =>
-    prov.name.toLowerCase().includes(search.value.toLowerCase())
+    prov.name.toLowerCase().includes(registerForm.value.location.toLowerCase())
   );
 });
 
+// Función selectProvince simplificada
 const selectProvince = (name) => {
-  search.value = name;
-  registerForm.location = name;  // Asigna el valor seleccionado
-  showSuggestions.value = false; // Oculta las sugerencias
+  registerForm.value.location = name;
+  showSuggestions.value = false;
 };
-
-
 
 // Flags de error
 const emailError = ref(false)
@@ -551,18 +528,20 @@ const emailExists = ref(false)
 
 // Computed para mensajes de placeholder
 const emailErrorMessage = computed(() => {
-  if (emailNotFound.value)    return 'Correo electrónico no encontrado'
-  if (emailError.value)       return 'Correo electrónico requerido'
+  if (emailNotFound.value) return 'Correo electrónico no encontrado'
+  if (emailError.value) return 'Correo electrónico requerido'
   return 'Correo electrónico'
 })
+
 const passwordErrorMessage = computed(() => {
   if (incorrectPassword.value) return 'Contraseña incorrecta'
-  if (passwordError.value)     return 'Contraseña requerida'
+  if (passwordError.value) return 'Contraseña requerida'
   return 'Contraseña'
 })
+
 const usernameErrorMessage = computed(() => {
   if (usernameExists.value) return 'Usuario ya existente'
-  if (usernameError.value)  return 'Nombre de usuario requerido'
+  if (usernameError.value) return 'Nombre de usuario requerido'
   return 'Nombre de usuario'
 })
 
@@ -572,11 +551,12 @@ const loadingSuccess = ref(false)
 
 // Validaciones
 function validateFields() {
-  usernameError.value        = !registerForm.value.username.trim()
-  emailError.value           = !registerForm.value.email.trim()
-  locationError.value        = !registerForm.value.location
-  passwordError.value        = !registerForm.value.password
+  usernameError.value = !registerForm.value.username.trim()
+  emailError.value = !registerForm.value.email.trim()
+  locationError.value = !registerForm.value.location.trim()
+  passwordError.value = !registerForm.value.password
   confirmPasswordError.value = !registerForm.value.confirmPassword
+
   return !(
     usernameError.value ||
     emailError.value ||
@@ -595,7 +575,6 @@ function verifyPasswordsMatch() {
   }
   return true
 }
-
 
 const login = async () => {
   // reset errores
@@ -745,6 +724,7 @@ function resetForm() {
   passwordError.value = confirmPasswordError.value = false
   usernameExists.value = emailExists.value = false
   isLoading.value = loadingSuccess.value = false
+  showSuggestions.value = false
 }
 
 function switchToRegister() {
@@ -773,11 +753,11 @@ onMounted(async () => {
 }
 
 input {
-    background-color: white;
+  background-color: white;
 }
 
 .roles {
-    background-color: #F9F5F0;
+  background-color: #F9F5F0;
 }
 
 body {
@@ -862,7 +842,7 @@ body {
   padding: 10rem 0 6rem;
   position: relative;
   overflow: hidden;
-height: 100vh;
+  height: 100vh;
 }
 
 .hero-bg {
@@ -1136,7 +1116,7 @@ height: 100vh;
   color: #1a2841;
 }
 
-.tab-info > p {
+.tab-info>p {
   font-size: 1.125rem;
   color: #415a77;
   margin-bottom: 2rem;
@@ -1457,7 +1437,8 @@ height: 100vh;
   padding: 1.5rem;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
   margin: 16px;
   padding: 10px 24px;
   border: none;
@@ -1493,7 +1474,12 @@ height: 100vh;
   margin-top: 4px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .modal-footer {
   padding: 16px;
   text-align: center;
@@ -1502,7 +1488,8 @@ height: 100vh;
 
 .spinner-icon {
   display: inline-block;
-  width: 16px; height: 16px;
+  width: 16px;
+  height: 16px;
   border: 2px solid #fff;
   border-top-color: transparent;
   border-radius: 50%;
@@ -1555,30 +1542,30 @@ height: 100vh;
     flex-direction: column;
     text-align: center;
   }
-  
+
   .hero-buttons {
     justify-content: center;
   }
-  
+
   .hero-cards {
     margin-top: 3rem;
   }
-  
+
   .tab-grid {
     flex-direction: column;
   }
-  
+
   .steps {
     flex-direction: column;
     gap: 2rem;
   }
-  
+
   .step-connector {
     width: 2px;
     height: 50px;
     margin: 0;
   }
-  
+
   .footer-top {
     flex-direction: column;
     gap: 2rem;
@@ -1589,19 +1576,19 @@ height: 100vh;
   .hero h1 {
     font-size: 2.5rem;
   }
-  
+
   .section-header h2 {
     font-size: 2rem;
   }
-  
+
   .tab-info h3 {
     font-size: 1.75rem;
   }
-  
+
   .get-started h2 {
     font-size: 2rem;
   }
-  
+
   .footer-bottom {
     flex-direction: column;
     gap: 1rem;
@@ -1613,40 +1600,40 @@ height: 100vh;
   .hero h1 {
     font-size: 2rem;
   }
-  
+
   .hero p {
     font-size: 1rem;
   }
-  
+
   .hero-buttons {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .btn-primary,
   .btn-secondary,
   .btn-role {
     width: 100%;
   }
-  
+
   .tabs-header {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .tab-button {
     width: 100%;
     justify-content: center;
   }
-  
+
   .tab-content {
     padding: 1.5rem;
   }
-  
+
   .auth-buttons {
     gap: 0.5rem;
   }
-  
+
   .btn-login,
   .btn-register {
     padding: 0.5rem 0.75rem;
@@ -1686,7 +1673,7 @@ height: 100vh;
   cursor: pointer;
   transition: background-color 0.2s ease;
   border-bottom: 1px solid rgba(61, 90, 128, 0.1);
-  color:black;
+  color: black;
 }
 
 .suggestion-item:last-child {
@@ -1721,5 +1708,4 @@ height: 100vh;
 .has-error .form-control {
   border-color: red;
 }
-
 </style>

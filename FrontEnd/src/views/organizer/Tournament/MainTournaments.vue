@@ -245,17 +245,12 @@ const askStart = t => {
 
 const startTournament = async () => {
   showStartConfirm.value = false
-  // Aquí iría la lógica para iniciar el torneo en el backend
-  console.log('Iniciando torneo:', toStart.value.id)
   
   // cambiar el estado del torneo
   activateTournament()
 
-  //router.push(`/web/organizer-liveTournament/${toStart.value.id}`)
-
   // Refrescar los datos después de iniciar el torneo
   loading.value = true
-  await fetchTournaments()
 }
 
 const activateTournament = async () => {
@@ -278,6 +273,8 @@ const activateTournament = async () => {
   } catch (e) {
     console.error(e);
   }
+
+await fetchTournaments()
 };
 
 const fetchTournament = async () => {

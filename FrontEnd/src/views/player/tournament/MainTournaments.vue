@@ -67,7 +67,7 @@
               
               <div v-else class="tournaments-grid">
                 <div 
-                  v-for="tournament in tournaments" 
+                  v-for="tournament in nonActiveTournaments" 
                   :key="tournament.id"
                   class="tournament-card"
                   @click="navigateToTournament(tournament.id)"
@@ -122,6 +122,8 @@
   
   const tournaments = ref([]);
   const loading = ref(true);
+
+
   
   // Obtener torneos del jugador
   const fetchTournaments = async () => {
@@ -142,6 +144,11 @@
   const activeTournaments = computed(() => 
     tournaments.value.filter(t => t.active && !t.closed)
   );
+
+  // Torneos NO activos
+const nonActiveTournaments = computed(() => 
+  tournaments.value.filter(t => !(t.active && !t.closed))
+);
   
   // Formatear fecha
   const formatDate = (dateString) => {
@@ -279,6 +286,7 @@
   border-radius: 1rem;
   font-size: 0.85rem;
   font-weight: 700;
+  color: #1a2841;
 }
   
   /* Detalles del torneo */

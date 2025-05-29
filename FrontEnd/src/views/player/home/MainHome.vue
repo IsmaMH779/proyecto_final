@@ -17,7 +17,14 @@
             </div>
           </div>
 
+          <!-- Placeholder cuando no hay torneos -->
+          <div v-if="filteredSortedTournaments.length === 0" class="empty-state">
+            <ion-icon :icon="trophyOutline" class="empty-icon" />
+            <p>No tienes torneos de esta semana</p>
+          </div>
+
           <div
+            v-else
             class="weekly-tournaments-container"
             ref="weeklyTournamentsContainer"
             @scroll="onWeekScroll"
@@ -60,7 +67,7 @@
             </div>
           </div>
 
-          <transition-group name="dot-move" tag="div" class="dots-container">
+          <transition-group name="dot-move" tag="div" class="dots-container" v-if="filteredSortedTournaments.length > 0">
             <span
               v-if="showLeftIndicator"
               key="left-indicator"
@@ -87,7 +94,6 @@
             <div class="stat-value">{{ monthlyJoinedTournaments }}</div>
             <div class="stat-label">Torneos inscritos este mes</div>
           </div>
-          
         </div>
 
         <!-- Mis eventos de la semana -->
@@ -103,8 +109,15 @@
               </button>
             </div>
           </div>
+
+          <!-- Placeholder cuando no hay eventos -->
+          <div v-if="weeklyEvents.length === 0" class="empty-state">
+            <ion-icon :icon="calendarOutline" class="empty-icon" />
+            <p>No tienes eventos de esta semana</p>
+          </div>
           
           <div
+            v-else
             class="events-container"
             ref="eventsContainer"
             @scroll="onEventScroll"
@@ -134,7 +147,7 @@
             </div>
           </div>
           
-          <transition-group name="dot-move" tag="div" class="dots-container">
+          <transition-group name="dot-move" tag="div" class="dots-container" v-if="weeklyEvents.length > 0">
             <span
               v-if="showLeftEventIndicator"
               key="left-event-indicator"
@@ -163,7 +176,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { IonPage, IonContent, IonIcon } from '@ionic/vue'
-import { chevronBack, chevronForward } from 'ionicons/icons'
+import { chevronBack, chevronForward, trophyOutline } from 'ionicons/icons'
 import { calendarOutline, timeOutline, locationOutline } from 'ionicons/icons'
 
 const API_URL = 'http://localhost:8082'
@@ -171,7 +184,7 @@ function getToken() {
   return localStorage.getItem('token') || '' 
 }
 
-// --- TORNEOS SEMANALES PARA JUGADOR ---
+// Torneos semanales para jugador
 const weeklyTournaments = ref([])
 const monthlyJoinedTournaments = ref(0)
 const totalRegistrations = ref(0)
@@ -183,6 +196,7 @@ const filteredSortedTournaments = computed(() =>
     .filter(t => !t.closed)
     .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
 )
+
 const tournamentChunks = computed(() => {
   const arr = filteredSortedTournaments.value
   const chunks = []
@@ -223,7 +237,7 @@ function scrollWeekTournaments(dir) {
   c.scrollBy({ left: dir === 'right' ? c.clientWidth : -c.clientWidth, behavior: 'smooth' })
 }
 
-// --- ESTADÍSTICAS DE JUGADOR ---
+// Estadísticas de jugador
 async function fetchPlayerStats() {
   try {
     const res = await fetch(`${API_URL}/api/tournaments/stats/player`, {
@@ -237,7 +251,7 @@ async function fetchPlayerStats() {
   }
 }
 
-// --- CARGAR TORNEOS SEMANALES DE JUGADOR ---
+// Cargar torneos semanales de jugador
 async function fetchWeeklyPlayerTournaments() {
   try {
     const res = await fetch(`${API_URL}/api/tournaments/weekly/player`, {
@@ -249,7 +263,7 @@ async function fetchWeeklyPlayerTournaments() {
   }
 }
 
-// --- EVENTOS SEMANALES DESDE EL BACKEND ---
+// Eventos semanales desde el backend
 const weeklyEvents = ref([])
 async function fetchWeeklyEvents() {
   try {
@@ -266,7 +280,7 @@ async function fetchWeeklyEvents() {
   }
 }
 
-// --- PAGINACIÓN DE EVENTOS (2x2) ---
+// Paginación de eventos (2x2)
 const eventsContainer      = ref(null)
 const currentEventPage    = ref(0)
 const eventChunks         = computed(() => {
@@ -308,13 +322,12 @@ function scrollEvents(dir) {
   c.scrollBy({ left: dir === 'right' ? c.clientWidth : -c.clientWidth, behavior: 'smooth' })
 }
 
-// --- UTILITIES ---
+// Utilidades
 const isToday = ds => new Date(ds).toDateString() === new Date().toDateString()
 const formatDay   = ds => new Date(ds).getDate()
 const formatMonth = ds => new Date(ds).toLocaleString('es-ES', { month: 'short' })
 const formatTime  = ds => new Date(ds).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
 
-// Montaje
 onMounted(async () => {
   await Promise.all([
     fetchWeeklyPlayerTournaments(),
@@ -325,7 +338,7 @@ onMounted(async () => {
 </script>
   
 <style scoped>
-/* ==== SCROLL VERTICAL ==== */
+/* Scroll vertical */
 ion-content {
   --background: #f9f5f0;
   overflow-y: auto;
@@ -335,7 +348,7 @@ ion-content {
   overflow-x: hidden;
 }
 
-/* ==== CONTENEDOR PRINCIPAL ==== */
+/* Contenedor principal */
 .player-home {
   background: #f9f5f0;
   max-width: 1200px;
@@ -351,7 +364,7 @@ ion-content {
   overflow-x: hidden; 
 }
 
-/* ==== SECCIONES ==== */
+/* Secciones */
 .section {
   padding: 1rem;
   width: 100%;
@@ -359,7 +372,7 @@ ion-content {
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(26, 40, 65, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden; /* Evitar que los elementos internos se salgan al hacer hover */
+  overflow: hidden;
 }
 
 .section:hover {
@@ -382,7 +395,28 @@ ion-content {
   font-weight: 600;
 }
 
-/* ==== NAVEGACIÓN FLECHAS ==== */
+/* Placeholder para estados vacíos */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: #e0e1dd;
+  border-radius: 1rem;
+  margin: 0;
+}
+
+.empty-state p {
+  color: #3d5a80;
+  font-weight: 600;
+  margin: 0;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #3d5a80;
+  margin-bottom: 1rem;
+}
+
+/* Navegación flechas */
 .navigation-arrows {
   display: flex;
   gap: 0.5rem;
@@ -412,51 +446,49 @@ ion-content {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* ==== TORNEOS SEMANALES ==== */
-  /* Ajustar el contenedor de torneos semanales */
-  .weekly-tournaments-container {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    max-width: 100%;
-    width: 100%;
-    position: relative;
-    padding: 10px 0; 
-    margin: 0; 
-    overflow-y: visible; 
-  }
+/* Torneos semanales */
+.weekly-tournaments-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
+  padding: 10px 0; 
+  margin: 0; 
+  overflow-y: visible; 
+}
 
-  .weekly-tournaments-container::-webkit-scrollbar {
-    display: none;
-  }
+.weekly-tournaments-container::-webkit-scrollbar {
+  display: none;
+}
 
-  .tournament-chunk {
-    flex: 0 0 100%;
-    display: flex;
-    gap: 1rem;
-    scroll-snap-align: start;
-    padding: 10px 1rem; 
-    width: 100%;
-    min-width: 100%;
-    box-sizing: border-box;
-    justify-content: flex-start; 
-  }
+.tournament-chunk {
+  flex: 0 0 100%;
+  display: flex;
+  gap: 1rem;
+  scroll-snap-align: start;
+  padding: 10px 1rem; 
+  width: 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+  justify-content: flex-start; 
+}
 
-  /* Ajustar la tarjeta para evitar desplazamientos */
-  .tournament-card-week {
-    flex: 0 0 calc((100% - 2rem) / 3);
-    background: #fff;
-    border-radius: 16px;
-    padding: 1.25rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: visible; 
-    transform-origin: center center;
-    margin: 0; 
-  }
+.tournament-card-week {
+  flex: 0 0 calc((100% - 2rem) / 3);
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: visible; 
+  transform-origin: center center;
+  margin: 0; 
+}
 
 .tournament-card-week:hover {
   transform: translateY(-5px);
@@ -518,23 +550,23 @@ ion-content {
   position: relative;
 }
 
-  .today-tournament::before {
-    content: "Hoy";
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: #3d5a80;
-    color: white;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    border-radius: 0 16px 0 8px; 
-    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
+.today-tournament::before {
+  content: "Hoy";
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #3d5a80;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 0 16px 0 8px; 
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-/* ==== PUNTOS E INDICADORES ==== */
+/* Puntos e indicadores */
 .dots-container {
   display: flex;
   justify-content: center;
@@ -589,7 +621,7 @@ ion-content {
   transform: scale(1);
 }
 
-/* ==== ESTADÍSTICAS RÁPIDAS ==== */
+/* Estadísticas rápidas */
 .stats {
   display: flex;
   justify-content: space-around;
@@ -636,8 +668,7 @@ ion-content {
   letter-spacing: 0.5px;
 }
 
-/* ==== EVENTOS SEMANALES ==== */
-/* Contenedor principal de eventos */
+/* Eventos semanales */
 .events-container {
   display: flex;
   overflow-x: auto;
@@ -761,23 +792,23 @@ ion-content {
   position: relative;
 }
 
-  .active-tournament::before {
-    content: "Activo";
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: #415a77;
-    color: white;
-    padding: 0.3rem 0.8rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    border-radius: 0 16px 0 8px;
-    box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
+.active-tournament::before {
+  content: "Activo";
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #415a77;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 0 16px 0 8px;
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-/* ==== ANIMACIONES ==== */
+/* Animaciones */
 @keyframes pulse-highlight {
   0%   { box-shadow: 0 0 0 0 rgba(61, 90, 128, 0.4); }
   70%  { box-shadow: 0 0 0 10px rgba(61, 90, 128, 0); }
@@ -796,8 +827,7 @@ ion-content {
   100% { box-shadow: 0 0 0 0 rgba(61, 90, 128, 0); }
 }
 
-/* ==== BREAKPOINTS ==== */
-/* Tablet y pantallas medianas (<= 1460px): apilar vertical */
+/* Responsive breakpoints */
 @media (max-width: 1460px) {
   .player-home {
     width: 100%;
@@ -824,7 +854,6 @@ ion-content {
   }
 }
 
-/* Tablet pequeña (<= 1024px): ajustes para torneos */
 @media (max-width: 1024px) {
   .tournament-chunk {
     flex-direction: column;
@@ -842,7 +871,6 @@ ion-content {
   }
 }
 
-/* Móvil (<= 768px): stats con ancho fijo */
 @media (max-width: 768px) {
   .player-home {
     padding: 0.75rem;
@@ -859,10 +887,7 @@ ion-content {
     width: 100%;
   }
   .navigation-arrows {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 10;
+    display: none;
   }
   .stats {
     flex-direction: row;
@@ -890,7 +915,6 @@ ion-content {
   }
 }
 
-/* Móvil pequeño (<= 490px): ajustes adicionales */
 @media (max-width: 490px) {
   .player-home {
     padding: 0.5rem;
@@ -904,10 +928,6 @@ ion-content {
   }
   .section-header h2 {
     font-size: 1.2rem;
-  }
-  .navigation-arrows {
-    top: 0.75rem;
-    right: 0.75rem;
   }
   .nav-btn {
     width: 32px;
@@ -982,7 +1002,6 @@ ion-content {
   }
 }
 
-/* Pantallas muy pequeñas (<= 360px): ajustes extremos */
 @media (max-width: 360px) {
   .player-home {
     padding: 0.25rem;
@@ -996,10 +1015,6 @@ ion-content {
   }
   .section-header h2 {
     font-size: 1.1rem;
-  }
-  .navigation-arrows {
-    top: 0.5rem;
-    right: 0.5rem;
   }
   .nav-btn {
     width: 28px;
@@ -1049,13 +1064,6 @@ ion-content {
   }
 }
 
-@media (max-width: 768px) {
-  .navigation-arrows {
-    display: none;
-  }
-}
-
-/* Pantallas grandes (> 1460px): mantener centrado */
 @media (min-width: 1461px) {
   .player-home {
     max-width: 1200px;
