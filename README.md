@@ -19,10 +19,10 @@
 
 -  Registro y autenticación de usuarios
 -  Gestión de perfiles de usuario
--  Sistema de emparejamiento (matchmaking)
+-  Sistema de emparejamiento
 -  Creación y administración de torneos
 -  Dashboard con estadísticas
--  Interfaz adaptada para escritorio y móvil con Ionic + Vue
+-  Interfaz adaptada para escritorio y móvil
 
 ---
 
