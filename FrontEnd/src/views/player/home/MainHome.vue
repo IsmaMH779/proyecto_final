@@ -18,7 +18,7 @@
           </div>
 
           <!-- Placeholder cuando no hay torneos -->
-          <div v-if="filteredSortedTournaments.length === 0" class="empty-state">
+          <div v-if="tournamentChunks.length === 0" class="empty-state">
             <ion-icon :icon="trophyOutline" class="empty-icon" />
             <p>No tienes torneos de esta semana</p>
           </div>

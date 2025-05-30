@@ -17,7 +17,14 @@
             </div>
           </div>
 
+          <!-- Placeholder para cuando no hay torneos -->
+          <div v-if="tournamentChunks.length === 0" class="empty-state">
+            <ion-icon :icon="trophyOutline" class="empty-icon" />
+            <p>No hay torneos programados para esta semana</p>
+          </div>
+
           <div
+            v-else
             class="weekly-tournaments-container"
             ref="weeklyTournamentsContainer"
             @scroll="onWeekScroll"
@@ -60,7 +67,7 @@
             </div>
           </div>
 
-          <transition-group name="dot-move" tag="div" class="dots-container">
+          <transition-group name="dot-move" tag="div" class="dots-container" v-if="tournamentChunks.length > 0">
             <span
               v-if="showLeftIndicator"
               key="left-indicator"
@@ -107,7 +114,14 @@
             </div>
           </div>
           
+          <!-- Placeholder para cuando no hay eventos -->
+          <div v-if="eventChunks.length === 0" class="empty-state">
+            <ion-icon :icon="calendarOutline" class="empty-icon" />
+            <p>No hay eventos programados para esta semana</p>
+          </div>
+          
           <div
+            v-else
             class="events-container"
             ref="eventsContainer"
             @scroll="onEventScroll"
@@ -137,7 +151,7 @@
             </div>
           </div>
           
-          <transition-group name="dot-move" tag="div" class="dots-container">
+          <transition-group name="dot-move" tag="div" class="dots-container" v-if="eventChunks.length > 0">
             <span
               v-if="showLeftEventIndicator"
               key="left-event-indicator"
@@ -167,7 +181,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { IonPage, IonContent, IonIcon } from '@ionic/vue'
 import { chevronBack, chevronForward } from 'ionicons/icons'
-import { calendarOutline, timeOutline, locationOutline } from 'ionicons/icons'
+import { calendarOutline, timeOutline, locationOutline, trophyOutline } from 'ionicons/icons'
 
 const API_URL = 'http://localhost:8082'
 function getToken() { 
@@ -290,6 +304,7 @@ const eventChunks = computed(() => {
   }
   return chunks
 })
+
 const eventPageCount = computed(() => eventChunks.value.length)
 const visibleEventPages = computed(() => {
   const total = eventPageCount.value
@@ -299,6 +314,7 @@ const visibleEventPages = computed(() => {
   if (start > total - 3) start = total - 3
   return [start, start + 1, start + 2]
 })
+
 const showLeftEventIndicator = computed(() => currentEventPage.value > 1)
 const showRightEventIndicator = computed(() => currentEventPage.value < eventPageCount.value - 2)
 
@@ -335,9 +351,6 @@ onMounted(async () => {
   await fetchWeeklyEvents()
 })
 </script>
-
-
-
 
 <style scoped>
 /* ==== SCROLL VERTICAL ==== */
@@ -807,6 +820,29 @@ ion-content {
   100% { box-shadow: 0 0 0 0 rgba(61, 90, 128, 0); }
 }
 
+/* Estilos para el estado vacío */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: transparent;
+  border-radius: 1rem;
+  margin: 1rem 0;
+}
+
+
+.empty-state p {
+  color: #3d5a80;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #3d5a80;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
 /* ==== BREAKPOINTS ==== */
 /* Tablet y pantallas medianas (<= 1460px): apilar vertical */
 @media (max-width: 1460px) {
@@ -882,6 +918,12 @@ ion-content {
   .nav-btn {
     width: 36px;
     height: 36px;
+  }
+  .empty-state {
+    padding: 1.5rem 1rem;
+  }
+  .empty-icon {
+    font-size: 2.5rem;
   }
 }
 
@@ -975,6 +1017,15 @@ ion-content {
     max-width: 100%;
     box-sizing: border-box;
   }
+  .empty-state {
+    padding: 1.25rem 0.75rem;
+  }
+  .empty-icon {
+    font-size: 2.25rem;
+  }
+  .empty-state p {
+    font-size: 0.9rem;
+  }
 }
 
 /* Pantallas muy pequeñas (<= 360px): ajustes extremos */
@@ -1041,6 +1092,15 @@ ion-content {
   }
   .detail-item ion-icon {
     font-size: 1rem;
+  }
+  .empty-state {
+    padding: 1rem 0.5rem;
+  }
+  .empty-icon {
+    font-size: 2rem;
+  }
+  .empty-state p {
+    font-size: 0.8rem;
   }
 }
 

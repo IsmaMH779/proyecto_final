@@ -293,7 +293,6 @@
           <div class="container">
             <div class="footer-top">
               <div class="footer-logo">
-                <img src="https://placehold.co/40x120" alt="TCG Logo" />
                 <p>La plataforma definitiva para torneos de TCG</p>
               </div>
 

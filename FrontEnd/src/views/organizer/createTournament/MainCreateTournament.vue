@@ -118,6 +118,7 @@
                       >
                         <option value="" disabled selected>Seleccionar número</option>
                         <option value="4">4</option>
+                        <option value="4">8</option>
                         <option value="16">16</option>
                       </select>
                       <div class="select-arrow">

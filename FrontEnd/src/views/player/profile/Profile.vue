@@ -528,6 +528,7 @@ ion-content {
   padding: 0.25rem 0.5rem;
   color: #1a2841;
   outline: none;
+  min-width: 120px !important;
 }
 
 .username-input:focus {

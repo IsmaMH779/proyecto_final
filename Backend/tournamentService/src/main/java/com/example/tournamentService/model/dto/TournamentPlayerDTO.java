@@ -22,6 +22,7 @@ public class TournamentPlayerDTO {
         this.active = tournament.isActive();
         this.format = tournament.getFormat();
         this.game = tournament.getGame();
+        this.closed = tournament.isClosed();
         this.location = tournament.getLocation();
     }
 

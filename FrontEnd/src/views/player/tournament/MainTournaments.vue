@@ -56,13 +56,9 @@
             </div>
             
             <div v-else>
-              <div v-if="tournaments.length === 0" class="empty-state">
+              <div v-if="nonActiveTournaments.length === 0" class="empty-state">
                 <ion-icon :icon="alertCircleOutline"></ion-icon>
                 <p>No estás inscrito en ningún torneo</p>
-                <ion-button fill="clear" @click="navigateToSearch">
-                  Buscar torneos
-                  <ion-icon slot="end" :icon="searchOutline"></ion-icon>
-                </ion-button>
               </div>
               
               <div v-else class="tournaments-grid">
@@ -147,7 +143,7 @@
 
   // Torneos NO activos
 const nonActiveTournaments = computed(() => 
-  tournaments.value.filter(t => !(t.active && !t.closed))
+  tournaments.value.filter(t => !t.active && !t.closed)
 );
   
   // Formatear fecha
@@ -178,10 +174,6 @@ const nonActiveTournaments = computed(() =>
   };
 
   const navigateToLiveTournament = (id) => router.push(`/web/player-liveTournament/${id}`)
-  
-  const navigateToSearch = () => {
-    router.push('/web/tournament-search');
-  };
   
   onMounted(fetchTournaments);
   </script>

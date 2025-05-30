@@ -1140,5 +1140,14 @@ ion-content {
     padding-left: 0;
   }
 }
+
+/* ocultar opciones de la libreria */
+:deep(.date-picker__value-display) {
+  display: none;
+}
+
+:deep(.calendar-header__mode-picker .calendar-header__mode-value) {
+  display: none;
+}
 </style>
 
